@@ -1,5 +1,0 @@
-server:
-  prefix: "GameServer" # 服务器名称前缀
-
-game_thread:
-  count: 4 # GameThread 的数量
