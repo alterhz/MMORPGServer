@@ -230,7 +230,7 @@ public class Message
 /// <param name="jsonData">JSON数据</param>
 public delegate void NetworkEventHandler(int protocolId, string jsonData);
 
-public class NettyClient : MonoBehaviour
+public class NettyClient
 {
     private TcpClient tcpClient;
     private NetworkStream networkStream;
@@ -251,22 +251,6 @@ public class NettyClient : MonoBehaviour
     public event Action<string> OnError;
 
     private const int MAX_MESSAGES_PER_FRAME = 50; // 每帧处理的最大消息数
-
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        // 在主线程中处理接收到的消息
-        ProcessReceivedMessages();
-    }
-
-    void OnDestroy()
-    {
-        Disconnect();
-    }
 
     /// <summary>
     /// 连接到服务器
@@ -445,7 +429,7 @@ public class NettyClient : MonoBehaviour
     /// <summary>
     /// 处理接收到的消息
     /// </summary>
-    private void ProcessReceivedMessages()
+    public void ProcessReceivedMessages()
     {
         int processedCount = 0;
         

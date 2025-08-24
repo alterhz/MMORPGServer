@@ -272,4 +272,31 @@ public class UIManager : MonoBehaviour
             inputField.text = text;
         }
     }
+
+    // 获取指定路径的TextMeshPro文本组件
+    public TMP_Text GetTMPText(string canvasName, string path)
+    {
+        return GetUIComponent<TMP_Text>(canvasName, path);
+    }
+
+    // 获取指定路径TextMeshPro文本的内容
+    public string GetText(string canvasName, string path)
+    {
+        TMP_Text tmpText = GetTMPText(canvasName, path);
+        if (tmpText != null)
+        {
+            return tmpText.text;
+        }
+        return string.Empty;
+    }
+
+    // 设置指定路径TextMeshPro文本的内容
+    public void SetText(string canvasName, string path, string text)
+    {
+        TMP_Text tmpText = GetTMPText(canvasName, path);
+        if (tmpText != null)
+        {
+            tmpText.text = text;
+        }
+    }
 }

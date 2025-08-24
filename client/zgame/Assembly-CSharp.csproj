@@ -66,10 +66,10 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\UI\MainManager.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
-    <Compile Include="Assets\Scripts\Net\Main.cs" />
+    <Compile Include="Assets\Scripts\Net\ClientManager.cs" />
+    <Compile Include="Assets\Scripts\GameInitializer.cs" />
     <Compile Include="Assets\Scripts\Net\NettyClient.cs" />
     <Compile Include="Assets\Scripts\UI\LoginManager.cs" />
-    <Compile Include="Assets\Scripts\UI\GameInitializer.cs" />
     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
   </ItemGroup>
   <ItemGroup>
