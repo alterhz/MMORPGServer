@@ -1,0 +1,9 @@
+server:
+  prefix: "GameServer" # 服务器名称前缀
+
+game_thread:
+  count: 4 # GameThread 的数量
+
+mongodb:
+  uri: "mongodb://localhost:27017"
+  db_name: "game_db"
