@@ -1,4 +1,4 @@
-package org.game.test.mongodb;
+package org.game.test.mongodb.async;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
@@ -26,8 +26,6 @@ public class MongoDBReactiveExample {
         try {
             MongoDatabase database = client.getDatabase("testdb");
             MongoCollection<Document> collection = database.getCollection("users");
-
-
 
             // 插入文档
             Document user = new Document("name", "Bob")

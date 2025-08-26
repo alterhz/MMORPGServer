@@ -1,15 +1,27 @@
 package org.game.service;
 
+import com.mongodb.client.model.Filters;
+import com.mongodb.reactivestreams.client.MongoCollection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.game.LogCore;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
+import org.game.core.db.HumanLoader;
+import org.game.core.db.MongoDBAsyncClient;
+import org.game.core.db.QuerySubscriber;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
+import org.game.dao.HumanDB;
 import org.game.proto.ResponseMessage;
 import org.game.rpc.IClientService;
 import org.game.rpc.ILoginService;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoginService extends GameServiceBase implements ILoginService {
 
@@ -35,6 +47,11 @@ public class LoginService extends GameServiceBase implements ILoginService {
         // 心跳逻辑
     }
 
+    @HumanLoader(entity = HumanDB.class)
+    public void loadHumanDB(HumanDB humanDB) {
+        logger.info("加载HumanDB");
+    }
+
     @Override
     public void destroy() {
         // 销毁逻辑
@@ -45,15 +62,24 @@ public class LoginService extends GameServiceBase implements ILoginService {
     public void login(String account, String password, ToPoint fromPoint) {
         logger.info("用户登录请求: account={}, password=***, fromPoint={}", account, fromPoint);
 
-        ResponseMessage responseMessage = new ResponseMessage();
-        if (account.equals("admin") && password.equals("admin")) {
-            responseMessage = ResponseMessage.success(fromPoint.getGameServiceName());
-        } else {
-            responseMessage = ResponseMessage.error(-1, "用户名或密码错误");
-        }
+        MongoCollection<HumanDB> humans = MongoDBAsyncClient.getCollection("humans", HumanDB.class);
 
-        IClientService clientService = ReferenceFactory.getProxy(IClientService.class, fromPoint);
-        clientService.sendMessage(Message.createMessage(1002, responseMessage));
+        // 查找账号为account的HumanDB
+        humans.find(Filters.eq("account", account)).first().subscribe(new QuerySubscriber<>(humanDBS -> {
+            ResponseMessage responseMessage;
+            if (!humanDBS.isEmpty()) {
+                // 登录成功
+                responseMessage = ResponseMessage.success("human count=" + humanDBS.size());
+            } else {
+                // 登录失败
+                responseMessage = ResponseMessage.error(-1, "用户：" + account + "，不存在！");
+            }
+
+            IClientService clientService = ReferenceFactory.getProxy(IClientService.class, fromPoint);
+            clientService.sendMessage(Message.createMessage(1002, responseMessage));
+
+            logger.debug("发送登录结果: {}", responseMessage);
+        }, 4));
     }
 
     @Override

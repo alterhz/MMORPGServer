@@ -1,6 +1,5 @@
-package org.game.test.mongodb;
+package org.game.test.mongodb.async;
 
-import com.mongodb.reactivestreams.client.MongoCollection;
 import org.bson.Document;
 import org.game.BaseUtils;
 import org.game.LogCore;

@@ -1,5 +1,7 @@
 package org.game.core.db;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -7,6 +9,9 @@ import com.mongodb.client.MongoDatabase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 
 import java.util.List;
 
@@ -22,8 +27,23 @@ public class MongoDBSyncClient {
     private static String defaultDbName;
 
     public static void init(String uri, String dbName) {
+        // 创建异步客户端
+        CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
+                MongoClientSettings.getDefaultCodecRegistry(),
+                CodecRegistries.fromProviders(
+                        PojoCodecProvider.builder()
+                                .automatic(true)
+                                .build()
+                )
+        );
+
+        MongoClientSettings clientSettings = MongoClientSettings.builder()
+                .codecRegistry(codecRegistry)
+                .applyConnectionString(new ConnectionString("mongodb://localhost:27017"))
+                .build();
+
         try {
-            client = MongoClients.create(uri);
+            client = MongoClients.create(clientSettings);
             defaultDbName = dbName;
             logger.info("MongoDB sync client initialized successfully. uri={}, dbName={}", uri, dbName);
         } catch (Exception e) {
@@ -36,6 +56,13 @@ public class MongoDBSyncClient {
      */
     public static MongoCollection<Document> getCollection(String collectionName) {
         return getDatabase().getCollection(collectionName);
+    }
+
+    /**
+     * 使用默认数据库名获取集合
+     */
+    public static <T> MongoCollection<T> getCollection(String collectionName, Class<T> clazz) {
+        return getDatabase().getCollection(collectionName, clazz);
     }
 
     /**
@@ -54,7 +81,7 @@ public class MongoDBSyncClient {
      * @param collectionName  集合名
      * @return 返回集合对象
      */
-    public static MongoCollection<Document> getOrCreateCollection(String collectionName) {
+    public static <T> MongoCollection<T> getOrCreateCollection(String collectionName, Class<T> clazz) {
         MongoDatabase database = getDatabase();
 
         // 列出所有集合名称
@@ -70,7 +97,11 @@ public class MongoDBSyncClient {
             }
         }
 
-        return getCollection(collectionName);
+        return getCollection(collectionName, clazz);
+    }
+
+    public static MongoCollection<Document> getOrCreateCollection(String collectionName) {
+        return getOrCreateCollection(collectionName, Document.class);
     }
 
     /**
