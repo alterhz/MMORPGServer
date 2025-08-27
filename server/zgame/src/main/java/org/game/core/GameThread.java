@@ -30,14 +30,14 @@ public class GameThread extends Thread {
     private static final ThreadLocal<GameThread> localGameThread = new ThreadLocal<>();
 
     /**
+     * RPC耗时打印周期
+     */
+    public static final int PERIOD_MS = 30 * 1000;
+
+    /**
      * 游戏服务列表:服务名称为key，服务实例为value
      */
     private final Map<String, GameServiceBase> gameServices = new ConcurrentHashMap<>();
-
-    /**
-     * 服务方法缓存:服务名称为key，方法名为value
-     */
-    private final Map<String, Map<String, Method>> serviceMethodMap = new ConcurrentHashMap<>();
 
     /**
      * 任务队列
@@ -93,7 +93,7 @@ public class GameThread extends Thread {
         super.start();
         GameProcess.addGameThread(this);
 
-        timerQueue.createTimer(30 * 1000, 30 * 1000, (timerId, context) -> {
+        timerQueue.createTimer(PERIOD_MS, PERIOD_MS, (timerId, context) -> {
             printRpcCost();
         }, new Param());
     }
