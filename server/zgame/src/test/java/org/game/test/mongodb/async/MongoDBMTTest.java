@@ -16,7 +16,7 @@ public class MongoDBMTTest {
 
         MyConfig.load();
 
-        MongoDBAsyncClient.init(MyConfig.getMongoDbUri(), MyConfig.getMongoDbName());
+        MongoDBAsyncClient.init(MyConfig.getConfig().getMongodb().getUri(), MyConfig.getConfig().getMongodb().getDbName());
 
         MongoDBAsyncClient.getCollection("users").find().subscribe(new Subscriber<Document>() {
 

@@ -1,7 +1,6 @@
 package org.game.test.mongodb.sync;
 
 import com.mongodb.client.MongoCollection;
-import org.bson.Document;
 import org.game.BaseUtils;
 import org.game.LogCore;
 import org.game.config.MyConfig;
@@ -14,7 +13,7 @@ public class HumanDBSync {
 
         MyConfig.load();
 
-        MongoDBSyncClient.init(MyConfig.getMongoDbUri(), MyConfig.getMongoDbName());
+        MongoDBSyncClient.init(MyConfig.getConfig().getMongodb().getUri(), MyConfig.getConfig().getMongodb().getDbName());
 
         try {
             MongoCollection<HumanDB> humans = MongoDBSyncClient.getOrCreateCollection("humans", HumanDB.class);

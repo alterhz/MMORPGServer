@@ -9,6 +9,7 @@ import org.game.core.db.MongoDBSyncClient;
 import org.game.core.net.NettyServer;
 import org.game.core.rpc.RPCProxy;
 import org.game.core.utils.ScanClassUtils;
+import org.game.human.HumanThread;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -22,8 +23,8 @@ public class GameStartUp {
             MyConfig.load();
 
             // 初始化同步MongoDB
-            String mongoDbUri = MyConfig.getMongoDbUri();
-            String mongoDbName = MyConfig.getMongoDbName();
+            String mongoDbUri = MyConfig.getConfig().getMongodb().getUri();
+            String mongoDbName = MyConfig.getConfig().getMongodb().getDbName();
             MongoDBSyncClient.init(mongoDbUri, mongoDbName);
             // 初始化异步MongoDB
             MongoDBAsyncClient.init(mongoDbUri, mongoDbName);
@@ -33,10 +34,13 @@ public class GameStartUp {
             initGameProcess();
 
             // 启动连接线程
-            NettyServer.startConnThread(0);
+            NettyServer.startConnThread(MyConfig.getConfig().getConnThread().getCount());
+
+            // 启动HumanThread线程组
+            createHumanThreads();
 
             // 3. 创建GameThread01
-            List<GameThread> gameThreads = createGameThreads();
+            createGameThreads();
 
             // 4. 扫描@ServiceConfig注解
             Set<Class<?>> serviceClasses = ScanClassUtils.scanServiceClasses();
@@ -72,31 +76,35 @@ public class GameStartUp {
         }
     }
 
+    private static void createHumanThreads() {
+        int humanThreadCount = MyConfig.getConfig().getHumanThread().getCount();
+        for (int i = 0; i < humanThreadCount; i++) {
+            HumanThread humanThread = new HumanThread(i);
+            humanThread.start();
+        }
+    }
+
     /**
      * 创建GameProgress实例
      * @return GameProgress对象
      */
     private static void initGameProcess() {
         String serverId = System.getProperty("serverId", "20001");
-        String progressName = MyConfig.getServerPrefix() + serverId;
+        String progressName = MyConfig.getConfig().getServer().getPrefix() + serverId;
         GameProcess.SetGameProcessName(progressName);
     }
 
     /**
      * 创建指定数量的GameThread实例并启动
-     * @return GameThread实例列表
      */
-    private static List<GameThread> createGameThreads() {
-        int threadCount = MyConfig.getGameThreadCount();
-        List<GameThread> gameThreads = new ArrayList<>();
+    private static void createGameThreads() {
+        int threadCount = MyConfig.getConfig().getGameThread().getCount();
         for (int i = 0; i < threadCount; i++) {
             String threadName = "GameThread" + i;
             GameThread gameThread = new GameThread(threadName);
             gameThread.start();
-            gameThreads.add(gameThread);
         }
         LogCore.logger.info("创建{}个GameThread成功", threadCount);
-        return gameThreads;
     }
 
     /**

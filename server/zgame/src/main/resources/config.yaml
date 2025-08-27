@@ -2,7 +2,13 @@ server:
   prefix: "GameServer" # 服务器名称前缀
 
 game_thread:
-  count: 4 # GameThread 的数量
+  count: 2 # GameThread 的数量
+
+human_thread:
+  count: 2 # HumanThread 的数量
+
+conn_thread:
+  count: 2 # ConnThread 的数量
 
 mongodb:
   uri: "mongodb://localhost:27017"

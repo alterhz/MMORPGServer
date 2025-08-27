@@ -19,7 +19,7 @@ public class HumanDBExample {
 
         MyConfig.load();
 
-        MongoDBAsyncClient.init(MyConfig.getMongoDbUri(), MyConfig.getMongoDbName());
+        MongoDBAsyncClient.init(MyConfig.getConfig().getMongodb().getUri(), MyConfig.getConfig().getMongodb().getDbName());
 
         MongoCollection<HumanDB> humans = MongoDBAsyncClient.getCollection("humans", HumanDB.class);
 

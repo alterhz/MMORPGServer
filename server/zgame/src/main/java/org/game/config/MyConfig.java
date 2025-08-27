@@ -38,32 +38,19 @@ public class MyConfig {
         }
     }
 
+    public static ConfigRoot getConfig() {
+        return config;
+    }
+
     // 获取服务器名称前缀
-    public static String getServerPrefix() {
-        return config.getServer().getPrefix();
-    }
 
-    // 获取GameThread数量
-    public static int getGameThreadCount() {
-        return config.getGameThread().getCount();
-    }
-
-    // 获取MongoDB URI
-    public static String getMongoDbUri() {
-        return config.getMongodb().getUri();
-    }
-
-    // 获取MongoDB数据库名称
-    public static String getMongoDbName() {
-        return config.getMongodb().getDbName();
-    }
-
-    // 其他配置获取方法...
 
     // 使用嵌套类结构表示配置
     public static class ConfigRoot {
         private ServerConfig server;
         private GameThreadConfig game_thread;
+        private HumanThreadConfig human_thread;
+        private ConnThreadConfig conn_thread;
         private MongoDbConfig mongodb;
 
         public ServerConfig getServer() {
@@ -80,6 +67,22 @@ public class MyConfig {
 
         public void setGameThread(GameThreadConfig game_thread) {
             this.game_thread = game_thread;
+        }
+
+        public HumanThreadConfig getHumanThread() {
+            return human_thread;
+        }
+
+        public void setHumanThread(HumanThreadConfig human_thread) {
+            this.human_thread = human_thread;
+        }
+
+        public ConnThreadConfig getConnThread() {
+            return conn_thread;
+        }
+
+        public void setConnThread(ConnThreadConfig conn_thread) {
+            this.conn_thread = conn_thread;
         }
 
         public MongoDbConfig getMongodb() {
@@ -104,6 +107,30 @@ public class MyConfig {
     }
 
     public static class GameThreadConfig {
+        private int count;
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
+        }
+    }
+
+    public static class HumanThreadConfig {
+        private int count;
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
+        }
+    }
+
+    public static class ConnThreadConfig {
         private int count;
 
         public int getCount() {
