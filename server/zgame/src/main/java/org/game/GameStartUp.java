@@ -9,7 +9,8 @@ import org.game.core.db.MongoDBSyncClient;
 import org.game.core.net.NettyServer;
 import org.game.core.rpc.RPCProxy;
 import org.game.core.utils.ScanClassUtils;
-import org.game.human.HumanThread;
+import org.game.core.human.HModInitializer;
+import org.game.core.human.HumanThread;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -21,6 +22,9 @@ public class GameStartUp {
         try {
             // 1. 载入配置文件
             MyConfig.load();
+
+            // 初始化HMods
+            HModInitializer.initHMods();
 
             // 初始化同步MongoDB
             String mongoDbUri = MyConfig.getConfig().getMongodb().getUri();

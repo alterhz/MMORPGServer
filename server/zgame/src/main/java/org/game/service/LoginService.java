@@ -4,7 +4,6 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.game.LogCore;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
 import org.game.core.db.HumanLoader;
@@ -14,14 +13,10 @@ import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
+import org.game.core.human.HumanThread;
 import org.game.proto.ResponseMessage;
 import org.game.rpc.IClientService;
 import org.game.rpc.ILoginService;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class LoginService extends GameServiceBase implements ILoginService {
 
@@ -70,6 +65,9 @@ public class LoginService extends GameServiceBase implements ILoginService {
             if (!humanDBS.isEmpty()) {
                 // 登录成功
                 responseMessage = ResponseMessage.success("human count=" + humanDBS.size());
+
+                HumanDB humanDB = humanDBS.get(0);
+                HumanThread.createHumanObject(humanDB.getAccount());
             } else {
                 // 登录失败
                 responseMessage = ResponseMessage.error(-1, "用户：" + account + "，不存在！");

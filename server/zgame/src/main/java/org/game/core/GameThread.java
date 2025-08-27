@@ -172,6 +172,10 @@ public class GameThread extends Thread {
     public void addGameService(GameServiceBase service) {
         gameServices.put(service.getName(), service);
         service.bindGameThread(this);
+        if (logger.isDebugEnabled()) {
+            // service绑定线程
+            logger.debug("Service: {} 绑定线程: {}", service.getName(), service.getGameThread().getName());
+        }
     }
 
     public void removeGameService(GameServiceBase service) {

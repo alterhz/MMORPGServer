@@ -1,12 +1,14 @@
-package org.game.human;
+package org.game.core.human;
 
 import org.game.core.GameThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.game.human.HumanObject;
+import org.game.service.HumanService;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 玩家线程
@@ -18,8 +20,16 @@ public class HumanThread extends GameThread {
     public static final String NAME = "HumanThread";
 
     private static final Map<Integer, HumanThread> humanThreads = new ConcurrentHashMap<>();
+    /**
+     * 分配计数
+     */
+    private static final AtomicLong allocCount = new AtomicLong();
 
+    /**
+     * 当前线程索引
+     */
     private final int index;
+
 
     public HumanThread(int index) {
         super(NAME + index);
@@ -41,4 +51,25 @@ public class HumanThread extends GameThread {
     public static int getHumanThreadCount() {
         return humanThreads.size();
     }
+
+    public static HumanObject createHumanObject(String id) {
+        HumanObject humanObj = new HumanObject(id);
+        HumanService humanService = new HumanService(id, humanObj);
+
+        // 随机分配一个线程
+        long count = allocCount.getAndIncrement();
+        int threadIndex = (int) (count % getHumanThreadCount());
+
+        HumanThread humanThread = getHumanThread(threadIndex);
+        humanThread.addGameService(humanService);
+        humanService.bindGameThread(humanThread);
+
+        humanThread.runTask(() -> {
+            humanService.init();
+            humanService.startup();
+        });
+
+        return humanObj;
+    }
+
 }

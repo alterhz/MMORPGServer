@@ -30,7 +30,7 @@ public class StageGlobalService extends GameServiceBase implements IStageGlobalS
         long timerId = timerQueue.createTimer(1000, 3000, (id, context) -> {
             logger.info("定时任务. thread={}, timerId={}, name={}", Thread.currentThread().getName(), id, context.getString("name"));
 
-            testRPCCost();
+//            testRPCCost();
 
         }, new Param().put("name", "张三"));
 

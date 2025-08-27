@@ -4,14 +4,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
-import org.game.rpc.IHumanObjectService;
+import org.game.human.HumanObject;
+import org.game.rpc.IHumanService;
 
-public class HumanObjectService extends GameServiceBase implements IHumanObjectService {
+public class HumanService extends GameServiceBase implements IHumanService {
 
-    public static final Logger logger = LogManager.getLogger(HumanObjectService.class);
+    public static final Logger logger = LogManager.getLogger(HumanService.class);
 
-    public HumanObjectService(String name) {
-        super(name);
+    private final HumanObject humanObj;
+
+    public HumanService(String id, HumanObject humanObj) {
+        super(id);
+        this.humanObj = humanObj;
+    }
+
+    public HumanObject getHumanObj() {
+        return humanObj;
     }
 
     @Override
@@ -19,6 +27,7 @@ public class HumanObjectService extends GameServiceBase implements IHumanObjectS
         // 初始化角色服务
         logger.info("HumanObjectService 初始化");
         // 可以在这里加载角色数据等
+        humanObj.initHMods();
     }
 
     @Override
@@ -30,7 +39,7 @@ public class HumanObjectService extends GameServiceBase implements IHumanObjectS
 
     @Override
     public void pulse(long now) {
-
+        humanObj.pulse(now);
     }
 
     @Override
