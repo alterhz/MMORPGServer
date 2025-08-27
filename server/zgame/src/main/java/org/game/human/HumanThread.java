@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 玩家线程
@@ -16,7 +17,7 @@ public class HumanThread extends GameThread {
 
     public static final String NAME = "HumanThread";
 
-    private static final Map<Integer, HumanThread> humanThreads = new HashMap<>();
+    private static final Map<Integer, HumanThread> humanThreads = new ConcurrentHashMap<>();
 
     private final int index;
 

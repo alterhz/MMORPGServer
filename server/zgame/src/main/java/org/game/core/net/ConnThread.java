@@ -6,6 +6,7 @@ import org.game.core.GameThread;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 连接线程类，负责处理网络连接相关的任务
@@ -17,7 +18,7 @@ public class ConnThread extends GameThread {
 
     public static final String NAME = "ConnThread";
 
-    private static final Map<Integer, ConnThread> connThreads = new HashMap<>();
+    private static final Map<Integer, ConnThread> connThreads = new ConcurrentHashMap<>();
 
     private final int index;
     /**
