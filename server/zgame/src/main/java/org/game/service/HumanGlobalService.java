@@ -24,6 +24,8 @@ public class HumanGlobalService extends GameServiceBase implements IHumanGlobalS
     // 添加TickTimer，每5秒执行一次
     private final TickTimer tickTimer = new TickTimer(5000);
 
+    private int rpcCallCount = 0;
+
     public HumanGlobalService(String name) {
         super(name);
     }
@@ -61,6 +63,11 @@ public class HumanGlobalService extends GameServiceBase implements IHumanGlobalS
     @Override
     public CompletableFuture<Integer> getHumanOnlineCount(int minLevel) {
         return CompletableFuture.completedFuture(onlineCount.get() + 101);
+    }
+
+    @Override
+    public void test() {
+        ++rpcCallCount;
     }
 
     @Override

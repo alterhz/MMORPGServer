@@ -29,17 +29,31 @@ public class StageGlobalService extends GameServiceBase implements IStageGlobalS
 
         long timerId = timerQueue.createTimer(1000, 3000, (id, context) -> {
             logger.info("定时任务. thread={}, timerId={}, name={}", Thread.currentThread().getName(), id, context.getString("name"));
+
+            testRPCCost();
+
         }, new Param().put("name", "张三"));
 
-        timerQueue.delay(10000, (id, context) -> {
+        timerQueue.delay(60000, (id, context) -> {
             timerQueue.cancelTimer(timerId);
         });
 
+        testRPC();
+    }
+
+    private void testRPC() {
+        // 纳秒计算
+        long start = System.nanoTime();
         // 获取服务代理
         IHumanGlobalService humanGlobalService = ReferenceFactory.getProxy(IHumanGlobalService.class);
 
         // 异步调用获取在线人数
         final CompletableFuture<Integer> future = humanGlobalService.getHumanOnlineCount(1);
+
+        // 耗时结束
+        long end = System.nanoTime();
+        logger.info("RPC单次调用，耗时（毫秒）: {} ", String.format("%.3f", (end - start) / 1000000.0f));
+
         future.whenComplete((count, throwable) -> {
             if (throwable != null) {
                 logger.error("获取在线人数失败", throwable);
@@ -48,6 +62,23 @@ public class StageGlobalService extends GameServiceBase implements IStageGlobalS
                 logger.info("在线人数 = {}", count);
             }
         });
+    }
+
+    private void testRPCCost() {
+        // 纳秒计算
+        long start = System.nanoTime();
+
+        for (int i = 0; i < 10000; i++) {
+            IHumanGlobalService humanGlobalService = ReferenceFactory.getProxy(IHumanGlobalService.class);
+
+            // 异步调用获取在线人数
+            humanGlobalService.test();
+        }
+
+        // 耗时结束
+        long end = System.nanoTime();
+        // 打印耗时，毫秒，小数点后3位
+        logger.info("1万次RPC调用，耗时（毫秒）: {}", String.format("%.3f", (end - start) / 1000000.0f));
     }
 
     @Override

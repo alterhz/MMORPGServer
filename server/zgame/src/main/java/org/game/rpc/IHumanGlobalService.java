@@ -13,6 +13,11 @@ public interface IHumanGlobalService {
     CompletableFuture<Integer> getHumanOnlineCount(int minLevel);
 
     /**
+     * 测试
+     */
+    void test();
+
+    /**
      * 热修复
      */
     void hotfix(Param param);

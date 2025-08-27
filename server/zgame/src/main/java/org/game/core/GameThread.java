@@ -1,7 +1,9 @@
 package org.game.core;
 
-import com.sun.jdi.VoidType;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.rpc.RPCRequest;
@@ -9,7 +11,9 @@ import org.game.core.rpc.RPCResponse;
 import org.game.core.utils.JsonUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -31,6 +35,11 @@ public class GameThread extends Thread {
     private final Map<String, GameServiceBase> gameServices = new ConcurrentHashMap<>();
 
     /**
+     * 服务方法缓存:服务名称为key，方法名为value
+     */
+    private final Map<String, Map<String, Method>> serviceMethodMap = new ConcurrentHashMap<>();
+
+    /**
      * 任务队列
      */
     private final BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<>();
@@ -43,6 +52,10 @@ public class GameThread extends Thread {
 
     // 存储CompletableFuture回调的Map
     private final ConcurrentHashMap<String, TimerFuture> callbackMap = new ConcurrentHashMap<>();
+
+    // RPC调用耗时：方法名为key，value:耗时, 总调用次数
+    private final Map<String, Pair<Long, Long>> rpcCost = new HashMap<>();
+
 
     static class TimerFuture {
         private final long timerId;
@@ -68,7 +81,7 @@ public class GameThread extends Thread {
     /**
      * 定时器队列
      */
-    private final TimerQueue callBackTimeoutQueue = new TimerQueue();
+    private final TimerQueue timerQueue = new TimerQueue();
 
     public GameThread(String name) {
         setName(name);
@@ -79,6 +92,10 @@ public class GameThread extends Thread {
     public synchronized void start() {
         super.start();
         GameProcess.addGameThread(this);
+
+        timerQueue.createTimer(30 * 1000, 30 * 1000, (timerId, context) -> {
+            printRpcCost();
+        }, new Param());
     }
 
     /**
@@ -148,7 +165,7 @@ public class GameThread extends Thread {
             service.pulse(now);
         }
 
-        callBackTimeoutQueue.update(now);
+        timerQueue.update(now);
     }
 
     // 添加GameService
@@ -221,7 +238,7 @@ public class GameThread extends Thread {
                     timerFuture.getFuture().complete(response.getData());
                 }
             }
-            callBackTimeoutQueue.cancelTimer(timerFuture.getTimerId());
+            timerQueue.cancelTimer(timerFuture.getTimerId());
         } else {
             logger.error("RPCResponse not found for requestId: {}", response.getRequestId());
         }
@@ -238,12 +255,13 @@ public class GameThread extends Thread {
     private void processSingleRPCRequest(RPCRequest request) {
         // 根据request获取目标服务并调用方法
         // 这里需要根据实际架构实现
-        logger.info("Processing RPC request: {}", request);
+//        logger.info("Processing RPC request: {}", request);
 
         invokeTargetMethod(request);
     }
 
     private Object invokeTargetMethod(RPCRequest request) {
+        long start = System.nanoTime();
         // 从gameServices获取服务对象
         String gameServiceName = request.getInvocation().getToPoint().getGameServiceName();
         GameServiceBase gameServiceBase = gameServices.get(gameServiceName);
@@ -257,6 +275,7 @@ public class GameThread extends Thread {
 
         // 反射调用方法
         try {
+            // 无需优化：与获取方法，再调用耗时一致。
             Object result = MethodUtils.invokeMethod(gameServiceBase, methodName, parameters);
 
             // 根据方法返回值类型构造RPCResponse
@@ -276,26 +295,50 @@ public class GameThread extends Thread {
             }
         } catch (InvocationTargetException e) {
             logger.error("Failed to invoke method: {}", request.getInvocation().getMethodName(), e);
-        } catch (NoSuchMethodException e) {
-            logger.error("Method not found: {}", request.getInvocation().getMethodName(), e);
         } catch (IllegalAccessException e) {
             logger.error("Access denied to method: {}", request.getInvocation().getMethodName(), e);
         } catch (ExecutionException e) {
             logger.error("Error executing method: {}", request.getInvocation().getMethodName(), e);
         } catch (InterruptedException e) {
             logger.error("Interrupted while executing method: {}", request.getInvocation().getMethodName(), e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 统计结束
+        long end = System.nanoTime();
+        // 耗时记录到rpcCost中
+        String serviceMethodName = gameServiceName + "#" + methodName;
+        Pair<Long, Long> pair = rpcCost.get(serviceMethodName);
+        if (pair == null) {
+            rpcCost.put(serviceMethodName, ImmutablePair.of(end - start, 1L));
+        } else {
+            rpcCost.put(serviceMethodName, ImmutablePair.of(pair.getLeft() + (end - start), pair.getRight() + 1));
         }
 
         return null;
     }
 
-    private void handleResponse(RPCResponse response) {
-        String jsonResponse = JsonUtils.tryEncode(response);
-        if (jsonResponse == null) {
-            return;
+    public void printRpcCost() {
+        // 打印RPC 函数名称，总耗时，总次数，每万次耗时
+        for (Map.Entry<String, Pair<Long, Long>> entry : rpcCost.entrySet()) {
+            Pair<Long, Long> pair = entry.getValue();
+            long count = pair.getRight();
+            Long cost = pair.getLeft();
+            logger.info("RPC Cost: method={} - totalCost={}ms - totalCount={} - 10K cost={}ms", entry.getKey(), String.format("%.3f", cost / 1000000.0f), count, String.format("%.3f", cost / count / 100.0f));
         }
-        logger.debug("Serialized response = {}", jsonResponse);
-        parseRPCResponse(jsonResponse);
+        rpcCost.clear();
+    }
+
+    private void handleResponse(RPCResponse response) {
+//        String jsonResponse = JsonUtils.tryEncode(response);
+//        if (jsonResponse == null) {
+//            return;
+//        }
+//        logger.debug("Serialized response = {}", jsonResponse);
+//        parseRPCResponse(jsonResponse);
+
+        dispatchResponse(response);
     }
 
     private void parseRPCResponse(String responseJson) {
@@ -321,7 +364,7 @@ public class GameThread extends Thread {
 
     // 添加回调到Map中
     public void addCallback(RPCRequest request, CompletableFuture<Object> future) {
-        long timerId = callBackTimeoutQueue.delay(CALLBACK_TIMEOUT, (id, context) -> {
+        long timerId = timerQueue.delay(CALLBACK_TIMEOUT, (id, context) -> {
             logger.error("RPC timerFuture timeout: {}", request);
             TimerFuture timerFuture = callbackMap.remove(request.getRequestId());
             if (timerFuture != null && !timerFuture.getFuture().isDone()) {

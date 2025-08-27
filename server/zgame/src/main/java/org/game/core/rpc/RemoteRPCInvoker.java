@@ -117,16 +117,22 @@ public class RemoteRPCInvoker implements InvocationHandler {
         CompletableFuture<Object> future = new CompletableFuture<>();
         currentGameThread.addCallback(request, future);
 
-        String jsonRequest = JsonUtils.encode(request);
-        if (jsonRequest == null) {
-            // 如果序列化失败，移除回调并抛出异常
-            currentGameThread.removeCallback(request.getRequestId());
-            logger.error("Failed to serialize RPC request = {}", request);
-            throw new RuntimeException("Failed to serialize RPC request");
-        }
+        // TODO 判断是否为本地调用
+        boolean isLocal = false;
+        if (isLocal) {
+            String jsonRequest = JsonUtils.encode(request);
+            if (jsonRequest == null) {
+                // 如果序列化失败，移除回调并抛出异常
+                currentGameThread.removeCallback(request.getRequestId());
+                logger.error("Failed to serialize RPC request = {}", request);
+                throw new RuntimeException("Failed to serialize RPC request");
+            }
 
-        // 发送序列化后的请求到目标GameThread
-        parseRPCRequest(jsonRequest);
+            // 发送序列化后的请求到目标GameThread
+            parseRPCRequest(jsonRequest);
+        } else {
+            dispatchRPCRequest(request);
+        }
 
         return future;
     }
@@ -151,7 +157,7 @@ public class RemoteRPCInvoker implements InvocationHandler {
      * <p>查找GameThread线程，添加到rpcRequestQueue列表</p>
      * @param request RPC请求
      */
-    private void dispatchRPCRequest(RPCRequest request) {
+    public void dispatchRPCRequest(RPCRequest request) {
         // 获取目标线程名称
         String targetThreadName = request.getInvocation().getToPoint().getGameThreadName();
 
