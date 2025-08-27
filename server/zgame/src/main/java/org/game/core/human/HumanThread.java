@@ -3,6 +3,7 @@ package org.game.core.human;
 import org.game.core.GameThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.game.core.db.HumanDBManager;
 import org.game.human.HumanObject;
 import org.game.service.HumanService;
 
@@ -67,6 +68,8 @@ public class HumanThread extends GameThread {
         humanThread.runTask(() -> {
             humanService.init();
             humanService.startup();
+
+            HumanDBManager.loadHumanDB(id, humanObj);
         });
 
         return humanObj;

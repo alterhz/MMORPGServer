@@ -6,17 +6,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
-import org.game.core.db.HumanLoader;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.QuerySubscriber;
+import org.game.core.human.HumanThread;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
-import org.game.core.human.HumanThread;
 import org.game.proto.ResponseMessage;
 import org.game.rpc.IClientService;
 import org.game.rpc.ILoginService;
+
+import java.util.List;
 
 public class LoginService extends GameServiceBase implements ILoginService {
 
@@ -42,11 +43,6 @@ public class LoginService extends GameServiceBase implements ILoginService {
         // 心跳逻辑
     }
 
-    @HumanLoader(entity = HumanDB.class)
-    public void loadHumanDB(HumanDB humanDB) {
-        logger.info("加载HumanDB");
-    }
-
     @Override
     public void destroy() {
         // 销毁逻辑
@@ -60,24 +56,27 @@ public class LoginService extends GameServiceBase implements ILoginService {
         MongoCollection<HumanDB> humans = MongoDBAsyncClient.getCollection("humans", HumanDB.class);
 
         // 查找账号为account的HumanDB
-        humans.find(Filters.eq("account", account)).first().subscribe(new QuerySubscriber<>(humanDBS -> {
-            ResponseMessage responseMessage;
-            if (!humanDBS.isEmpty()) {
-                // 登录成功
-                responseMessage = ResponseMessage.success("human count=" + humanDBS.size());
+        humans.find(Filters.eq("account", account)).first().subscribe(new QuerySubscriber<>() {
+            @Override
+            protected void onLoadDB(List<HumanDB> humanDBS) {
+                ResponseMessage responseMessage;
+                if (!humanDBS.isEmpty()) {
+                    // 登录成功
+                    responseMessage = ResponseMessage.success("human count=" + humanDBS.size());
 
-                HumanDB humanDB = humanDBS.get(0);
-                HumanThread.createHumanObject(humanDB.getAccount());
-            } else {
-                // 登录失败
-                responseMessage = ResponseMessage.error(-1, "用户：" + account + "，不存在！");
+                    HumanDB humanDB = humanDBS.get(0);
+                    HumanThread.createHumanObject(humanDB.getAccount());
+                } else {
+                    // 登录失败
+                    responseMessage = ResponseMessage.error(-1, "用户：" + account + "，不存在！");
+                }
+
+                IClientService clientService = ReferenceFactory.getProxy(IClientService.class, fromPoint);
+                clientService.sendMessage(Message.createMessage(1002, responseMessage));
+
+                logger.debug("发送登录结果: {}", responseMessage);
             }
-
-            IClientService clientService = ReferenceFactory.getProxy(IClientService.class, fromPoint);
-            clientService.sendMessage(Message.createMessage(1002, responseMessage));
-
-            logger.debug("发送登录结果: {}", responseMessage);
-        }, 4));
+        });
     }
 
     @Override

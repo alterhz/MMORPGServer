@@ -17,7 +17,7 @@ public class HModInitializer
 
     public static void initHMods() {
         // 通过反射查找所有的HModBase子类
-        Set<Class<?>> classes = ScanClassUtils.scanServiceClasses();
+        Set<Class<?>> classes = ScanClassUtils.scanAllClasses();
         for (Class<?> clazz : classes) {
             if (HModBase.class.isAssignableFrom(clazz) && clazz != HModBase.class) {
                 logger.info("Found HModBase subclass: " + clazz.getName());

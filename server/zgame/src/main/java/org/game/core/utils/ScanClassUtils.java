@@ -16,8 +16,8 @@ public class ScanClassUtils {
 
     private static final Logger logger = LogManager.getLogger(ScanClassUtils.class);
 
-    // 扫描所有带有@ServiceConfig注解的类
-    public static Set<Class<?>> scanServiceClasses() {
+    // 扫描所有的类
+    public static Set<Class<?>> scanAllClasses() {
         Set<Class<?>> serviceClasses = new HashSet<>();
 
         try {
