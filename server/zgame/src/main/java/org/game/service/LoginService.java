@@ -105,12 +105,8 @@ public class LoginService extends GameServiceBase implements ILoginService {
         CSSelectHuman csSelectHuman = message.getJsonObject(CSSelectHuman.class);
         String humanId = csSelectHuman.getHumanId();
 
-        HumanDB selectHumanDB = loginInfo.humans.stream()
-                .filter(humanDB -> humanDB.getId().toHexString().equals(humanId))
-                .findFirst()
-                .orElse(null);
-
-        if (selectHumanDB == null) {
+        // 是否存在HumanId
+        if (!loginInfo.humans.contains(humanId)) {
             logger.error("选择的角色不存在: humanId={}", humanId);
             SCSelectHuman scSelectHuman = new SCSelectHuman();
             scSelectHuman.setCode(1);
@@ -119,12 +115,34 @@ public class LoginService extends GameServiceBase implements ILoginService {
             return;
         }
 
-        HumanThread.createHumanObject(selectHumanDB);
+        MongoDBAsyncClient.getCollection("humans", HumanDB.class)
+                .find(Filters.eq("id", humanId))
+                .subscribe(new QuerySubscriber<>() {
+                    @Override
+                    protected void onLoadDB(List<HumanDB> humanDBS) {
+                        if (!humanDBS.isEmpty()) {
+                            HumanDB selectHumanDB = humanDBS.get(0);
+                            HumanThread.createHumanObject(selectHumanDB);
+                        } else {
+                            logger.error("选择的角色不存在: humanId={}", humanId);
+                            SCSelectHuman scSelectHuman = new SCSelectHuman();
+                            scSelectHuman.setCode(1);
+                            scSelectHuman.setMessage("选择失败");
+                            sendProto(fromPoint, Proto.SC_SELECT_HUMAN, scSelectHuman);
+                        }
+                    }
 
-        SCSelectHuman scSelectHuman = new SCSelectHuman();
-        scSelectHuman.setCode(0);
-        scSelectHuman.setMessage("选择成功");
-        sendProto(fromPoint, Proto.SC_SELECT_HUMAN, scSelectHuman);
+                    @Override
+                    protected void onError(String errMessage) {
+                        logger.error("查询角色失败: {}", errMessage);
+
+                        // 角色列表查询失败
+                        SCQueryHumans scQueryHumans = new SCQueryHumans();
+                        scQueryHumans.setCode(1);
+                        scQueryHumans.setMessage("查询失败");
+                        sendProto(fromPoint, Proto.SC_QUERY_HUMANS, scQueryHumans);
+                    }
+                });
     }
 
     private void CSQueryHumans(Message message, ToPoint fromPoint) {
@@ -149,18 +167,20 @@ public class LoginService extends GameServiceBase implements ILoginService {
                 .subscribe(new QuerySubscriber<>() {
                     @Override
                     protected void onLoadDB(List<HumanDB> humanDBS) {
-                        // 保存角色列表
-                        loginInfo.humans.addAll(humanDBS);
-
                         List<HumanInfo> humanList = new ArrayList<>();
                         for (HumanDB humanDB : humanDBS) {
                             // 创建角色信息对象
+                            String hexHumanId = humanDB.getId().toHexString();
+
                             HumanInfo humanInfo = new HumanInfo();
-                            humanInfo.setId(humanDB.getId().toHexString());
+                            humanInfo.setId(hexHumanId);
                             humanInfo.setName(humanDB.getName());
                             // 这里暂时将职业字段设置为默认值，因为在HumanDB中没有找到职业字段
                             humanInfo.setProfession("未知职业");
                             humanList.add(humanInfo);
+
+                            // 记录角色列表ID
+                            loginInfo.humans.add(hexHumanId);
                         }
 
                         SCQueryHumans scQueryHumans = new SCQueryHumans();
@@ -234,7 +254,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         ToPoint clientPoint;
         LoginPeriod loginPeriod = LoginPeriod.LOGIN;
         // 账号对应的HumanDB列表
-        List<HumanDB> humans = new ArrayList<>();
+        List<String> humans = new ArrayList<>();
 
         LoginInfo(String account, ToPoint clientPoint) {
             this.account = account;
