@@ -55,6 +55,7 @@ public class HumanThread extends GameThread {
 
     public static HumanObject createHumanObject(String id) {
         HumanObject humanObj = new HumanObject(id);
+        humanObj.init();
         HumanService humanService = new HumanService(id, humanObj);
 
         // 随机分配一个线程
@@ -69,7 +70,7 @@ public class HumanThread extends GameThread {
             humanService.init();
             humanService.startup();
 
-            HumanDBManager.loadHumanDB(id, humanObj);
+            HumanDBManager.loadHumanDB(humanObj);
         });
 
         return humanObj;

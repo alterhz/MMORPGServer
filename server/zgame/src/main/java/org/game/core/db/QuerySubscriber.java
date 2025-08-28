@@ -50,8 +50,13 @@ public abstract class QuerySubscriber<T> implements Subscriber<T> {
 
     @Override
     public void onComplete() {
-        gameThread.runTask(() -> {
+        if (gameThread == null) {
             onLoadDB(dbCollections);
-        });
+        } else {
+            gameThread.runTask(() -> {
+                onLoadDB(dbCollections);
+            });
+        }
+
     }
 }

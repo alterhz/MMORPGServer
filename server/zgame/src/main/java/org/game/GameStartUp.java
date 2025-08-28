@@ -4,12 +4,13 @@ import org.game.config.MyConfig;
 import org.game.core.GameProcess;
 import org.game.core.GameServiceBase;
 import org.game.core.GameThread;
+import org.game.core.db.HumanDBManager;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.MongoDBSyncClient;
 import org.game.core.net.NettyServer;
 import org.game.core.rpc.RPCProxy;
 import org.game.core.utils.ScanClassUtils;
-import org.game.core.human.HModInitializer;
+import org.game.core.human.HModScanner;
 import org.game.core.human.HumanThread;
 
 import java.lang.reflect.Constructor;
@@ -23,8 +24,8 @@ public class GameStartUp {
             // 1. 载入配置文件
             MyConfig.load();
 
-            // 初始化HMods
-            HModInitializer.initHMods();
+            // HumanLoader初始化
+            HumanDBManager.init();
 
             // 初始化同步MongoDB
             String mongoDbUri = MyConfig.getConfig().getMongodb().getUri();

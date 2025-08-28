@@ -50,6 +50,7 @@ public class HumanAttrDB {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .append("humanId", humanId)
+                .append("attributes", attributes)
                 .append("description", description)
                 .toString();
     }

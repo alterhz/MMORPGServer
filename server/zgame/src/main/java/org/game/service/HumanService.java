@@ -26,8 +26,6 @@ public class HumanService extends GameServiceBase implements IHumanService {
     public void init() {
         // 初始化角色服务
         logger.info("HumanObjectService 初始化");
-        // 可以在这里加载角色数据等
-        humanObj.initHMods();
     }
 
     @Override

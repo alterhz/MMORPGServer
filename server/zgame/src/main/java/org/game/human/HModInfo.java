@@ -2,6 +2,11 @@ package org.game.human;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.game.core.db.HumanLoader;
+import org.game.core.db.MongoDBAsyncClient;
+import org.game.dao.HumanInfoDB;
+
+import java.util.List;
 
 public class HModInfo extends HModBase{
 
@@ -23,4 +28,22 @@ public class HModInfo extends HModBase{
     public void getInfo() {
         logger.info("HModInfo getInfo");
     }
+
+    @HumanLoader(entity = HumanInfoDB.class)
+    public void loadHumanInfo(List<HumanInfoDB> humanInfoDBs) {
+        logger.info("加载HumanInfoDB：{}", humanInfoDBs);
+
+        // 如果没有数据，则插入一条
+        if (humanInfoDBs.size() < 2) {
+            HumanInfoDB humanInfoDB = new HumanInfoDB();
+            humanInfoDB.setId(null);
+            humanInfoDB.setHumanId(humanObj.getId());
+            humanInfoDB.setInfo("这是测试数据");
+
+            MongoDBAsyncClient.insertOne(humanInfoDB);
+
+            logger.info("插入HumanInfoDB：{}", humanInfoDB);
+        }
+    }
+
 }

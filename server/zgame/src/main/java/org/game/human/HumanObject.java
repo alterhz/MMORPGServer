@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.TimerQueue;
-import org.game.core.human.HModInitializer;
+import org.game.core.human.HModScanner;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,8 +31,8 @@ public class HumanObject {
         return id;
     }
 
-    public void initHMods() {
-        List<Class<? extends HModBase>> hModClasses = HModInitializer.getHModClasses();
+    public void init() {
+        List<Class<? extends HModBase>> hModClasses = HModScanner.getHModClasses();
         for (Class<? extends HModBase> hModClass : hModClasses) {
             try {
                 // 使用带参数的构造函数创建实例
@@ -51,6 +51,10 @@ public class HumanObject {
 
     public <T extends HModBase> T getHMod(Class<T> clazz) {
         return (T) hModBaseMap.get(clazz);
+    }
+
+    public HModBase getHModBase(Class<?> clazz) {
+        return hModBaseMap.get(clazz);
     }
 
     public void pulse(long now) {

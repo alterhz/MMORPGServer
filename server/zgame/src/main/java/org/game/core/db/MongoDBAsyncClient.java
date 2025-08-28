@@ -2,6 +2,7 @@ package org.game.core.db;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoCollection;
@@ -12,6 +13,8 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 // ✅ 正确做法：全局单例或依赖注入一个 MongoClient
 public class MongoDBAsyncClient {
@@ -67,6 +70,33 @@ public class MongoDBAsyncClient {
             throw new IllegalStateException("Default database name not set. Please call init(uri, dbName) method.");
         }
         return client.getDatabase(defaultDbName);
+    }
+
+    public static <T> void insertOne(T obj) {
+        Entity annotation = obj.getClass().getAnnotation(Entity.class);
+        String collectionName = annotation.collectionName();
+        Class<T> clazz = (Class<T>) obj.getClass();
+        getCollection(collectionName, clazz).insertOne(obj).subscribe(new Subscriber<>() {
+            @Override
+            public void onSubscribe(Subscription s) {
+                s.request(1);
+            }
+
+            @Override
+            public void onNext(InsertOneResult insertOneResult) {
+                logger.info("插入成功。{}", insertOneResult);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                logger.error("插入失败", t);
+            }
+
+            @Override
+            public void onComplete() {
+                logger.info("插入成功");
+            }
+        });
     }
 
     // 应用关闭时调用
