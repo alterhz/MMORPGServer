@@ -6,6 +6,7 @@ import org.game.LogCore;
 import org.game.service.ClientService;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 服务器处理器，处理连接建立、断开和异常
@@ -13,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     // 用于分配连接的索引
-    private static AtomicInteger channelAllocID = new AtomicInteger(0);
+    private static AtomicLong channelAllocID = new AtomicLong(0);
 
     private ClientService clientService;
 
@@ -22,8 +23,8 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         super.channelActive(ctx);
         String remoteAddress = ctx.channel().remoteAddress().toString();
 
-        int clientID = channelAllocID.incrementAndGet();
-        int connThreadIndex = clientID % ConnThread.getConnThreadCount();
+        long clientID = channelAllocID.incrementAndGet();
+        int connThreadIndex = (int)(clientID % ConnThread.getConnThreadCount());
         ConnThread connThread = ConnThread.getConnThread(connThreadIndex);
         if (connThread == null) {
             LogCore.logger.error("找不到连接线程，请检查配置, connThreadIndex:{}", connThreadIndex);
@@ -47,7 +48,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         LogCore.logger.info("客户端已断开连接: {}, channelAllocationIndex={}", remoteAddress, channelAllocID);
 
         clientService.getGameThread().runTask(() -> {
-            clientService.delayClose();
+            clientService.Disconnect();
         });
     }
 

@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 用户凭证类，用于Jackson序列化和反序列化
  * 包含用户名和密码字段
  */
-public class UserCredentials {
+public class CSLogin {
     
-    @JsonProperty("username")
-    private String username;
+    @JsonProperty("account")
+    private String account;
     
     @JsonProperty("password")
     private String password;
@@ -17,17 +17,17 @@ public class UserCredentials {
     /**
      * 默认构造函数，用于Jackson反序列化
      */
-    public UserCredentials() {
+    public CSLogin() {
     }
     
     /**
      * 带参数的构造函数
      * 
-     * @param username 用户名
+     * @param account 用户名
      * @param password 密码
      */
-    public UserCredentials(String username, String password) {
-        this.username = username;
+    public CSLogin(String account, String password) {
+        this.account = account;
         this.password = password;
     }
     
@@ -36,17 +36,17 @@ public class UserCredentials {
      * 
      * @return 用户名
      */
-    public String getUsername() {
-        return username;
+    public String getAccount() {
+        return account;
     }
     
     /**
      * 设置用户名
      * 
-     * @param username 用户名
+     * @param account 用户名
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public void setAccount(String account) {
+        this.account = account;
     }
     
     /**
@@ -70,7 +70,7 @@ public class UserCredentials {
     @Override
     public String toString() {
         return "UserCredentials{" +
-                "username='" + username + '\'' +
+                "username='" + account + '\'' +
                 ", password='" + password + '\'' +
                 '}';
     }

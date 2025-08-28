@@ -13,8 +13,8 @@ public class HumanService extends GameServiceBase implements IHumanService {
 
     private final HumanObject humanObj;
 
-    public HumanService(String id, HumanObject humanObj) {
-        super(id);
+    public HumanService(HumanObject humanObj) {
+        super(humanObj.getId());
         this.humanObj = humanObj;
     }
 
@@ -26,6 +26,7 @@ public class HumanService extends GameServiceBase implements IHumanService {
     public void init() {
         // 初始化角色服务
         logger.info("HumanObjectService 初始化");
+        humanObj.init();
     }
 
     @Override

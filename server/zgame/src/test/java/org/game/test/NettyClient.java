@@ -10,7 +10,7 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import org.game.BaseUtils;
 import org.game.LogCore;
 import org.game.core.net.*;
-import org.game.proto.UserCredentials;
+import org.game.proto.CSLogin;
 
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -104,9 +104,9 @@ public class NettyClient {
                     byte[] content = input.getBytes();
                     String name = new String(content);
 
-                    UserCredentials userCredentials = new UserCredentials(name, "admin");
+                    CSLogin CSLogin = new CSLogin(name, "admin");
 
-                    Message message = Message.createMessage(1001, userCredentials);
+                    Message message = Message.createMessage(1001, CSLogin);
                     content = message.toBytes();
 
                     // 发送消息

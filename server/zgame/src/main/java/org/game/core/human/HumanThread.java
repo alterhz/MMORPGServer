@@ -4,6 +4,7 @@ import org.game.core.GameThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.db.HumanDBManager;
+import org.game.dao.HumanDB;
 import org.game.human.HumanObject;
 import org.game.service.HumanService;
 
@@ -53,10 +54,10 @@ public class HumanThread extends GameThread {
         return humanThreads.size();
     }
 
-    public static HumanObject createHumanObject(String id) {
-        HumanObject humanObj = new HumanObject(id);
-        humanObj.init();
-        HumanService humanService = new HumanService(id, humanObj);
+    public static void createHumanObject(HumanDB humanDB) {
+        HumanObject humanObj = new HumanObject(humanDB.getId().toHexString());
+        humanObj.setHumanDB(humanDB);
+        HumanService humanService = new HumanService(humanObj);
 
         // 随机分配一个线程
         long count = allocCount.getAndIncrement();
@@ -66,14 +67,15 @@ public class HumanThread extends GameThread {
         humanThread.addGameService(humanService);
         humanService.bindGameThread(humanThread);
 
+        HumanLookup.add(humanObj.getId(), humanObj.getAccount(), humanThread.getName());
+
         humanThread.runTask(() -> {
             humanService.init();
             humanService.startup();
 
-            HumanDBManager.loadHumanDB(humanObj);
+            HumanDBManager.loadHumanModDB(humanObj);
         });
 
-        return humanObj;
     }
 
 }

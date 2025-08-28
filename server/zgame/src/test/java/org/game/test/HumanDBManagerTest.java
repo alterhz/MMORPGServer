@@ -19,7 +19,7 @@ public class HumanDBManagerTest {
         HumanObject humanObj = new HumanObject("admin");
         humanObj.init();
 
-        HumanDBManager.loadHumanDB(humanObj);
+        HumanDBManager.loadHumanModDB(humanObj);
 
         Thread.sleep(50000);
     }

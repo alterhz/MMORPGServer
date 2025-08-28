@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.TimerQueue;
 import org.game.core.human.HModScanner;
+import org.game.dao.HumanDB;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,8 @@ public class HumanObject {
 
     private final String id;
 
+    private HumanDB humanDB;
+
     private final Map<Class<?>, HModBase> hModBaseMap = new HashMap<>();
 
     private final TimerQueue timerQueue = new TimerQueue();
@@ -29,6 +32,18 @@ public class HumanObject {
 
     public String getId() {
         return id;
+    }
+
+    public HumanDB getHumanDB() {
+        return humanDB;
+    }
+
+    public void setHumanDB(HumanDB humanDB) {
+        this.humanDB = humanDB;
+    }
+
+    public String getAccount() {
+        return humanDB != null ? humanDB.getAccount() : "";
     }
 
     public void init() {

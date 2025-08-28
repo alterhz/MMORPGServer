@@ -17,28 +17,38 @@ public class HumanDBManager {
 
     public static final Logger logger = LogManager.getLogger(HumanDBManager.class);
 
+    /**
+     * 进程启动时，初始化。这个是事实不可变对象，线程安全的
+     */
     private static final List<HumanLoaderMethodInfo> humanLoaderMethodInfos = new ArrayList<>();
 
     public static void init() {
-        humanLoaderMethodInfos.addAll(scanAndLoadHumanDB());
+        humanLoaderMethodInfos.addAll(scanHumanLoaderMethods());
     }
 
-    public static void loadHumanDB(HumanObject humanObj) {
-
+    /**
+     * 加载Human相关DB
+     */
+    public static void loadHumanModDB(HumanObject humanObj) {
         for (HumanLoaderMethodInfo humanLoaderMethodInfo : humanLoaderMethodInfos) {
-            final Class<Object> fromUnknownClass;
             MongoDBAsyncClient.getCollection(humanLoaderMethodInfo.getCollectionName(), humanLoaderMethodInfo.getEntity())
             .find(Filters.eq("humanId", humanObj.getId()))
                     .subscribe(new QuerySubscriber<Object>(Long.MAX_VALUE) {
                         @Override
                         protected void onLoadDB(List<Object> dbCollections) {
                             try {
-                                logger.info("加载HumanDB成功. {}", humanLoaderMethodInfo.getCollectionName());
+                                logger.info("加载Human相关DB成功. {}", humanLoaderMethodInfo.getCollectionName());
                                 HModBase hModBase = humanObj.getHModBase(humanLoaderMethodInfo.getHModClass());
                                 humanLoaderMethodInfo.getMethod().invoke(hModBase, dbCollections);
                             } catch (IllegalAccessException | InvocationTargetException e) {
+                                logger.error("加载Human相关DB失败. collectionName={}, humanObj={}", humanLoaderMethodInfo.getCollectionName(), humanObj);
                                 throw new RuntimeException(e);
                             }
+                        }
+
+                        @Override
+                        protected void onError(String errMessage) {
+                            logger.error("加载Human相关DB失败. collectionName={}, humanObj={}, errMessage={}", humanLoaderMethodInfo.getCollectionName(), humanObj, errMessage);
                         }
                     });
         }
@@ -48,7 +58,7 @@ public class HumanDBManager {
     /**
      * 扫描所有的类，并扫描所有包含@HumanLoader注解的static函数
      */
-    public static List<HumanLoaderMethodInfo> scanAndLoadHumanDB() {
+    public static List<HumanLoaderMethodInfo> scanHumanLoaderMethods() {
         List<HumanLoaderMethodInfo> humanLoaderMethodInfos = new ArrayList<>();
         List<Class<? extends HModBase>> hModClasses = HModScanner.getHModClasses();
         for (Class<?> hModClazz : hModClasses) {

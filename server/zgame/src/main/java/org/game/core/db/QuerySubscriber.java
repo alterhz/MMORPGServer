@@ -44,9 +44,18 @@ public abstract class QuerySubscriber<T> implements Subscriber<T> {
     @Override
     public void onError(Throwable t) {
         logger.error("❌ 错误: {}", t.getMessage());
+        if (gameThread == null) {
+            onError(t.getMessage());
+        } else {
+            gameThread.runTask(() -> {
+                onError(t.getMessage());
+            });
+        }
     }
 
     protected abstract void onLoadDB(List<T> dbCollections);
+
+    protected abstract void onError(String errMessage);
 
     @Override
     public void onComplete() {
@@ -57,6 +66,5 @@ public abstract class QuerySubscriber<T> implements Subscriber<T> {
                 onLoadDB(dbCollections);
             });
         }
-
     }
 }

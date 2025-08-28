@@ -9,6 +9,7 @@ human_thread:
 
 conn_thread:
   count: 2 # ConnThread 的数量
+  frame_message_count : 100 # 每帧处理消息数量
 
 mongodb:
   uri: "mongodb://localhost:27017"

@@ -158,6 +158,10 @@ public class RemoteRPCInvoker implements InvocationHandler {
      * @param request RPC请求
      */
     public void dispatchRPCRequest(RPCRequest request) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Dispatching RPC request: {}", request);
+        }
+
         // 获取目标线程名称
         String targetThreadName = request.getInvocation().getToPoint().getGameThreadName();
 

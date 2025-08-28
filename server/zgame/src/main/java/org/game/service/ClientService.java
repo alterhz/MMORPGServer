@@ -4,12 +4,13 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.game.config.MyConfig;
 import org.game.core.*;
+import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
-import org.game.core.rpc.FromPoint;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
-import org.game.proto.UserCredentials;
+import org.game.proto.CSLogin;
 import org.game.rpc.IClientService;
 import org.game.rpc.ILoginService;
 
@@ -32,31 +33,37 @@ public class ClientService  extends GameServiceBase implements IClientService {
 
     private final Channel channel;
 
-    private final int clientID;
+    private final long clientID;
 
+    /**
+     * 阶段
+     */
+    private ClientPeriod period = ClientPeriod.LOGIN;
+
+    /**
+     * 延迟关闭定时器
+     */
     private TickTimer delayCloseTimer;
 
     // 添加消息队列，用于存储待处理的消息结构体
     private final BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
 
-    public ClientService(int clientID, Channel channel) {
+    // 角色连接点
+    private ToPoint humanToPoint;
+
+    public ClientService(long clientID, Channel channel) {
         super(String.valueOf(clientID));
         this.channel = channel;
         this.clientID = clientID;
     }
 
-    public int getClientID() {
+    public long getClientID() {
         return clientID;
     }
 
     @Override
     public void init() {
         logger.info("ClientService 初始化, id={}", getName());
-
-//        timerQueue.createTimer(5000, 2000, (id, context) -> {
-//            // 发送消息
-//            sendMessage(Message.createMessage(1, "hello world"));
-//        });
     }
 
     @Override
@@ -64,8 +71,10 @@ public class ClientService  extends GameServiceBase implements IClientService {
         logger.info("ClientService 启动, id={}", getName());
     }
 
-    public void delayClose() {
+    @Override
+    public void Disconnect() {
         logger.info("ClientService 关闭, id={}", getName());
+        changePeriod(ClientPeriod.DISCONNECT);
         if (delayCloseTimer != null) {
             return;
         }
@@ -91,6 +100,16 @@ public class ClientService  extends GameServiceBase implements IClientService {
     @Override
     public void hotfix(Param param) {
 
+    }
+
+    @Override
+    public void changePeriod(ClientPeriod period) {
+        this.period = period;
+    }
+
+    @Override
+    public void setHumanToPoint(String humanId, ToPoint humanPoint) {
+        this.humanToPoint = humanPoint;
     }
 
     @Override
@@ -123,11 +142,10 @@ public class ClientService  extends GameServiceBase implements IClientService {
      * 在pulse方法中被调用，确保在游戏线程中处理消息
      */
     private void consumeMessages() {
-        // 每次心跳处理最多300条消息，避免占用过多处理时间
-        Message message;
-        
-        for (int i = 0; i < 300; i++) {
-            message = messageQueue.poll();
+        // 每次心跳处理最多100条消息，避免占用过多处理时间
+        int frameMessageCount = MyConfig.getConfig().getConnThread().getFrameMessageCount();
+        for (int i = 0; i < frameMessageCount; i++) {
+            Message message = messageQueue.poll();
             if (message == null) {
                 break;
             }
@@ -139,23 +157,22 @@ public class ClientService  extends GameServiceBase implements IClientService {
     }
 
     private void onDispatchMessage(Message message) {
-        switch (message.getProtoID()) {
-            case 1001:
-                // 处理登录请求
-                UserCredentials credentials = message.getJsonObject(UserCredentials.class);
-                logger.info("ClientService 登录请求, id={}, username={}, password={}", getName(), credentials.getUsername(), credentials.getPassword());
-
+        switch (period) {
+            case LOGIN:
+            case SELECT_HUMAN:
                 ToPoint fromPoint = new ToPoint(GameProcess.getGameProcessName(), GameThread.getCurrentThreadName(), getName());
-
                 ILoginService loginService = ReferenceFactory.getProxy(ILoginService.class);
-                loginService.login(credentials.getUsername(), credentials.getPassword(), fromPoint);
+                loginService.dispatch(message, fromPoint);
                 break;
-            case 2:
-                // 处理消息2
+            case PLAYING:
+                // 处理游戏请求
+                break;
+            case DISCONNECT:
+                // 处理断线请求
                 break;
             default:
-                // 处理其他消息
                 break;
         }
+
     }
 }

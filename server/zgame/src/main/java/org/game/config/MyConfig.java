@@ -132,6 +132,8 @@ public class MyConfig {
 
     public static class ConnThreadConfig {
         private int count;
+        // 每帧处理消息的数量
+        private int frame_message_count;
 
         public int getCount() {
             return count;
@@ -139,6 +141,14 @@ public class MyConfig {
 
         public void setCount(int count) {
             this.count = count;
+        }
+
+        public int getFrameMessageCount() {
+            return frame_message_count;
+        }
+
+        public void setFrameMessageCount(int frame_message_count) {
+            this.frame_message_count = frame_message_count;
         }
     }
 
