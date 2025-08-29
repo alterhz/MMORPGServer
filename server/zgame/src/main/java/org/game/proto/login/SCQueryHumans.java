@@ -1,6 +1,7 @@
-package org.game.proto;
+package org.game.proto.login;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.game.proto.common.HumanInfo;
 
 import java.util.List;
 

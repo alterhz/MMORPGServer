@@ -1,4 +1,4 @@
-package org.game.proto;
+package org.game.proto.login;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;

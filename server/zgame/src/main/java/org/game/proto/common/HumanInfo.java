@@ -1,4 +1,4 @@
-package org.game.proto;
+package org.game.proto.common;
 
 public class HumanInfo {
     private String id;

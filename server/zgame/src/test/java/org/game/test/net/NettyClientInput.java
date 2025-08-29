@@ -10,7 +10,7 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import org.game.BaseUtils;
 import org.game.LogCore;
 import org.game.core.net.*;
-import org.game.proto.CSLogin;
+import org.game.proto.login.CSLogin;
 
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;

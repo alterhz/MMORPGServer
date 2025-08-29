@@ -25,7 +25,7 @@ public class ProtoScanner {
 
     /**
      * 扫描当前类的所有static变量名称，并扫描当前包下的所有类，并建立协议类与协议ID的映射关系
-     * 例如：CS_LOGIN对应对应的是 org.game.proto.CSLogin
+     * 例如：CS_LOGIN对应对应的是 org.game.proto.login.CSLogin
      * 建立一个协议类与协议ID的映射关系
      */
     public static void init() {

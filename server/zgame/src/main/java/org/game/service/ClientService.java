@@ -10,7 +10,6 @@ import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
-import org.game.proto.CSLogin;
 import org.game.rpc.IClientService;
 import org.game.rpc.ILoginService;
 

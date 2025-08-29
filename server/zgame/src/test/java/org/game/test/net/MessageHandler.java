@@ -4,9 +4,9 @@ import io.netty.channel.Channel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.net.Message;
-import org.game.proto.CSSelectHuman;
+import org.game.proto.login.CSSelectHuman;
 import org.game.proto.Proto;
-import org.game.proto.SCQueryHumans;
+import org.game.proto.login.SCQueryHumans;
 
 public class MessageHandler {
     public static final Logger logger = LogManager.getLogger(MessageHandler.class);
