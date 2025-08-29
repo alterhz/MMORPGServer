@@ -9,6 +9,7 @@ import org.game.core.GameServiceBase;
 import org.game.core.Param;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.QuerySubscriber;
+import org.game.core.event.AccountMessageDispatcher;
 import org.game.core.human.HumanLookup;
 import org.game.core.human.HumanThread;
 import org.game.core.net.ClientPeriod;
@@ -40,6 +41,8 @@ public class LoginService extends GameServiceBase implements ILoginService {
      */
     private final Map<Long, LoginInfo> loginInfoMap = new java.util.HashMap<>();
 
+    private final AccountMessageDispatcher accountProtoDispatch = new AccountMessageDispatcher();
+
     public LoginService(String name) {
         super(name);
     }
@@ -48,6 +51,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
     public void init() {
         // 初始化逻辑
         logger.info("LoginService 初始化");
+        accountProtoDispatch.init();
     }
 
     @Override
@@ -73,22 +77,10 @@ public class LoginService extends GameServiceBase implements ILoginService {
 
     @Override
     public void dispatch(Message message, ToPoint fromPoint) {
-        switch (message.getProtoID()) {
-            case Proto.CS_LOGIN:
-                CSLogin(message, fromPoint);
-                break;
-            case Proto.CS_QUERY_HUMANS:
-                CSQueryHumans(message, fromPoint);
-                break;
-            case Proto.CS_SELECT_HUMAN:
-                CSSelectHuman(message, fromPoint);
-                break;
-            default:
-                logger.warn("LoginService 接收到未知消息: {}", message);
-                break;
-        }
+        accountProtoDispatch.dispatch(String.valueOf(message.getProtoID()), this, message, fromPoint);
     }
 
+    @MessageListener(CSSelectHuman.class)
     private void CSSelectHuman(Message message, ToPoint clientPoint) {
         logger.info("接收到消息CS_SELECT_HUMAN: {}", message);
         long clientID = NumberUtils.toLong(clientPoint.getGameServiceName());
@@ -146,6 +138,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                 });
     }
 
+    @MessageListener(CSQueryHumans.class)
     private void CSQueryHumans(Message message, ToPoint fromPoint) {
         logger.info("接收到消息CS_QUERY_HUMANS: {}", message);
         long clientID = NumberUtils.toLong(fromPoint.getGameServiceName());
@@ -205,6 +198,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                 });
     }
 
+    @MessageListener(CSLogin.class)
     private void CSLogin(Message message, ToPoint fromPoint) {
         logger.info("接收到消息CS_LOGIN: {}", message);
         long clientID = NumberUtils.toLong(fromPoint.getGameServiceName());

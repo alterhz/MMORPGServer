@@ -1,10 +1,12 @@
 package org.game.proto.login;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.game.proto.ProtoID;
 import org.game.proto.common.HumanInfo;
 
 import java.util.List;
 
+@ProtoID(1004)
 public class SCQueryHumans {
     private int code;
     private List<HumanInfo> humanList;

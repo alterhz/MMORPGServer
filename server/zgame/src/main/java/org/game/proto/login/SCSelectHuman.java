@@ -1,7 +1,9 @@
 package org.game.proto.login;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.game.proto.ProtoID;
 
+@ProtoID(1006)
 public class SCSelectHuman {
 
     private int code;

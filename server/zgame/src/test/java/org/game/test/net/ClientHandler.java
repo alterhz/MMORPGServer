@@ -4,7 +4,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.game.LogCore;
 import org.game.core.net.Message;
-import org.game.core.net.RC4;
 
 import java.io.IOException;
 
@@ -13,12 +12,15 @@ import java.io.IOException;
  */
 public class ClientHandler extends ChannelInboundHandlerAdapter {
 
-    private MessageHandler messageHandler;
+    private final ClientMessageDispatcher clientMessageDispatcher = new ClientMessageDispatcher();
+
+    private LoginMessageHandler loginMessageHandler;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         LogCore.logger.info("与服务器建立连接: {}", ctx.channel().remoteAddress());
-        messageHandler = new MessageHandler(ctx.channel());
+        clientMessageDispatcher.init();
+        loginMessageHandler = new LoginMessageHandler(ctx.channel());
     }
 
     @Override
@@ -32,7 +34,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             }
 
             Message message = Message.fromBytes(data);
-            messageHandler.handle(ctx.channel(), message);
+            clientMessageDispatcher.dispatch(String.valueOf(message.getProtoID()), loginMessageHandler, message);
         }
     }
 

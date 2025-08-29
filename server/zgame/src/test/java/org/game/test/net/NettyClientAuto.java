@@ -12,8 +12,8 @@ import org.game.LogCore;
 import org.game.core.net.Message;
 import org.game.core.net.RC4DecryptHandler;
 import org.game.core.net.RC4EncryptHandler;
+import org.game.proto.ProtoScanner;
 import org.game.proto.login.CSLogin;
-import org.game.proto.Proto;
 
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -91,9 +91,9 @@ public class NettyClientAuto {
     }
 
     private void login() {
-        CSLogin CSLogin = new CSLogin("admin", "admin");
-
-        Message message = Message.createMessage(Proto.CS_LOGIN, CSLogin);
+        CSLogin csLogin = new CSLogin("admin", "admin");
+        Integer protoID = ProtoScanner.getProtoID(CSLogin.class);
+        Message message = Message.createMessage(protoID, csLogin);
 
         // 发送消息
         channel.writeAndFlush(message.toBytes()).addListener(future -> {
@@ -154,6 +154,9 @@ public class NettyClientAuto {
     
     public static void main(String[] args) throws InterruptedException {
         BaseUtils.init(20000);
+
+        ProtoScanner.init();
+
         NettyClientAuto client = new NettyClientAuto("127.0.0.1", 1080, "your_rc4_key");
         client.start();
     }
