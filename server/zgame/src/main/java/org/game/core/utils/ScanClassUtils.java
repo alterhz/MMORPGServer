@@ -16,13 +16,16 @@ public class ScanClassUtils {
 
     private static final Logger logger = LogManager.getLogger(ScanClassUtils.class);
 
-    // 扫描所有的类
     public static Set<Class<?>> scanAllClasses() {
+        return scanAllClasses("org.game");
+    }
+
+    // 扫描所有的类
+    public static Set<Class<?>> scanAllClasses(String packageName) {
         Set<Class<?>> serviceClasses = new HashSet<>();
 
         try {
             // 获取org.game包的URL路径
-            String packageName = "org.game";
             String packagePath = packageName.replace(".", "/");
             Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(packagePath);
 

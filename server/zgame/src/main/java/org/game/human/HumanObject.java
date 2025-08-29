@@ -9,6 +9,7 @@ import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
+import org.game.proto.ProtoScanner;
 import org.game.rpc.IClientService;
 
 import java.util.ArrayList;
@@ -79,7 +80,8 @@ public class HumanObject {
         logger.info("加载完成");
     }
 
-    public <T> void sendMessage(int protoID, T jsonObject) {
+    public <T> void sendMessage(T jsonObject) {
+        Integer protoID = ProtoScanner.getProtoID(jsonObject.getClass());
         IClientService proxy = ReferenceFactory.getProxy(IClientService.class, clientPoint);
         proxy.sendMessage(Message.createMessage(protoID, jsonObject));
     }

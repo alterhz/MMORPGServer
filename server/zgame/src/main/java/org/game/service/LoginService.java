@@ -113,7 +113,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
             SCSelectHuman scSelectHuman = new SCSelectHuman();
             scSelectHuman.setCode(1);
             scSelectHuman.setMessage("选择失败");
-            sendProto(clientPoint, Proto.SC_SELECT_HUMAN, scSelectHuman);
+            sendProto(clientPoint, scSelectHuman);
             return;
         }
 
@@ -130,7 +130,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                             SCSelectHuman scSelectHuman = new SCSelectHuman();
                             scSelectHuman.setCode(1);
                             scSelectHuman.setMessage("选择失败");
-                            sendProto(clientPoint, Proto.SC_SELECT_HUMAN, scSelectHuman);
+                            sendProto(clientPoint, scSelectHuman);
                         }
                     }
 
@@ -142,7 +142,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                         SCQueryHumans scQueryHumans = new SCQueryHumans();
                         scQueryHumans.setCode(1);
                         scQueryHumans.setMessage("查询失败");
-                        sendProto(clientPoint, Proto.SC_QUERY_HUMANS, scQueryHumans);
+                        sendProto(clientPoint, scQueryHumans);
                     }
                 });
     }
@@ -190,7 +190,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                         scQueryHumans.setHumanList(humanList);
                         scQueryHumans.setMessage("查询成功");
 
-                        sendProto(fromPoint, Proto.SC_QUERY_HUMANS, scQueryHumans);
+                        sendProto(fromPoint, scQueryHumans);
                     }
 
                     @Override
@@ -201,7 +201,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                         SCQueryHumans scQueryHumans = new SCQueryHumans();
                         scQueryHumans.setCode(1);
                         scQueryHumans.setMessage("查询失败");
-                        sendProto(fromPoint, Proto.SC_QUERY_HUMANS, scQueryHumans);
+                        sendProto(fromPoint, scQueryHumans);
                     }
                 });
     }
@@ -239,10 +239,11 @@ public class LoginService extends GameServiceBase implements ILoginService {
         SCLogin scLogin = new SCLogin();
         scLogin.setCode(0);
         scLogin.setMessage("登录成功");
-        sendProto(fromPoint, Proto.SC_LOGIN, scLogin);
+        sendProto(fromPoint, scLogin);
     }
 
-    private <T> void sendProto(ToPoint clientPoint, int protoID, T proto) {
+    private <T> void sendProto(ToPoint clientPoint, T proto) {
+        Integer protoID = ProtoScanner.getProtoID(proto.getClass());
         IClientService clientService = ReferenceFactory.getProxy(IClientService.class, clientPoint);
         clientService.sendMessage(Message.createMessage(protoID, proto));
     }

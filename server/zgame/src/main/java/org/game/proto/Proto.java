@@ -12,4 +12,5 @@ public class Proto {
     // 选择角色
     public static final int CS_SELECT_HUMAN = 1005;
     public static final int SC_SELECT_HUMAN = 1006;
+
 }

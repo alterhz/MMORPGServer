@@ -39,11 +39,6 @@ public class SCQueryHumans {
         this.message = message;
     }
 
-    public static ResponseMessage error(int code, String message)
-    {
-        return ResponseMessage.error(code, message);
-    }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this)

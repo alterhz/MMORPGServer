@@ -13,6 +13,8 @@ import org.game.core.rpc.RPCProxy;
 import org.game.core.utils.ScanClassUtils;
 import org.game.core.human.HModScanner;
 import org.game.core.human.HumanThread;
+import org.game.proto.Proto;
+import org.game.proto.ProtoScanner;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -24,6 +26,9 @@ public class GameStartUp {
         try {
             // 1. 载入配置文件
             MyConfig.load();
+
+            // 初始化Proto
+            ProtoScanner.init();
 
             // DB实体扫描
             DaoScanner.init();
