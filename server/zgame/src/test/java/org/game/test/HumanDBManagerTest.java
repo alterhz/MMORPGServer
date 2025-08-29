@@ -2,6 +2,7 @@ package org.game.test;
 
 import org.game.BaseUtils;
 import org.game.config.MyConfig;
+import org.game.core.db.DaoScanner;
 import org.game.core.db.HumanDBManager;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.human.HumanObject;
@@ -9,6 +10,8 @@ import org.game.human.HumanObject;
 public class HumanDBManagerTest {
     public static void main(String[] args) throws InterruptedException {
         BaseUtils.init(20000);
+
+        DaoScanner.init();
 
         MyConfig.load();
 

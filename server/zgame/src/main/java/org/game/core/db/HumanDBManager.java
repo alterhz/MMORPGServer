@@ -31,19 +31,23 @@ public class HumanDBManager {
      */
     public static void loadHumanModDB(HumanObject humanObj) {
         for (HumanLoaderMethodInfo humanLoaderMethodInfo : humanLoaderMethodInfos) {
-            MongoDBAsyncClient.getCollection(humanLoaderMethodInfo.getCollectionName(), humanLoaderMethodInfo.getEntity())
+            humanObj.addLoadingHModDB(humanLoaderMethodInfo.getCollectionName());
+
+            MongoDBAsyncClient.getCollection(humanLoaderMethodInfo.getEntity())
             .find(Filters.eq("humanId", humanObj.getId()))
                     .subscribe(new QuerySubscriber<Object>(Long.MAX_VALUE) {
                         @Override
                         protected void onLoadDB(List<Object> dbCollections) {
                             try {
-                                logger.info("加载Human相关DB成功. {}", humanLoaderMethodInfo.getCollectionName());
                                 HModBase hModBase = humanObj.getHModBase(humanLoaderMethodInfo.getHModClass());
                                 humanLoaderMethodInfo.getMethod().invoke(hModBase, dbCollections);
+                                humanObj.removeLoadingHModDB(humanLoaderMethodInfo.getCollectionName());
+                                humanObj.loadHModComplete();
                             } catch (IllegalAccessException | InvocationTargetException e) {
                                 logger.error("加载Human相关DB失败. collectionName={}, humanObj={}", humanLoaderMethodInfo.getCollectionName(), humanObj);
                                 throw new RuntimeException(e);
                             }
+
                         }
 
                         @Override

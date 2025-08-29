@@ -117,7 +117,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
             return;
         }
 
-        MongoDBAsyncClient.getCollection("humans", HumanDB.class)
+        MongoDBAsyncClient.getCollection(HumanDB.class)
                 .find(Filters.eq("_id", new ObjectId(humanId)))
                 .subscribe(new QuerySubscriber<>() {
                     @Override
@@ -164,7 +164,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         loginInfo.loginPeriod = LoginPeriod.QUERY_HUMANS;
 
         String account = loginInfo.account;
-        MongoDBAsyncClient.getCollection("humans", HumanDB.class)
+        MongoDBAsyncClient.getCollection(HumanDB.class)
                 .find(Filters.eq("account", account))
                 .subscribe(new QuerySubscriber<>() {
                     @Override

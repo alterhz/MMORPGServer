@@ -4,6 +4,7 @@ import org.game.config.MyConfig;
 import org.game.core.GameProcess;
 import org.game.core.GameServiceBase;
 import org.game.core.GameThread;
+import org.game.core.db.DaoScanner;
 import org.game.core.db.HumanDBManager;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.MongoDBSyncClient;
@@ -23,6 +24,9 @@ public class GameStartUp {
         try {
             // 1. 载入配置文件
             MyConfig.load();
+
+            // DB实体扫描
+            DaoScanner.init();
 
             // HumanLoader初始化
             HumanDBManager.init();

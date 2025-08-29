@@ -55,6 +55,11 @@ public class MongoDBAsyncClient {
         return getDatabase().getCollection(collection);
     }
 
+    public static <T> MongoCollection<T> getCollection(Class<T> clazz) {
+        String collectionName = DaoScanner.getCollectionName(clazz);
+        return getDatabase().getCollection(collectionName, clazz);
+    }
+
     /**
      * 使用默认数据库名获取集合
      */
@@ -76,7 +81,7 @@ public class MongoDBAsyncClient {
         Entity annotation = obj.getClass().getAnnotation(Entity.class);
         String collectionName = annotation.collectionName();
         Class<T> clazz = (Class<T>) obj.getClass();
-        getCollection(collectionName, clazz).insertOne(obj).subscribe(new Subscriber<>() {
+        getCollection(clazz).insertOne(obj).subscribe(new Subscriber<>() {
             @Override
             public void onSubscribe(Subscription s) {
                 s.request(1);

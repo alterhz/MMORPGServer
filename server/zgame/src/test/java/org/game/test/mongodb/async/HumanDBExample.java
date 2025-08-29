@@ -4,6 +4,7 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import org.game.BaseUtils;
 import org.game.LogCore;
 import org.game.config.MyConfig;
+import org.game.core.db.DaoScanner;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.dao.HumanDB;
 
@@ -17,11 +18,13 @@ public class HumanDBExample {
         // 用于阻塞主线程，等待异步操作完成
         CountDownLatch latch = new CountDownLatch(1);
 
+        DaoScanner.init();
+
         MyConfig.load();
 
         MongoDBAsyncClient.init(MyConfig.getConfig().getMongodb().getUri(), MyConfig.getConfig().getMongodb().getDbName());
 
-        MongoCollection<HumanDB> humans = MongoDBAsyncClient.getCollection("humans", HumanDB.class);
+        MongoCollection<HumanDB> humans = MongoDBAsyncClient.getCollection(HumanDB.class);
 
         try {
             // 创建测试对象

@@ -5,15 +5,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.TimerQueue;
 import org.game.core.human.HModScanner;
-import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
-import org.game.core.rpc.RPCProxy;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
-import org.game.proto.Proto;
 import org.game.rpc.IClientService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +28,8 @@ public class HumanObject {
     private ToPoint clientPoint;
 
     private HumanDB humanDB;
+
+    private final List<String> loadingHModDBs = new ArrayList<>();
 
     private final Map<Class<?>, HModBase> hModBaseMap = new HashMap<>();
 
@@ -57,6 +57,26 @@ public class HumanObject {
 
     public void setClientPoint(ToPoint clientPoint) {
         this.clientPoint = clientPoint;
+    }
+
+    public void addLoadingHModDB(String hModDB) {
+        loadingHModDBs.add(hModDB);
+        logger.debug("正在加载 {}", hModDB);
+    }
+
+    public void removeLoadingHModDB(String hModDB) {
+        loadingHModDBs.remove(hModDB);
+        logger.debug("加载完成 {}", hModDB);
+    }
+
+    public void loadHModComplete() {
+        if (loadingHModDBs.isEmpty()) {
+            onLoadingComplete();
+        }
+    }
+
+    protected void onLoadingComplete() {
+        logger.info("加载完成");
     }
 
     public <T> void sendMessage(int protoID, T jsonObject) {
