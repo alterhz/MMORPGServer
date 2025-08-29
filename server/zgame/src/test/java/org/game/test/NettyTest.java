@@ -2,6 +2,7 @@ package org.game.test;
 
 import org.game.BaseUtils;
 import org.game.core.net.NettyServer;
+import org.game.test.net.NettyClientInput;
 
 public class NettyTest {
     public static void main(String[] args) throws InterruptedException {
@@ -13,7 +14,7 @@ public class NettyTest {
         // 等待3秒
         Thread.sleep(3000);
 
-        NettyClient client = new NettyClient("127.0.0.1", 1080, "your_rc4_key");
+        NettyClientInput client = new NettyClientInput("127.0.0.1", 1080, "your_rc4_key");
         client.start();
 
         server.shutdown();

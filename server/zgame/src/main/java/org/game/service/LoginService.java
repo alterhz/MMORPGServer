@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
 import org.game.core.db.HumanDBManager;
@@ -116,7 +117,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         }
 
         MongoDBAsyncClient.getCollection("humans", HumanDB.class)
-                .find(Filters.eq("id", humanId))
+                .find(Filters.eq("_id", new ObjectId(humanId)))
                 .subscribe(new QuerySubscriber<>() {
                     @Override
                     protected void onLoadDB(List<HumanDB> humanDBS) {

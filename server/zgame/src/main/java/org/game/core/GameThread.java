@@ -270,7 +270,7 @@ public class GameThread extends Thread {
         String gameServiceName = request.getInvocation().getToPoint().getGameServiceName();
         GameServiceBase gameServiceBase = gameServices.get(gameServiceName);
         if (gameServiceBase == null) {
-            throw new RuntimeException("GameService not found: " + gameServiceName);
+            throw new RuntimeException("GameService not found: " + request);
         }
 
         // 获取目标方法名

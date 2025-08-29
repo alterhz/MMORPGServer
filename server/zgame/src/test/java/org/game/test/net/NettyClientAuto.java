@@ -1,4 +1,4 @@
-package org.game.test;
+package org.game.test.net;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -9,8 +9,11 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import org.game.BaseUtils;
 import org.game.LogCore;
-import org.game.core.net.*;
+import org.game.core.net.Message;
+import org.game.core.net.RC4DecryptHandler;
+import org.game.core.net.RC4EncryptHandler;
 import org.game.proto.CSLogin;
+import org.game.proto.Proto;
 
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -22,15 +25,15 @@ import java.util.concurrent.TimeUnit;
  * @author Lingma
  * @date 2025-08-01
  */
-public class NettyClient {
-    
+public class NettyClientAuto {
+
     private final String host;
     private final int port;
     private final String rc4Key;
     private EventLoopGroup group;
     private Channel channel;
-    
-    public NettyClient(String host, int port, String rc4Key) {
+
+    public NettyClientAuto(String host, int port, String rc4Key) {
         this.host = host;
         this.port = port;
         this.rc4Key = rc4Key;
@@ -74,7 +77,9 @@ public class NettyClient {
             ChannelFuture future = bootstrap.connect(host, port).sync();
             channel = future.channel();
             LogCore.logger.info("已连接到服务器 {}:{}", host, port);
-            
+
+            login();
+
             // 等待用户输入并发送消息
             handleUserInput();
             
@@ -84,7 +89,20 @@ public class NettyClient {
             shutdown();
         }
     }
-    
+
+    private void login() {
+        CSLogin CSLogin = new CSLogin("admin", "admin");
+
+        Message message = Message.createMessage(Proto.CS_LOGIN, CSLogin);
+
+        // 发送消息
+        channel.writeAndFlush(message.toBytes()).addListener(future -> {
+            if (!future.isSuccess()) {
+                LogCore.logger.error("发送消息失败", future.cause());
+            }
+        });
+    }
+
     /**
      * 处理用户输入，发送消息到服务器
      */
@@ -102,19 +120,7 @@ public class NettyClient {
                     
                     // 构造测试消息包：协议ID(4字节)+内容
                     byte[] content = input.getBytes();
-                    String name = new String(content);
 
-                    CSLogin CSLogin = new CSLogin(name, "admin");
-
-                    Message message = Message.createMessage(1001, CSLogin);
-                    content = message.toBytes();
-
-                    // 发送消息
-                    channel.writeAndFlush(content).addListener(future -> {
-                        if (!future.isSuccess()) {
-                            LogCore.logger.error("发送消息失败", future.cause());
-                        }
-                    });
                     
                     // 等待一段时间避免过快输入
                     TimeUnit.MILLISECONDS.sleep(100);
@@ -148,7 +154,7 @@ public class NettyClient {
     
     public static void main(String[] args) throws InterruptedException {
         BaseUtils.init(20000);
-        NettyClient client = new NettyClient("127.0.0.1", 1080, "your_rc4_key");
+        NettyClientAuto client = new NettyClientAuto("127.0.0.1", 1080, "your_rc4_key");
         client.start();
     }
 
