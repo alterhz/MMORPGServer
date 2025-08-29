@@ -29,6 +29,8 @@ public class HumanService extends GameServiceBase implements IHumanService {
         humanObj.init();
     }
 
+
+
     @Override
     public void startup() {
         // 启动角色服务
@@ -41,11 +43,11 @@ public class HumanService extends GameServiceBase implements IHumanService {
         humanObj.pulse(now);
     }
 
+
     @Override
     public void destroy() {
         // 销毁角色服务
         logger.info("HumanObjectService 销毁");
-        // 可以在这里保存角色数据等
     }
 
     @Override

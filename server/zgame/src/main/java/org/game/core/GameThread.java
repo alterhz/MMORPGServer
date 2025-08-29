@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.game.core.net.ConnThread;
 import org.game.core.rpc.RPCRequest;
 import org.game.core.rpc.RPCResponse;
 import org.game.core.utils.JsonUtils;
@@ -170,6 +171,9 @@ public class GameThread extends Thread {
 
     // 添加GameService
     public void addGameService(GameServiceBase service) {
+        if (gameServices.containsKey(service.getName())) {
+            logger.error("Service: {} 已存在", service.getName());
+        }
         gameServices.put(service.getName(), service);
         service.bindGameThread(this);
         if (logger.isDebugEnabled()) {
@@ -180,6 +184,11 @@ public class GameThread extends Thread {
 
     public void removeGameService(GameServiceBase service) {
         gameServices.remove(service.getName());
+        service.destroy();
+        if (logger.isDebugEnabled()) {
+            // service解绑线程
+            logger.debug("Service: {} 解绑线程: {}", service.getName(), service.getGameThread().getName());
+        }
     }
 
     // 根据名称获取GameService
@@ -193,7 +202,7 @@ public class GameThread extends Thread {
     }
 
     public void destroy() {
-
+        logger.info("GameThread: {} 销毁", getName());
     }
 
     // RPC相关方法
@@ -270,7 +279,14 @@ public class GameThread extends Thread {
         String gameServiceName = request.getInvocation().getToPoint().getGameServiceName();
         GameServiceBase gameServiceBase = gameServices.get(gameServiceName);
         if (gameServiceBase == null) {
-            throw new RuntimeException("GameService not found: " + request);
+            // 判断当前位于ConnThread线程
+            logger.error("GameService not found: {}", request);
+            if (!(GameThread.getCurrentGameThread() instanceof ConnThread)) {
+                throw new RuntimeException("GameService not found: " + request);
+            } else {
+                // ConnThread线程，直接返回null
+                return null;
+            }
         }
 
         // 获取目标方法名

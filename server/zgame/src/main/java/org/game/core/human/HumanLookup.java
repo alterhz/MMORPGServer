@@ -1,7 +1,13 @@
 package org.game.core.human;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.game.core.GameProcess;
+import org.game.core.GameServiceBase;
+import org.game.core.GameThread;
 import org.game.human.HumanObject;
+import org.game.service.HumanService;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * 人物查找
  */
 public class HumanLookup {
+
+    public static final Logger logger = LogManager.getLogger(HumanLookup.class);
 
     private static final Map<String, HumanLocation> humanIdMap = new ConcurrentHashMap<>();
     private static final Map<String, HumanLocation> accountMap = new ConcurrentHashMap<>();
@@ -35,6 +43,23 @@ public class HumanLookup {
 
     public static HumanLocation getByAccountSafely(String account) {
         return accountMap.get(account);
+    }
+
+    public static void KickHumanByAccount(String account) {
+        HumanLocation humanLocation = accountMap.get(account);
+        if (humanLocation != null) {
+            GameThread humanThread = GameProcess.getGameThread(humanLocation.threadName);
+            if (humanThread != null) {
+                humanThread.runTask(() -> {
+                    HumanService humanService = (HumanService)humanThread.getGameService(humanLocation.humanId);
+                    if (humanService != null) {
+                        HumanObject humanObj = humanService.getHumanObj();
+                        humanObj.disconnect();
+                        humanThread.removeGameService(humanService);
+                    }
+                });
+            }
+        }
     }
 
     public static class HumanLocation {

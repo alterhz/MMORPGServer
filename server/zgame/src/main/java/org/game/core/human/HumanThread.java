@@ -4,6 +4,7 @@ import org.game.core.GameThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.db.HumanDBManager;
+import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
 import org.game.human.HumanObject;
 import org.game.service.HumanService;
@@ -54,9 +55,10 @@ public class HumanThread extends GameThread {
         return humanThreads.size();
     }
 
-    public static void createHumanObject(HumanDB humanDB) {
+    public static void createHumanObject(HumanDB humanDB, ToPoint clientPoint) {
         HumanObject humanObj = new HumanObject(humanDB.getId().toHexString());
         humanObj.setHumanDB(humanDB);
+        humanObj.setClientPoint(clientPoint);
         HumanService humanService = new HumanService(humanObj);
 
         // 随机分配一个线程

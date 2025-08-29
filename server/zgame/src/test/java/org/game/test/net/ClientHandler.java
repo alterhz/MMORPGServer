@@ -6,6 +6,8 @@ import org.game.LogCore;
 import org.game.core.net.Message;
 import org.game.core.net.RC4;
 
+import java.io.IOException;
+
 /**
  * 客户端处理
  */
@@ -42,6 +44,12 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         LogCore.logger.error("客户端发生异常", cause);
+        if (cause instanceof IOException &&
+                cause.getMessage().contains("远程主机强迫关闭了一个现有的连接")) {
+            LogCore.logger.debug("客户端主动断开连接: {}", ctx.channel().remoteAddress());
+        } else {
+            LogCore.logger.error("网络异常: {}", ctx.channel().remoteAddress(), cause);
+        }
         ctx.close();
     }
 }

@@ -4,8 +4,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.game.LogCore;
 import org.game.service.ClientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -74,7 +76,13 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        LogCore.logger.error("网络异常: {}", ctx.channel().remoteAddress(), cause);
+        // 过滤掉远程主机强制关闭连接的异常，这类异常通常由客户端主动断开连接引起
+        if (cause instanceof IOException && 
+            cause.getMessage().contains("远程主机强迫关闭了一个现有的连接")) {
+            LogCore.logger.debug("客户端主动断开连接: {}", ctx.channel().remoteAddress());
+        } else {
+            LogCore.logger.error("网络异常: {}", ctx.channel().remoteAddress(), cause);
+        }
         ctx.close();
     }
 

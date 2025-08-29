@@ -5,7 +5,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.TimerQueue;
 import org.game.core.human.HModScanner;
+import org.game.core.net.ClientPeriod;
+import org.game.core.net.Message;
+import org.game.core.rpc.RPCProxy;
+import org.game.core.rpc.ReferenceFactory;
+import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
+import org.game.proto.Proto;
+import org.game.rpc.IClientService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +26,8 @@ public class HumanObject {
     public static final Logger logger = LogManager.getLogger(HumanObject.class);
 
     private final String id;
+
+    private ToPoint clientPoint;
 
     private HumanDB humanDB;
 
@@ -40,6 +49,19 @@ public class HumanObject {
 
     public void setHumanDB(HumanDB humanDB) {
         this.humanDB = humanDB;
+    }
+
+    public ToPoint getClientPoint() {
+        return clientPoint;
+    }
+
+    public void setClientPoint(ToPoint clientPoint) {
+        this.clientPoint = clientPoint;
+    }
+
+    public <T> void sendMessage(int protoID, T jsonObject) {
+        IClientService proxy = ReferenceFactory.getProxy(IClientService.class, clientPoint);
+        proxy.sendMessage(Message.createMessage(protoID, jsonObject));
     }
 
     public String getAccount() {
@@ -83,5 +105,18 @@ public class HumanObject {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .toString();
+    }
+
+    public void disconnect() {
+        logger.info("断开连接");
+        // TODO 保存数据
+        saveHumanData();
+
+        IClientService proxy = ReferenceFactory.getProxy(IClientService.class, clientPoint);
+        proxy.Disconnect();
+    }
+
+    private void saveHumanData() {
+        logger.info("保存数据");
     }
 }

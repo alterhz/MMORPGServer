@@ -12,6 +12,7 @@ import org.game.core.Param;
 import org.game.core.db.HumanDBManager;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.QuerySubscriber;
+import org.game.core.human.HumanLookup;
 import org.game.core.human.HumanThread;
 import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
@@ -89,9 +90,9 @@ public class LoginService extends GameServiceBase implements ILoginService {
         }
     }
 
-    private void CSSelectHuman(Message message, ToPoint fromPoint) {
+    private void CSSelectHuman(Message message, ToPoint clientPoint) {
         logger.info("接收到消息CS_SELECT_HUMAN: {}", message);
-        long clientID = NumberUtils.toLong(fromPoint.getGameServiceName());
+        long clientID = NumberUtils.toLong(clientPoint.getGameServiceName());
         LoginInfo loginInfo = loginInfoMap.get(clientID);
         if (loginInfo == null) {
             logger.error("选择角色，loginInfo == null: clientID={}", clientID);
@@ -112,7 +113,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
             SCSelectHuman scSelectHuman = new SCSelectHuman();
             scSelectHuman.setCode(1);
             scSelectHuman.setMessage("选择失败");
-            sendProto(fromPoint, Proto.SC_SELECT_HUMAN, scSelectHuman);
+            sendProto(clientPoint, Proto.SC_SELECT_HUMAN, scSelectHuman);
             return;
         }
 
@@ -123,13 +124,13 @@ public class LoginService extends GameServiceBase implements ILoginService {
                     protected void onLoadDB(List<HumanDB> humanDBS) {
                         if (!humanDBS.isEmpty()) {
                             HumanDB selectHumanDB = humanDBS.get(0);
-                            HumanThread.createHumanObject(selectHumanDB);
+                            HumanThread.createHumanObject(selectHumanDB, clientPoint);
                         } else {
                             logger.error("选择的角色不存在: humanId={}", humanId);
                             SCSelectHuman scSelectHuman = new SCSelectHuman();
                             scSelectHuman.setCode(1);
                             scSelectHuman.setMessage("选择失败");
-                            sendProto(fromPoint, Proto.SC_SELECT_HUMAN, scSelectHuman);
+                            sendProto(clientPoint, Proto.SC_SELECT_HUMAN, scSelectHuman);
                         }
                     }
 
@@ -141,7 +142,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                         SCQueryHumans scQueryHumans = new SCQueryHumans();
                         scQueryHumans.setCode(1);
                         scQueryHumans.setMessage("查询失败");
-                        sendProto(fromPoint, Proto.SC_QUERY_HUMANS, scQueryHumans);
+                        sendProto(clientPoint, Proto.SC_QUERY_HUMANS, scQueryHumans);
                     }
                 });
     }
@@ -220,8 +221,10 @@ public class LoginService extends GameServiceBase implements ILoginService {
             loginInfoMap.remove(clientID);
             IClientService clientService = ReferenceFactory.getProxy(IClientService.class, existLoginInfo.clientPoint);
             clientService.Disconnect();
-            return;
         }
+
+        // 踢掉在线的角色
+        HumanLookup.KickHumanByAccount(account);
 
         // 记录账号登录信息
         LoginInfo loginInfo = new LoginInfo(account, fromPoint);
