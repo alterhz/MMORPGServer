@@ -12,12 +12,13 @@ import org.game.core.db.QuerySubscriber;
 import org.game.core.event.AccountMessageDispatcher;
 import org.game.core.human.HumanLookup;
 import org.game.core.human.HumanThread;
+import org.game.core.message.ProtoListener;
+import org.game.core.message.ProtoScanner;
 import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
-import org.game.proto.*;
 import org.game.proto.common.HumanInfo;
 import org.game.proto.login.*;
 import org.game.rpc.IClientService;
@@ -80,7 +81,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         accountProtoDispatch.dispatch(String.valueOf(message.getProtoID()), this, message, fromPoint);
     }
 
-    @MessageListener(CSSelectHuman.class)
+    @ProtoListener(CSSelectHuman.class)
     private void CSSelectHuman(Message message, ToPoint clientPoint) {
         logger.info("接收到消息CS_SELECT_HUMAN: {}", message);
         long clientID = NumberUtils.toLong(clientPoint.getGameServiceName());
@@ -138,7 +139,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                 });
     }
 
-    @MessageListener(CSQueryHumans.class)
+    @ProtoListener(CSQueryHumans.class)
     private void CSQueryHumans(Message message, ToPoint fromPoint) {
         logger.info("接收到消息CS_QUERY_HUMANS: {}", message);
         long clientID = NumberUtils.toLong(fromPoint.getGameServiceName());
@@ -198,7 +199,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                 });
     }
 
-    @MessageListener(CSLogin.class)
+    @ProtoListener(CSLogin.class)
     private void CSLogin(Message message, ToPoint fromPoint) {
         logger.info("接收到消息CS_LOGIN: {}", message);
         long clientID = NumberUtils.toLong(fromPoint.getGameServiceName());

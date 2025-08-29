@@ -9,7 +9,7 @@ import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
-import org.game.proto.ProtoScanner;
+import org.game.core.message.ProtoScanner;
 import org.game.rpc.IClientService;
 
 import java.util.ArrayList;

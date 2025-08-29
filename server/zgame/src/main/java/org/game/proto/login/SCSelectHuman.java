@@ -1,12 +1,17 @@
 package org.game.proto.login;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.game.proto.ProtoID;
+import org.game.core.message.Proto;
+import org.game.proto.ProtoIds;
 
-@ProtoID(1006)
+@Proto(ProtoIds.SC_SELECT_HUMAN)
 public class SCSelectHuman {
 
+    @JsonProperty("code")
     private int code;
+    
+    @JsonProperty("message")
     private String message;
 
     public SCSelectHuman()

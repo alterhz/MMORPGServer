@@ -5,18 +5,24 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.game.core.message.Proto;
 import org.game.proto.ProtoIds;
 
-@Proto(ProtoIds.SC_LOGIN)
-public class SCLogin {
+@Proto(ProtoIds.SC_CREATE_HUMAN)
+public class SCCreateHuman {
     @JsonProperty("code")
     private int code;
-
+    
+    @JsonProperty("humanId")
+    private String humanId;
+    
     @JsonProperty("message")
     private String message;
+    
+    @JsonProperty("success")
+    private boolean success;
 
-    public SCLogin() {
+    public SCCreateHuman() {
     }
 
-    public SCLogin(int code, String message) {
+    public SCCreateHuman(int code, String message) {
         this.code = code;
         this.message = message;
     }
@@ -37,11 +43,29 @@ public class SCLogin {
         this.message = message;
     }
 
+    public String getHumanId() {
+        return humanId;
+    }
+
+    public void setHumanId(String humanId) {
+        this.humanId = humanId;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("code", code)
+                .append("humanId", humanId)
                 .append("message", message)
+                .append("success", success)
                 .toString();
     }
 }

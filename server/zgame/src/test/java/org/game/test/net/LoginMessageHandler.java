@@ -4,8 +4,8 @@ import io.netty.channel.Channel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.net.Message;
-import org.game.proto.MessageListener;
-import org.game.proto.ProtoScanner;
+import org.game.core.message.ProtoListener;
+import org.game.core.message.ProtoScanner;
 import org.game.proto.login.CSQueryHumans;
 import org.game.proto.login.CSSelectHuman;
 import org.game.proto.login.SCLogin;
@@ -21,7 +21,7 @@ public class LoginMessageHandler {
         this.channel = channel;
     }
 
-    @MessageListener(SCLogin.class)
+    @ProtoListener(SCLogin.class)
     public void onLogin(Message message) {
         logger.info("登录成功");
         // 请求获取角色列表
@@ -29,7 +29,7 @@ public class LoginMessageHandler {
         sendMessage(csQueryHumans);
     }
 
-    @MessageListener(SCQueryHumans.class)
+    @ProtoListener(SCQueryHumans.class)
     public void onQueryHumans(Message message) {
         // 处理消息
         SCQueryHumans scQueryHumans = message.getJsonObject(SCQueryHumans.class);

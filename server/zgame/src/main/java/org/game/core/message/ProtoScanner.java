@@ -1,12 +1,9 @@
-package org.game.proto;
+package org.game.core.message;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.utils.ScanClassUtils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -31,9 +28,9 @@ public class ProtoScanner {
         Set<Class<?>> classes = ScanClassUtils.scanAllClasses("org.game.proto");
         for (Class<?> clazz : classes) {
             // 检查类是否包含ProtoID注解
-            if (clazz.isAnnotationPresent(ProtoID.class)) {
-                ProtoID protoIDAnnotation = clazz.getAnnotation(ProtoID.class);
-                int protoId = protoIDAnnotation.value();
+            if (clazz.isAnnotationPresent(Proto.class)) {
+                Proto protoAnnotation = clazz.getAnnotation(Proto.class);
+                int protoId = protoAnnotation.value();
                 PROTO_ID_MAP.put(clazz, protoId);
                 logger.info("通过注解建立协议映射: {} <-> {}", clazz.getSimpleName(), protoId);
             }

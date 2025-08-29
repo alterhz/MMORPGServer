@@ -1,4 +1,4 @@
-package org.game.proto;
+package org.game.core.message;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface ProtoID {
+public @interface Proto {
     int value();
 }

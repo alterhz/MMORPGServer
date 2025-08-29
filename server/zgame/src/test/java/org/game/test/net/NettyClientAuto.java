@@ -12,7 +12,7 @@ import org.game.LogCore;
 import org.game.core.net.Message;
 import org.game.core.net.RC4DecryptHandler;
 import org.game.core.net.RC4EncryptHandler;
-import org.game.proto.ProtoScanner;
+import org.game.core.message.ProtoScanner;
 import org.game.proto.login.CSLogin;
 
 import java.util.Scanner;

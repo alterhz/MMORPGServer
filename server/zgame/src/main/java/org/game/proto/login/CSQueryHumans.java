@@ -1,7 +1,8 @@
 package org.game.proto.login;
 
-import org.game.proto.ProtoID;
+import org.game.core.message.Proto;
+import org.game.proto.ProtoIds;
 
-@ProtoID(1003)
+@Proto(ProtoIds.CS_QUERY_HUMANS)
 public class CSQueryHumans {
 }

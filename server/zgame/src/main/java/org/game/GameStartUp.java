@@ -12,7 +12,7 @@ import org.game.core.net.NettyServer;
 import org.game.core.rpc.RPCProxy;
 import org.game.core.utils.ScanClassUtils;
 import org.game.core.human.HumanThread;
-import org.game.proto.ProtoScanner;
+import org.game.core.message.ProtoScanner;
 
 import java.lang.reflect.Constructor;
 import java.util.*;

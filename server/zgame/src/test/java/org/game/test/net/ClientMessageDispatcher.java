@@ -1,9 +1,8 @@
 package org.game.test.net;
 
 import org.game.core.event.EventDispatcher;
-import org.game.proto.MessageListener;
-import org.game.proto.ProtoScanner;
-import org.game.service.LoginService;
+import org.game.core.message.ProtoListener;
+import org.game.core.message.ProtoScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +18,8 @@ public class ClientMessageDispatcher extends EventDispatcher {
         Class<?> loginServiceClass = LoginMessageHandler.class;
         Method[] methods = loginServiceClass.getDeclaredMethods();
         for (Method method : methods) {
-            if (method.isAnnotationPresent(MessageListener.class)) {
-                MessageListener annotation = method.getAnnotation(MessageListener.class);
+            if (method.isAnnotationPresent(ProtoListener.class)) {
+                ProtoListener annotation = method.getAnnotation(ProtoListener.class);
                 Class<?> clazz = annotation.value();
                 Integer protoID = ProtoScanner.getProtoID(clazz);
                 register(String.valueOf(protoID), method);

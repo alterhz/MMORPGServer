@@ -1,4 +1,4 @@
-package org.game.proto;
+package org.game.core.message;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,6 +8,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface MessageListener {
+public @interface ProtoListener {
     Class<?> value();
 }

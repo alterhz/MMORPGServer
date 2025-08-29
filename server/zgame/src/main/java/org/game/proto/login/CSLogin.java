@@ -1,13 +1,14 @@
 package org.game.proto.login;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.game.proto.ProtoID;
+import org.game.core.message.Proto;
+import org.game.proto.ProtoIds;
 
 /**
  * 用户凭证类，用于Jackson序列化和反序列化
  * 包含用户名和密码字段
  */
-@ProtoID(1001)
+@Proto(ProtoIds.CS_LOGIN)
 public class CSLogin {
     
     @JsonProperty("account")
