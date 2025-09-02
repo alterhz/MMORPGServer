@@ -1,15 +1,17 @@
 package org.game.service;
 
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.InsertOneResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bson.BsonValue;
 import org.bson.types.ObjectId;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.QuerySubscriber;
-import org.game.core.event.AccountMessageDispatcher;
 import org.game.core.human.HumanLookup;
 import org.game.core.human.HumanThread;
 import org.game.core.message.ProtoListener;
@@ -42,7 +44,10 @@ public class LoginService extends GameServiceBase implements ILoginService {
      */
     private final Map<Long, LoginInfo> loginInfoMap = new java.util.HashMap<>();
 
-    private final AccountMessageDispatcher accountProtoDispatch = new AccountMessageDispatcher();
+    /**
+     * 登录协议分发器
+     */
+    private final LoginDispatcher loginDispatcher = new LoginDispatcher();
 
     public LoginService(String name) {
         super(name);
@@ -52,7 +57,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
     public void init() {
         // 初始化逻辑
         logger.info("LoginService 初始化");
-        accountProtoDispatch.init();
+        loginDispatcher.init();
     }
 
     @Override
@@ -78,7 +83,54 @@ public class LoginService extends GameServiceBase implements ILoginService {
 
     @Override
     public void dispatch(Message message, ToPoint fromPoint) {
-        accountProtoDispatch.dispatch(String.valueOf(message.getProtoID()), this, message, fromPoint);
+        loginDispatcher.dispatch(String.valueOf(message.getProtoID()), this, message, fromPoint);
+    }
+
+    @ProtoListener(CSCreateHuman.class)
+    private void CSCreateHuman(Message message, ToPoint clientPoint) {
+        logger.info("接收到消息CS_CREATE_HUMAN: {}", message);
+        long clientID = NumberUtils.toLong(clientPoint.getGameServiceName());
+        LoginInfo loginInfo = loginInfoMap.get(clientID);
+        if (loginInfo == null) {
+            logger.error("创建角色，loginInfo == null: clientID={}", clientID);
+            return;
+        }
+        if (loginInfo.loginPeriod != LoginPeriod.QUERY_HUMANS) {
+            logger.error("创建角色，不在查询角色阶段: clientID={}, loginPeriod={}", clientID, loginInfo.loginPeriod);
+            return;
+        }
+        loginInfo.loginPeriod = LoginPeriod.CREATE_HUMAN;
+
+        CSCreateHuman csCreateHuman = message.getJsonObject(CSCreateHuman.class);
+
+        // TODO 创建角色
+        HumanDB humanDB = new HumanDB();
+        humanDB.setId(null);
+        humanDB.setAccount(loginInfo.account);
+        humanDB.setName(csCreateHuman.getName());
+
+        MongoDBAsyncClient.getCollection(HumanDB.class)
+                .insertOne(humanDB)
+                .subscribe(new QuerySubscriber<>() {
+                    @Override
+                    protected void onLoadDB(List<InsertOneResult> dbCollections) {
+                        BsonValue insertedId = dbCollections.get(0).getInsertedId();
+                        logger.info("创建角色成功: insertedId={}", insertedId);
+                        SCCreateHuman scCreateHuman = new SCCreateHuman();
+                        scCreateHuman.setCode(0);
+                        scCreateHuman.setHumanId(insertedId.asObjectId().getValue().toHexString());
+                        scCreateHuman.setSuccess(true);
+                        sendProto(clientPoint, scCreateHuman);
+
+                        HumanThread.loadHumanObject(humanDB, clientPoint);
+                    }
+
+                    @Override
+                    protected void onError(String errMessage) {
+                        logger.info("创建角色失败: {}", errMessage);
+                    }
+                });
+
     }
 
     @ProtoListener(CSSelectHuman.class)
@@ -116,7 +168,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                     protected void onLoadDB(List<HumanDB> humanDBS) {
                         if (!humanDBS.isEmpty()) {
                             HumanDB selectHumanDB = humanDBS.get(0);
-                            HumanThread.createHumanObject(selectHumanDB, clientPoint);
+                            HumanThread.loadHumanObject(selectHumanDB, clientPoint);
                         } else {
                             logger.error("选择的角色不存在: humanId={}", humanId);
                             SCSelectHuman scSelectHuman = new SCSelectHuman();
@@ -207,6 +259,16 @@ public class LoginService extends GameServiceBase implements ILoginService {
         CSLogin csLogin = message.getJsonObject(CSLogin.class);
         String account = csLogin.getAccount();
 
+        // 账号不能为空或者空格
+        if (StringUtils.isBlank(account)) {
+            logger.error("账号不能为空或者空格: account={}", account);
+            SCLogin scLogin = new SCLogin();
+            scLogin.setCode(1);
+            scLogin.setMessage("登录失败：账号不能为空");
+            sendProto(fromPoint, scLogin);
+            return;
+        }
+
         // 账号已登录
         LoginInfo existLoginInfo = accountLoginInfoMap.get(account);
         if (existLoginInfo != null && existLoginInfo.clientPoint != fromPoint) {
@@ -246,6 +308,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         LOGIN,
         QUERY_HUMANS,
         SELECT_HUMAN,
+        CREATE_HUMAN,
     }
 
     static class LoginInfo {

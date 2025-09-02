@@ -1,16 +1,16 @@
-package org.game.core.event;
+package org.game.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.game.core.event.EventDispatcher;
 import org.game.core.message.ProtoListener;
 import org.game.core.message.ProtoScanner;
-import org.game.service.LoginService;
 
 import java.lang.reflect.Method;
 
 
-public class AccountMessageDispatcher extends EventDispatcher {
-    public static final Logger logger = LogManager.getLogger(AccountMessageDispatcher.class);
+public class LoginDispatcher extends EventDispatcher {
+    public static final Logger logger = LogManager.getLogger(LoginDispatcher.class);
 
     public void init() {
         logger.info("MessageDispatch 初始化");

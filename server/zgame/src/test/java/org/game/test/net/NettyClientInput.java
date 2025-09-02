@@ -11,6 +11,7 @@ import org.game.BaseUtils;
 import org.game.LogCore;
 import org.game.core.net.*;
 import org.game.proto.login.CSLogin;
+import org.game.test.net.handler.LoginHandler;
 
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -60,7 +61,7 @@ public class NettyClientInput {
                             pipeline.addLast(new RC4DecryptHandler(rc4Key));
                             
                             // 添加客户端业务处理器
-                            pipeline.addLast(new ClientHandler());
+                            pipeline.addLast(new ClientHandler(new LoginHandler()));
                             
                             // 添加长度字段编码器
                             pipeline.addLast(new LengthFieldPrepender(4));

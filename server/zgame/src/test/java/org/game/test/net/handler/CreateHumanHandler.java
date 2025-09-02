@@ -1,24 +1,20 @@
-package org.game.test.net;
+package org.game.test.net.handler;
 
-import io.netty.channel.Channel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.game.core.net.Message;
 import org.game.core.message.ProtoListener;
-import org.game.core.message.ProtoScanner;
+import org.game.core.net.Message;
 import org.game.proto.login.CSQueryHumans;
 import org.game.proto.login.CSSelectHuman;
 import org.game.proto.login.SCLogin;
 import org.game.proto.login.SCQueryHumans;
+import org.game.test.net.ClientProtoDispatcher;
 
-public class LoginMessageHandler {
-    public static final Logger logger = LogManager.getLogger(LoginMessageHandler.class);
+public class CreateHumanHandler extends ClientProtoDispatcher {
+    public static final Logger logger = LogManager.getLogger(CreateHumanHandler.class);
 
-    private final Channel channel;
-
-    public LoginMessageHandler(Channel channel)
+    public CreateHumanHandler()
     {
-        this.channel = channel;
     }
 
     @ProtoListener(SCLogin.class)
@@ -46,9 +42,4 @@ public class LoginMessageHandler {
         }
     }
 
-    private <T> void sendMessage(T proto) {
-        Integer protoID = ProtoScanner.getProtoID(proto.getClass());
-        Message message = Message.createMessage(protoID, proto);
-        channel.writeAndFlush(message.toBytes());
-    }
 }

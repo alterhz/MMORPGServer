@@ -14,6 +14,7 @@ import org.game.core.net.RC4DecryptHandler;
 import org.game.core.net.RC4EncryptHandler;
 import org.game.core.message.ProtoScanner;
 import org.game.proto.login.CSLogin;
+import org.game.test.net.handler.LoginHandler;
 
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -41,10 +42,10 @@ public class NettyClientAuto {
     
     /**
      * 启动客户端并连接到服务器
-     * 
+     *
      * @throws InterruptedException 如果连接过程中线程被中断
      */
-    public void start() throws InterruptedException {
+    public void start(ClientProtoDispatcher dispatcher, String account) throws InterruptedException {
         group = new NioEventLoopGroup();
         
         try {
@@ -63,7 +64,7 @@ public class NettyClientAuto {
                             pipeline.addLast(new RC4DecryptHandler(rc4Key));
                             
                             // 添加客户端业务处理器
-                            pipeline.addLast(new ClientHandler());
+                            pipeline.addLast(new ClientHandler(dispatcher));
                             
                             // 添加长度字段编码器
                             pipeline.addLast(new LengthFieldPrepender(4));
@@ -78,7 +79,7 @@ public class NettyClientAuto {
             channel = future.channel();
             LogCore.logger.info("已连接到服务器 {}:{}", host, port);
 
-            login();
+            login(account);
 
             // 等待用户输入并发送消息
             handleUserInput();
@@ -90,8 +91,8 @@ public class NettyClientAuto {
         }
     }
 
-    private void login() {
-        CSLogin csLogin = new CSLogin("admin", "admin");
+    private void login(String account) {
+        CSLogin csLogin = new CSLogin(account, "");
         Integer protoID = ProtoScanner.getProtoID(CSLogin.class);
         Message message = Message.createMessage(protoID, csLogin);
 
@@ -158,7 +159,7 @@ public class NettyClientAuto {
         ProtoScanner.init();
 
         NettyClientAuto client = new NettyClientAuto("127.0.0.1", 1080, "your_rc4_key");
-        client.start();
+        client.start(new LoginHandler(), "robot");
     }
 
 }

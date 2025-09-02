@@ -55,7 +55,9 @@ public class HumanThread extends GameThread {
         return humanThreads.size();
     }
 
-    public static void createHumanObject(HumanDB humanDB, ToPoint clientPoint) {
+    public static void loadHumanObject(HumanDB humanDB, ToPoint clientPoint) {
+        logger.info("加载玩家对象: {}", humanDB);
+
         HumanObject humanObj = new HumanObject(humanDB.getId().toHexString());
         humanObj.setHumanDB(humanDB);
         humanObj.setClientPoint(clientPoint);

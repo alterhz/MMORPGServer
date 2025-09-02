@@ -12,15 +12,18 @@ import java.io.IOException;
  */
 public class ClientHandler extends ChannelInboundHandlerAdapter {
 
-    private final ClientMessageDispatcher clientMessageDispatcher = new ClientMessageDispatcher();
+    private final ClientProtoDispatcher clientProtoDispatcher;
 
-    private LoginMessageHandler loginMessageHandler;
+    public ClientHandler(ClientProtoDispatcher clientProtoDispatcher) {
+        super();
+        this.clientProtoDispatcher = clientProtoDispatcher;
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         LogCore.logger.info("与服务器建立连接: {}", ctx.channel().remoteAddress());
-        clientMessageDispatcher.init();
-        loginMessageHandler = new LoginMessageHandler(ctx.channel());
+        clientProtoDispatcher.init();
+        clientProtoDispatcher.setChannel(ctx.channel());
     }
 
     @Override
@@ -34,7 +37,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             }
 
             Message message = Message.fromBytes(data);
-            clientMessageDispatcher.dispatch(String.valueOf(message.getProtoID()), loginMessageHandler, message);
+            clientProtoDispatcher.dispatch(String.valueOf(message.getProtoID()), clientProtoDispatcher, message);
         }
     }
 

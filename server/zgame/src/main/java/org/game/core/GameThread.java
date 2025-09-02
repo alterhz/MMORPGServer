@@ -345,7 +345,7 @@ public class GameThread extends Thread {
             Pair<Long, Long> pair = entry.getValue();
             long count = pair.getRight();
             Long cost = pair.getLeft();
-            logger.info("RPC Cost: method={} - totalCost={}ms - totalCount={} - 10K cost={}ms", entry.getKey(), String.format("%.3f", cost / 1000000.0f), count, String.format("%.3f", cost / count / 100.0f));
+            logger.info("RPC Cost: method={} - totalCost={}ms - totalCount={} averageCost={}ms", entry.getKey(), String.format("%.3f", cost / 1000000.0f), count, String.format("%.3f", cost / count / 1000000.0f));
         }
         rpcCost.clear();
     }
