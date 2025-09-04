@@ -20,6 +20,15 @@ public class ScanClassUtils {
         return scanAllClasses("org.game");
     }
 
+    /**
+     * 获取全局Service服务
+     * <p>扫描org.game.global包下的所有类</p>
+     */
+    public static Set<Class<?>> scanGlobalServiceClasses() {
+        return scanAllClasses("org.game.global");
+    }
+
+
     // 扫描所有的类
     public static Set<Class<?>> scanAllClasses(String packageName) {
         Set<Class<?>> serviceClasses = new HashSet<>();

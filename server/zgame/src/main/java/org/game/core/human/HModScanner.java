@@ -17,7 +17,7 @@ public class HModScanner
 
     public static List<Class<? extends HModBase>> getHModClasses() {
         if (hModClasses.isEmpty()) {
-            Set<Class<?>> classes = ScanClassUtils.scanAllClasses();
+            Set<Class<?>> classes = ScanClassUtils.scanAllClasses("org.game.human");
             for (Class<?> clazz : classes) {
                 if (HModBase.class.isAssignableFrom(clazz) && clazz != HModBase.class) {
                     logger.info("Found HModBase subclass: {}", clazz.getName());

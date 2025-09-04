@@ -19,7 +19,7 @@ public class DaoScanner {
     private static final Map<Class<?>, String> entityMap = new HashMap<>();
 
     public static void init() {
-        Set<Class<?>> classes = ScanClassUtils.scanAllClasses();
+        Set<Class<?>> classes = ScanClassUtils.scanAllClasses("org.game.dao");
         for (Class<?> clazz : classes) {
             if (clazz.isAnnotationPresent(Entity.class)) {
                 Entity entity = clazz.getAnnotation(Entity.class);

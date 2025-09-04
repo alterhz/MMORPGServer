@@ -55,7 +55,7 @@ public class GameStartUp {
             createGameThreads();
 
             // 4. 扫描@ServiceConfig注解
-            Set<Class<?>> serviceClasses = ScanClassUtils.scanAllClasses();
+            Set<Class<?>> serviceClasses = ScanClassUtils.scanGlobalServiceClasses();
 
             // 5. 检查服务名称是否重复
             Map<String, Class<?>> serviceMap = validateServiceNames(serviceClasses);
