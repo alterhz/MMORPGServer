@@ -106,7 +106,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         myStruct.setSex(true);
         myStruct.setDesc("测试");
         humanInfoService.getInfo(33, "dfsd", myStruct).thenAccept(humanInfo -> {
-            logger.info("获取角色信息成功: {}", humanInfo);
+            logger.info("调用HumanRPC，成功: {}", humanInfo);
         });
         SCTest scTest = new SCTest();
         sendProto(clientPoint, scTest);

@@ -15,6 +15,6 @@ public class HumanInfoService extends HumanServiceBase implements IHumanInfoServ
     @Override
     public CompletableFuture<String> getInfo(int a, String b, MyStruct myStruct) {
         String id = humanObj.getId();
-        return CompletableFuture.completedFuture("HumanInfoService" + id);
+        return CompletableFuture.completedFuture("humanId=" + id);
     }
 }

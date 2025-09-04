@@ -3,7 +3,6 @@ package org.game.human.rpc;
 import org.game.core.Param;
 import org.game.core.net.Message;
 import org.game.core.rpc.RPCProxy;
-import org.game.core.rpc.ToPoint;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -20,6 +19,10 @@ public interface IHumanService {
      */
     void dispatchProto(Message message);
 
+    /**
+     * 转发rpc调用
+     */
+    public static final String DISPATCH_METHOD_NAME = "dispatchRPC";
     /**
      * 转发rpc调用
      */

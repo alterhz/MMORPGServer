@@ -9,6 +9,7 @@ import org.game.core.ServiceRegistryManager;
 import org.game.core.human.HumanLookup;
 import org.game.core.human.HumanThread;
 import org.game.core.utils.JsonUtils;
+import org.game.human.rpc.IHumanService;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -86,8 +87,9 @@ public class HumanRPCInvoker implements InvocationHandler {
             dispatchMethodArgsTypes.add(param.getClass().getName());
         }
 
+
         // 构造RpcInvocation
-        RpcInvocation invocation = new RpcInvocation(fromPoint, targetPoint, "dispatchMethod", dispatchMethodArgs, dispatchMethodArgsTypes);
+        RpcInvocation invocation = new RpcInvocation(fromPoint, targetPoint, IHumanService.DISPATCH_METHOD_NAME, dispatchMethodArgs, dispatchMethodArgsTypes);
 
         // 生成唯一请求ID
         String requestId = UUID.randomUUID().toString();
