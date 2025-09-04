@@ -7,7 +7,7 @@ import org.game.core.db.HumanDBManager;
 import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
 import org.game.human.HumanObject;
-import org.game.service.HumanService;
+import org.game.human.service.HumanService;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,6 +55,9 @@ public class HumanThread extends GameThread {
         return humanThreads.size();
     }
 
+    /**
+     * 加载玩家对象
+     */
     public static void loadHumanObject(HumanDB humanDB, ToPoint clientPoint) {
         logger.info("加载玩家对象: {}", humanDB);
 

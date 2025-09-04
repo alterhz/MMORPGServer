@@ -32,4 +32,15 @@ public class ReferenceFactory {
                 new RemoteRPCInvoker(toPoint)
         );
     }
+
+    public static <T> T getHumanProxy(Class<T> clazz, String humanId) {
+        if (!clazz.isAnnotationPresent(HumanRPCProxy.class)) {
+            throw new IllegalArgumentException("Interface must be annotated with @HumanRPCProxy");
+        }
+        return (T) Proxy.newProxyInstance(
+                clazz.getClassLoader(),
+                new Class[]{clazz},
+                new HumanRPCInvoker(humanId)
+        );
+    }
 }

@@ -18,4 +18,8 @@ public class ProtoIds {
     // 创建角色
     public static final int CS_CREATE_HUMAN = 1007;
     public static final int SC_CREATE_HUMAN = 1008;
+
+    // 测试
+    public static final int CS_TEST = 1009;
+    public static final int SC_TEST = 1010;
 }

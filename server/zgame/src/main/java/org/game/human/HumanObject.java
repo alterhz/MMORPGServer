@@ -6,8 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.game.core.TimerQueue;
 import org.game.core.human.HModScanner;
 import org.game.core.net.Message;
-import org.game.core.rpc.ReferenceFactory;
-import org.game.core.rpc.ToPoint;
+import org.game.core.rpc.*;
 import org.game.dao.HumanDB;
 import org.game.core.message.ProtoScanner;
 import org.game.rpc.IClientService;
@@ -32,7 +31,16 @@ public class HumanObject {
 
     private final List<String> loadingHModDBs = new ArrayList<>();
 
+    /**
+     * hModBase
+     */
     private final Map<Class<?>, HModBase> hModBaseMap = new HashMap<>();
+
+    /**
+     * HumanServiceBase
+     * key: classSimpleName, value: HumanServiceBase
+     */
+    private final Map<String, HumanServiceBase> humanServiceBaseMap = new HashMap<>();
 
     private final TimerQueue timerQueue = new TimerQueue();
 
@@ -91,6 +99,12 @@ public class HumanObject {
     }
 
     public void init() {
+        InitHMods();
+
+        initHModServices();
+    }
+
+    private void InitHMods() {
         List<Class<? extends HModBase>> hModClasses = HModScanner.getHModClasses();
         for (Class<? extends HModBase> hModClass : hModClasses) {
             try {
@@ -106,6 +120,30 @@ public class HumanObject {
             HModBase hModBase = hModBaseMap.get(hModClass);
             hModBase.onInit();
         }
+    }
+
+    private void initHModServices() {
+        List<Class<? extends HumanServiceBase>> humanService = HumanRPCScanner.getHumanService();
+        for (Class<? extends HumanServiceBase> humanServiceClass : humanService) {
+            try {
+                HumanServiceBase humanServiceBase = humanServiceClass.getConstructor(HumanObject.class).newInstance(this);
+                // 获取humanServiceClass实现的接口
+                Class<?>[] interfaces = humanServiceClass.getInterfaces();
+                for (Class<?> inter : interfaces) {
+                    // 检查接口是否包含HumanRPCProxy注解
+                    if (inter.isAnnotationPresent(HumanRPCProxy.class)) {
+                        humanServiceBaseMap.put(inter.getSimpleName().toLowerCase(), humanServiceBase);
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("HumanServiceBase init error", e);
+            }
+        }
+    }
+
+    public HumanServiceBase getHumanService(String classSimpleName) {
+        return humanServiceBaseMap.get(classSimpleName);
     }
 
     public <T extends HModBase> T getHMod(Class<T> clazz) {

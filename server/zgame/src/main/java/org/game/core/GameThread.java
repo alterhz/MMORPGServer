@@ -282,7 +282,7 @@ public class GameThread extends Thread {
             // 判断当前位于ConnThread线程
             logger.error("GameService not found: {}", request);
             if (!(GameThread.getCurrentGameThread() instanceof ConnThread)) {
-                throw new RuntimeException("GameService not found: " + request);
+                throw new RuntimeException("GameService not found: " + gameServiceName + ", request=" + request);
             } else {
                 // ConnThread线程，直接返回null
                 return null;

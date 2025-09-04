@@ -4,10 +4,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.GameProcess;
-import org.game.core.GameServiceBase;
 import org.game.core.GameThread;
 import org.game.human.HumanObject;
-import org.game.service.HumanService;
+import org.game.human.service.HumanService;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +34,17 @@ public class HumanLookup {
             humanIdMap.remove(humanId);
             accountMap.remove(humanLocation.getAccount());
         }
+    }
+
+    /**
+     * 获取玩家线程名称
+     */
+    public static String getHumanThreadName(String humanId) {
+        HumanLocation humanLocation = humanIdMap.get(humanId);
+        if (humanLocation != null) {
+            return humanLocation.getThreadName();
+        }
+        return null;
     }
 
     public static HumanLocation getByHumanIdSafely(String humanId) {

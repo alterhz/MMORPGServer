@@ -5,7 +5,7 @@ import org.game.core.net.Message;
 import org.game.core.rpc.RPCProxy;
 import org.game.core.rpc.ToPoint;
 
-@RPCProxy()
+@RPCProxy
 public interface ILoginService {
 
     /**

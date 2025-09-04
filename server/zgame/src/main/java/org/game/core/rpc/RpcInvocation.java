@@ -100,7 +100,7 @@ public class RpcInvocation {
      * @return 转换后的参数
      */
     @SuppressWarnings("unchecked")
-    private Object convertToType(Object param, String typeName) {
+    public static Object convertToType(Object param, String typeName) {
         if (param == null) {
             return null;
         }

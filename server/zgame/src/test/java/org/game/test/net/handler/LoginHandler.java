@@ -58,4 +58,27 @@ public class LoginHandler extends ClientProtoDispatcher {
         }
     }
 
+    // 选择角色成功
+    @ProtoListener(SCSelectHuman.class)
+    public void onSelectHuman(Message message) {
+        // 处理消息
+        SCSelectHuman scSelectHuman = message.getJsonObject(SCSelectHuman.class);
+        if (scSelectHuman.getCode() == 0) {
+            logger.info("选择角色成功");
+            // 测试
+            CSTest csTest = new CSTest();
+            sendMessage(csTest);
+        } else {
+            logger.info("选择角色失败");
+        }
+    }
+
+    // 测试
+    @ProtoListener(SCTest.class)
+    public void onTest(Message message) {
+        // 处理消息
+        SCTest scTest = message.getJsonObject(SCTest.class);
+        logger.info("测试成功");
+    }
+
 }

@@ -21,6 +21,8 @@ import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
+import org.game.human.MyStruct;
+import org.game.human.rpc.IHumanInfoService;
 import org.game.proto.common.HumanInfo;
 import org.game.proto.login.*;
 import org.game.rpc.IClientService;
@@ -84,6 +86,30 @@ public class LoginService extends GameServiceBase implements ILoginService {
     @Override
     public void dispatch(Message message, ToPoint fromPoint) {
         loginDispatcher.dispatch(String.valueOf(message.getProtoID()), this, message, fromPoint);
+    }
+
+    // CS_TEST
+    @ProtoListener(CSTest.class)
+    private void CSTest(Message message, ToPoint clientPoint) {
+        logger.info("接收到消息CS_TEST: {}", message);
+        long clientID = NumberUtils.toLong(clientPoint.getGameServiceName());
+        LoginInfo loginInfo = loginInfoMap.get(clientID);
+        if (loginInfo == null) {
+            logger.error("CSTest，loginInfo == null: clientID={}", clientID);
+            return;
+        }
+        String humanId = loginInfo.humans.get(0);
+        IHumanInfoService humanInfoService = ReferenceFactory.getHumanProxy(IHumanInfoService.class, humanId);
+        MyStruct myStruct = new MyStruct();
+        myStruct.setId(1);
+        myStruct.setName("张三");
+        myStruct.setSex(true);
+        myStruct.setDesc("测试");
+        humanInfoService.getInfo(33, "dfsd", myStruct).thenAccept(humanInfo -> {
+            logger.info("获取角色信息成功: {}", humanInfo);
+        });
+        SCTest scTest = new SCTest();
+        sendProto(clientPoint, scTest);
     }
 
     @ProtoListener(CSCreateHuman.class)
@@ -169,6 +195,10 @@ public class LoginService extends GameServiceBase implements ILoginService {
                         if (!humanDBS.isEmpty()) {
                             HumanDB selectHumanDB = humanDBS.get(0);
                             HumanThread.loadHumanObject(selectHumanDB, clientPoint);
+
+                            // 选择角色成功
+                            SCSelectHuman scSelectHuman = new SCSelectHuman(0, "选择角色成功");
+                            sendProto(clientPoint, scSelectHuman);
                         } else {
                             logger.error("选择的角色不存在: humanId={}", humanId);
                             SCSelectHuman scSelectHuman = new SCSelectHuman();
