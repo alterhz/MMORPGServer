@@ -16,8 +16,8 @@ zgame 是一个基于 Java 的游戏服务端框架，用于构建网络化游�
 详细文档请参考以下链接：
 
 - [RPC 调用流程文档](docs/RPC.md) - 详细介绍项目中的 RPC 调用机制和实现原理
-- [RPC使用步骤文档](docs/rpc_step.md) - 详细介绍 RPC 的使用步骤
 - [HumanRPC 框架开发指南](docs/HumanRPC.md) - 详细介绍 HumanRPC 框架的使用方法
+- [GlobalRPC 框架开发指南](docs/GlobalRPC.md) - 详细介绍 GlobalRPC 框架的使用方法
 
 ## 快速开始
 
