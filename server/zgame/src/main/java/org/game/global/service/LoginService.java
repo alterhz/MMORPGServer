@@ -1,4 +1,4 @@
-package org.game.service;
+package org.game.global.service;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
@@ -21,12 +21,12 @@ import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
-import org.game.human.MyStruct;
+import org.game.human.module.MyStruct;
 import org.game.human.rpc.IHumanInfoService;
 import org.game.proto.common.HumanInfo;
 import org.game.proto.login.*;
-import org.game.rpc.IClientService;
-import org.game.rpc.ILoginService;
+import org.game.global.rpc.IClientService;
+import org.game.global.rpc.ILoginService;
 
 import java.util.ArrayList;
 import java.util.List;

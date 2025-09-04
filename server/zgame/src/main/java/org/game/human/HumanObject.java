@@ -9,7 +9,7 @@ import org.game.core.net.Message;
 import org.game.core.rpc.*;
 import org.game.dao.HumanDB;
 import org.game.core.message.ProtoScanner;
-import org.game.rpc.IClientService;
+import org.game.global.rpc.IClientService;
 
 import java.util.ArrayList;
 import java.util.HashMap;

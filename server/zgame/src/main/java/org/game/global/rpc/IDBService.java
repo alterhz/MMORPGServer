@@ -1,4 +1,4 @@
-package org.game.rpc;
+package org.game.global.rpc;
 
 import org.game.core.GameServiceBase;
 import org.game.core.Param;

@@ -1,4 +1,4 @@
-package org.game.rpc;
+package org.game.global.rpc;
 
 import org.game.core.Param;
 import org.game.core.rpc.RPCProxy;

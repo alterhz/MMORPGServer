@@ -22,7 +22,7 @@ HumanRPC 主要由以下几个组件构成：
 package org.game.human.rpc;
 
 import org.game.core.rpc.HumanRPCProxy;
-import org.game.human.MyStruct;
+import org.game.human.module.MyStruct;
 import java.util.concurrent.CompletableFuture;
 
 @HumanRPCProxy
@@ -45,7 +45,7 @@ package org.game.human.service;
 
 import org.game.core.rpc.HumanServiceBase;
 import org.game.human.HumanObject;
-import org.game.human.MyStruct;
+import org.game.human.module.MyStruct;
 import org.game.human.rpc.IHumanInfoService;
 import java.util.concurrent.CompletableFuture;
 

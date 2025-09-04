@@ -1,14 +1,16 @@
-package org.game.human;
+package org.game.human.module;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.db.HumanLoader;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.dao.HumanInfoDB;
+import org.game.human.HModBase;
+import org.game.human.HumanObject;
 
 import java.util.List;
 
-public class HModInfo extends HModBase{
+public class HModInfo extends HModBase {
 
     public static final Logger logger = LogManager.getLogger(HModInfo.class);
 

@@ -1,12 +1,12 @@
-package org.game.service;
+package org.game.global.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
 import org.game.core.rpc.ReferenceFactory;
-import org.game.rpc.IHumanGlobalService;
-import org.game.rpc.IStageGlobalService;
+import org.game.global.rpc.IHumanGlobalService;
+import org.game.global.rpc.IStageGlobalService;
 
 import java.util.concurrent.CompletableFuture;
 

@@ -1,4 +1,4 @@
-package org.game.service;
+package org.game.global.service;
 
 import com.mongodb.client.MongoCollection;
 import org.apache.logging.log4j.LogManager;
@@ -7,7 +7,7 @@ import org.bson.Document;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
 import org.game.core.db.MongoDBSyncClient;
-import org.game.rpc.IDBService;
+import org.game.global.rpc.IDBService;
 
 import java.util.concurrent.CompletableFuture;
 

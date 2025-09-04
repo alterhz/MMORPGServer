@@ -1,4 +1,4 @@
-package org.game.human;
+package org.game.human.module;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

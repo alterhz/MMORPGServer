@@ -1,4 +1,4 @@
-package org.game.service;
+package org.game.global.service;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -10,8 +10,8 @@ import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
-import org.game.rpc.IClientService;
-import org.game.rpc.ILoginService;
+import org.game.global.rpc.IClientService;
+import org.game.global.rpc.ILoginService;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

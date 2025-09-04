@@ -1,4 +1,4 @@
-package org.game.service;
+package org.game.global.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
