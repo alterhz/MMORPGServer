@@ -39,7 +39,8 @@ public class HumanDBManager {
                         @Override
                         protected void onLoadDB(List<Object> dbCollections) {
                             try {
-                                HModBase hModBase = humanObj.getHModBase(humanLoaderMethodInfo.getHModClass());
+                                Class<?> hModClass = humanLoaderMethodInfo.getMethod().getDeclaringClass();
+                                HModBase hModBase = humanObj.getHModBase(hModClass);
                                 humanLoaderMethodInfo.getMethod().invoke(hModBase, dbCollections);
                                 humanObj.removeLoadingHModDB(humanLoaderMethodInfo.getCollectionName());
                                 humanObj.loadHModComplete();
@@ -75,7 +76,7 @@ public class HumanDBManager {
             for (Method method : hModClazz.getDeclaredMethods()) {
                 if (method.isAnnotationPresent(HumanLoader.class) && !Modifier.isStatic(method.getModifiers())) {
                     // 获取HumanLoader注解的值
-                    HumanLoaderMethodInfo humanLoaderMethodInfo = createHumanLoaderMethodInfo(hModClazz, method);
+                    HumanLoaderMethodInfo humanLoaderMethodInfo = createHumanLoaderMethodInfo(method);
                     humanLoaderMethodInfos.add(humanLoaderMethodInfo);
                 }
             }
@@ -83,7 +84,7 @@ public class HumanDBManager {
         return humanLoaderMethodInfos;
     }
 
-    private static HumanLoaderMethodInfo createHumanLoaderMethodInfo(Class<?> clazz, Method method) {
+    private static HumanLoaderMethodInfo createHumanLoaderMethodInfo(Method method) {
         HumanLoader loader = method.getAnnotation(HumanLoader.class);
         Class<?> entity = loader.entity();
         // 判断entity类是否包含@Entity注解
@@ -94,14 +95,10 @@ public class HumanDBManager {
         Entity entityAnnotation = entity.getAnnotation(Entity.class);
         String collectionName = entityAnnotation.collectionName();
 
-        return new HumanLoaderMethodInfo(clazz, entity, collectionName, method);
+        return new HumanLoaderMethodInfo(entity, collectionName, method);
     }
 
     public static class  HumanLoaderMethodInfo {
-        /**
-         * HMod类
-         */
-        private final Class<?> hModClass;
         /**
          * DB实体类
          */
@@ -115,15 +112,10 @@ public class HumanDBManager {
          */
         private final Method method;
 
-        public HumanLoaderMethodInfo(Class<?> hModClass, Class<?> entity, String collectionName, Method method) {
-            this.hModClass = hModClass;
+        public HumanLoaderMethodInfo(Class<?> entity, String collectionName, Method method) {
             this.entity = entity;
             this.collectionName = collectionName;
             this.method = method;
-        }
-
-        public Class<?> getHModClass() {
-            return hModClass;
         }
 
         public Class<?> getEntity() {

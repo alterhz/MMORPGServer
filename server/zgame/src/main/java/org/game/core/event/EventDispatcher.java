@@ -19,6 +19,8 @@ public class EventDispatcher {
      */
     public void register(String eventName, Method method) {
         method.setAccessible(true);
+        Class<?> aClass = method.getDeclaringClass();
+        logger.info("EventDispatcher 注册 {} {}", aClass, method.getName());
         eventMap.computeIfAbsent(eventName, k -> new java.util.ArrayList<>()).add(method);
     }
 
