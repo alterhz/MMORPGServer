@@ -75,7 +75,7 @@ public class HumanDBManager {
             for (Method method : hModClazz.getDeclaredMethods()) {
                 if (method.isAnnotationPresent(HumanLoader.class) && !Modifier.isStatic(method.getModifiers())) {
                     // 获取HumanLoader注解的值
-                    HumanLoaderMethodInfo humanLoaderMethodInfo = getHumanLoaderMethodInfo(hModClazz, method);
+                    HumanLoaderMethodInfo humanLoaderMethodInfo = createHumanLoaderMethodInfo(hModClazz, method);
                     humanLoaderMethodInfos.add(humanLoaderMethodInfo);
                 }
             }
@@ -83,7 +83,7 @@ public class HumanDBManager {
         return humanLoaderMethodInfos;
     }
 
-    private static HumanLoaderMethodInfo getHumanLoaderMethodInfo(Class<?> clazz, Method method) {
+    private static HumanLoaderMethodInfo createHumanLoaderMethodInfo(Class<?> clazz, Method method) {
         HumanLoader loader = method.getAnnotation(HumanLoader.class);
         Class<?> entity = loader.entity();
         // 判断entity类是否包含@Entity注解
@@ -98,9 +98,21 @@ public class HumanDBManager {
     }
 
     public static class  HumanLoaderMethodInfo {
+        /**
+         * HMod类
+         */
         private final Class<?> hModClass;
+        /**
+         * DB实体类
+         */
         private final Class<?> entity;
+        /**
+         * DB集合名称
+         */
         private final String collectionName;
+        /**
+         * HMod中的DB加载函数
+         */
         private final Method method;
 
         public HumanLoaderMethodInfo(Class<?> hModClass, Class<?> entity, String collectionName, Method method) {

@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
+import org.game.core.net.Message;
 import org.game.core.rpc.HumanServiceBase;
 import org.game.core.rpc.RpcInvocation;
 import org.game.human.HumanObject;
@@ -64,7 +65,12 @@ public class HumanService extends GameServiceBase implements IHumanService {
     }
 
     @Override
-    public CompletableFuture<Object> dispatchMethod(String hModService, String methodName, List<Object> parameters, List<String> parameterTypes) {
+    public void dispatchProto(Message message) {
+
+    }
+
+    @Override
+    public CompletableFuture<Object> dispatchRPC(String hModService, String methodName, List<Object> parameters, List<String> parameterTypes) {
         logger.info("HumanObjectService 调用: hModService={}, methodName={}, parameterTypes={}, parameters={}", hModService, methodName, parameterTypes, parameters);
 
         // 转发rpc调用
