@@ -8,6 +8,7 @@ import org.game.core.db.DaoScanner;
 import org.game.core.db.HumanDBManager;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.MongoDBSyncClient;
+import org.game.core.human.HumanProtoDispatcher;
 import org.game.core.net.NettyServer;
 import org.game.core.rpc.RPCProxy;
 import org.game.core.utils.ScanClassUtils;
@@ -27,6 +28,9 @@ public class GameStartUp {
 
             // 初始化Proto
             ProtoScanner.init();
+
+            // HumanProtoListener初始化
+            HumanProtoDispatcher.getInstance().init();
 
             // DB实体扫描
             DaoScanner.init();

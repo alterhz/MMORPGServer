@@ -22,15 +22,6 @@ public class HModInfo extends HModBase {
         super(humanObj);
     }
 
-    @Override
-    protected void onInit() {
-        super.onInit();
-
-        HModAttr hMod = humanObj.getHMod(HModAttr.class);
-        String attr = hMod.getAttr();
-        logger.info("HModInfo init, attr: {}", attr);
-    }
-
     public void getInfo() {
         logger.info("HModInfo getInfo");
     }
@@ -52,14 +43,23 @@ public class HModInfo extends HModBase {
         }
     }
 
+    @Override
+    protected void onInitAfterLoadDB() {
+        super.onInitAfterLoadDB();
+
+        HModAttr hMod = humanObj.getHMod(HModAttr.class);
+        String attr = hMod.getAttr();
+        logger.info("HModInfo init, attr: {}", attr);
+    }
+
     /**
      * 消息监听CS_TEST
      */
     @ProtoListener(CSTest.class)
-    private void CSTest(Message message) {
-        logger.info("接收到消息CS_TEST: {}", message);
+    private void CSTest(CSTest csTest) {
+        logger.info("接收到消息CS_TEST: {}", csTest);
 
-        SCTest scTest = new SCTest();
+        SCTest scTest = new SCTest("角色DB加载成功测试");
         humanObj.sendMessage(scTest);
     }
 

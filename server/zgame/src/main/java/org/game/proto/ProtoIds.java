@@ -19,7 +19,12 @@ public class ProtoIds {
     public static final int CS_CREATE_HUMAN = 1007;
     public static final int SC_CREATE_HUMAN = 1008;
 
+    // 发送客户端数据开始
+    public static final int SC_SEND_TO_CLIENT_BEGIN = 1009;
+    // 发送客户端数据结束
+    public static final int SC_SEND_TO_CLIENT_END = 1010;
+
     // 测试
-    public static final int CS_TEST = 1009;
-    public static final int SC_TEST = 1010;
+    public static final int CS_TEST = 1101;
+    public static final int SC_TEST = 1102;
 }

@@ -6,12 +6,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.config.MyConfig;
 import org.game.core.*;
+import org.game.core.human.HumanThread;
 import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.global.rpc.IClientService;
 import org.game.global.rpc.ILoginService;
+import org.game.human.rpc.IHumanService;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -47,6 +49,7 @@ public class ClientService  extends GameServiceBase implements IClientService {
     // 添加消息队列，用于存储待处理的消息结构体
     private final BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
 
+    private String humanId;
     // 角色连接点
     private ToPoint humanToPoint;
 
@@ -108,7 +111,9 @@ public class ClientService  extends GameServiceBase implements IClientService {
 
     @Override
     public void setHumanToPoint(String humanId, ToPoint humanPoint) {
+        this.humanId = humanId;
         this.humanToPoint = humanPoint;
+        this.period = ClientPeriod.PLAYING;
     }
 
     @Override
@@ -165,6 +170,8 @@ public class ClientService  extends GameServiceBase implements IClientService {
                 break;
             case PLAYING:
                 // 处理游戏请求
+                IHumanService humanService = ReferenceFactory.getProxy(IHumanService.class, humanToPoint);
+                humanService.dispatchProto(message);
                 break;
             case DISCONNECT:
                 // 处理断线请求

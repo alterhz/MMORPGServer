@@ -5,11 +5,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.TimerQueue;
 import org.game.core.human.HModScanner;
+import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
 import org.game.core.rpc.*;
 import org.game.dao.HumanDB;
 import org.game.core.message.ProtoScanner;
 import org.game.global.rpc.IClientService;
+import org.game.global.service.ClientService;
+import org.game.proto.login.SCSendToClientBegin;
+import org.game.proto.login.SCSendToClientEnd;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,9 +29,11 @@ public class HumanObject {
 
     private final String id;
 
-    private ToPoint clientPoint;
+    private final ToPoint clientPoint;
 
-    private HumanDB humanDB;
+    private final ToPoint humanObjPoint;
+
+    private final HumanDB humanDB;
 
     private final List<String> loadingHModDBs = new ArrayList<>();
 
@@ -44,8 +50,11 @@ public class HumanObject {
 
     private final TimerQueue timerQueue = new TimerQueue();
 
-    public HumanObject(String id) {
-        this.id = id;
+    public HumanObject(HumanDB humanDB, ToPoint clientPoint, ToPoint humanObjPoint) {
+        this.id = humanDB.getId().toHexString();
+        this.humanDB = humanDB;
+        this.clientPoint = clientPoint;
+        this.humanObjPoint = humanObjPoint;
     }
 
     public String getId() {
@@ -56,16 +65,12 @@ public class HumanObject {
         return humanDB;
     }
 
-    public void setHumanDB(HumanDB humanDB) {
-        this.humanDB = humanDB;
-    }
-
     public ToPoint getClientPoint() {
         return clientPoint;
     }
 
-    public void setClientPoint(ToPoint clientPoint) {
-        this.clientPoint = clientPoint;
+    public ToPoint getHumanObjPoint() {
+        return humanObjPoint;
     }
 
     public void addLoadingHModDB(String hModDB) {
@@ -84,8 +89,38 @@ public class HumanObject {
         }
     }
 
+    /**
+     * 所有HMod加载完成
+     */
     protected void onLoadingComplete() {
-        logger.info("加载完成");
+        forEachHModInit();
+
+        // 修改ClientService的HumanToPoint连接点，并切换阶段
+        IClientService clientService = ReferenceFactory.getProxy(IClientService.class, clientPoint);
+        clientService.setHumanToPoint(id, humanObjPoint);
+
+        // 发送协议
+        SCSendToClientBegin scSendToClientBegin = new SCSendToClientBegin();
+        sendMessage(scSendToClientBegin);
+
+        forEachHModSendToClient();
+
+        SCSendToClientEnd scSendToClientEnd = new SCSendToClientEnd();
+        sendMessage(scSendToClientEnd);
+    }
+
+    public void forEachHModInit() {
+        for (HModBase hModBase : hModBaseMap.values()) {
+            hModBase.onInitAfterLoadDB();
+        }
+        logger.info("{} 初始化完成 {} 个HMod", this, hModBaseMap.size());
+    }
+
+    private void forEachHModSendToClient() {
+        for (HModBase hModBase : hModBaseMap.values()) {
+            hModBase.onSendToClient();
+        }
+        logger.info("{} 发送协议完成 {} 个HMod", this, hModBaseMap.size());
     }
 
     public <T> void sendMessage(T jsonObject) {
@@ -115,11 +150,7 @@ public class HumanObject {
                 logger.error("HModBase init error", e);
             }
         }
-
-        for (Class<? extends HModBase> hModClass : hModClasses) {
-            HModBase hModBase = hModBaseMap.get(hModClass);
-            hModBase.onInit();
-        }
+        logger.info("{} 加载完成 {} 个HMod", this, hModClasses.size());
     }
 
     private void initHModServices() {

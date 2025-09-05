@@ -1,5 +1,6 @@
 package org.game.core.human;
 
+import org.game.core.GameProcess;
 import org.game.core.GameThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,16 +62,19 @@ public class HumanThread extends GameThread {
     public static void loadHumanObject(HumanDB humanDB, ToPoint clientPoint) {
         logger.info("加载玩家对象: {}", humanDB);
 
-        HumanObject humanObj = new HumanObject(humanDB.getId().toHexString());
-        humanObj.setHumanDB(humanDB);
-        humanObj.setClientPoint(clientPoint);
-        HumanService humanService = new HumanService(humanObj);
+        String humanId = humanDB.getId().toHexString();
 
         // 随机分配一个线程
         long count = allocCount.getAndIncrement();
         int threadIndex = (int) (count % getHumanThreadCount());
-
         HumanThread humanThread = getHumanThread(threadIndex);
+
+        // HumanObject连接点
+        ToPoint humanPoint = new ToPoint(GameProcess.getGameProcessName(), humanThread.getName(), humanId);
+
+        HumanObject humanObj = new HumanObject(humanDB, clientPoint, humanPoint);
+        HumanService humanService = new HumanService(humanObj);
+
         humanThread.addGameService(humanService);
         humanService.bindGameThread(humanThread);
 

@@ -14,10 +14,19 @@ public class ProtoScanner {
      * 协议ID与协议类的映射关系
      */
     public static final Map<Class<?>, Integer> PROTO_ID_MAP = new HashMap<>();
+    /**
+     * 协议ID与协议类的反向映射关系
+     */
+    public static final Map<Integer, Class<?>> ID_PROTO_MAP = new HashMap<>();
 
     // 类查找协议ID
-    public static Integer getProtoID(Class<?> clazz) {
+    public static int getProtoID(Class<?> clazz) {
         return PROTO_ID_MAP.get(clazz);
+    }
+
+    // 协议ID查找类
+    public static Class<?> getProtoClass(int protoId) {
+        return ID_PROTO_MAP.get(protoId);
     }
 
     /**
@@ -32,6 +41,7 @@ public class ProtoScanner {
                 Proto protoAnnotation = clazz.getAnnotation(Proto.class);
                 int protoId = protoAnnotation.value();
                 PROTO_ID_MAP.put(clazz, protoId);
+                ID_PROTO_MAP.put(protoId, clazz);
                 logger.info("通过注解建立协议映射: {} <-> {}", clazz.getSimpleName(), protoId);
             }
         }

@@ -35,7 +35,7 @@ public class Message {
         return new Message(protoID, jsonStr);
     }
 
-    public <T> T getJsonObject(Class<T> clazz) {
+    public <T> T getProto(Class<T> clazz) {
         return JsonUtils.tryDecode(jsonStr, clazz);
     }
 

@@ -108,7 +108,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         humanInfoService.getInfo(33, "dfsd", myStruct).thenAccept(humanInfo -> {
             logger.info("调用HumanRPC，成功: {}", humanInfo);
         });
-        SCTest scTest = new SCTest();
+        SCTest scTest = new SCTest("登录成功测试");
         sendProto(clientPoint, scTest);
     }
 
@@ -127,7 +127,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         }
         loginInfo.loginPeriod = LoginPeriod.CREATE_HUMAN;
 
-        CSCreateHuman csCreateHuman = message.getJsonObject(CSCreateHuman.class);
+        CSCreateHuman csCreateHuman = message.getProto(CSCreateHuman.class);
 
         // TODO 创建角色
         HumanDB humanDB = new HumanDB();
@@ -174,7 +174,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         }
         loginInfo.loginPeriod = LoginPeriod.SELECT_HUMAN;
 
-        CSSelectHuman csSelectHuman = message.getJsonObject(CSSelectHuman.class);
+        CSSelectHuman csSelectHuman = message.getProto(CSSelectHuman.class);
         String humanId = csSelectHuman.getHumanId();
 
         // 是否存在HumanId
@@ -286,7 +286,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         logger.info("接收到消息CS_LOGIN: {}", message);
         long clientID = NumberUtils.toLong(fromPoint.getGameServiceName());
 
-        CSLogin csLogin = message.getJsonObject(CSLogin.class);
+        CSLogin csLogin = message.getProto(CSLogin.class);
         String account = csLogin.getAccount();
 
         // 账号不能为空或者空格

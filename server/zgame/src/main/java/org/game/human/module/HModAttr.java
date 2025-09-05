@@ -21,20 +21,6 @@ public class HModAttr extends HModBase {
         super(humanObj);
     }
 
-    @Override
-    protected void onInit() {
-        super.onInit();
-
-        HModInfo hMod = humanObj.getHMod(HModInfo.class);
-        hMod.getInfo();
-
-        logger.info("HModAttr init");
-    }
-
-    public String getAttr() {
-        return "attr";
-    }
-
     @HumanLoader(entity = HumanAttrDB.class)
     public void loadHumanAttrDB(List<HumanAttrDB> humanAttrDBs) {
         logger.info("加载HumanAttrDB：{}", humanAttrDBs);
@@ -55,6 +41,20 @@ public class HModAttr extends HModBase {
 
             logger.info("插入HumanAttrDB：{}", humanAttrDB);
         }
+    }
+
+    @Override
+    protected void onInitAfterLoadDB() {
+        super.onInitAfterLoadDB();
+
+        HModInfo hMod = humanObj.getHMod(HModInfo.class);
+        hMod.getInfo();
+
+        logger.info("HModAttr init");
+    }
+
+    public String getAttr() {
+        return "attr";
     }
 
 

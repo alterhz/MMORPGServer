@@ -71,7 +71,6 @@ public class MongoDBReactiveExample {
     // 自定义 Subscriber 打印结果
     static class PrintSubscriber<T> implements org.reactivestreams.Subscriber<T> {
         private final String prefix;
-        private org.reactivestreams.Subscription subscription;
 
         public PrintSubscriber(String prefix) {
             this.prefix = prefix;
@@ -79,7 +78,6 @@ public class MongoDBReactiveExample {
 
         @Override
         public void onSubscribe(org.reactivestreams.Subscription s) {
-            this.subscription = s;
             s.request(1); // 请求一个数据
         }
 

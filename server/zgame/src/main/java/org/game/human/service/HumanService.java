@@ -5,6 +5,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
+import org.game.core.human.HumanProtoDispatcher;
+import org.game.core.message.ProtoScanner;
 import org.game.core.net.Message;
 import org.game.core.rpc.HumanServiceBase;
 import org.game.core.rpc.RpcInvocation;
@@ -66,7 +68,19 @@ public class HumanService extends GameServiceBase implements IHumanService {
 
     @Override
     public void dispatchProto(Message message) {
+        int protoID = message.getProtoID();
 
+        Class<?> protoClass = ProtoScanner.getProtoClass(protoID);
+        Object protoObj = message.getProto(protoClass);
+        if (protoObj == null) {
+            logger.error("HumanObject接收到协议，解析失败。protoID={}, humanObj={}", protoID, humanObj);
+            return;
+        }
+
+        HumanProtoDispatcher.getInstance().dispatch(String.valueOf(protoID), method ->  {
+            Class<?> hModClass = method.getDeclaringClass();
+            return humanObj.getHModBase(hModClass);
+        }, protoObj);
     }
 
     @Override

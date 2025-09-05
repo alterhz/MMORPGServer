@@ -1,8 +1,6 @@
 package org.game.test.net.handler;
 
-import io.netty.util.internal.MathUtil;
 import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.message.ProtoListener;
@@ -28,7 +26,7 @@ public class LoginHandler extends ClientProtoDispatcher {
     @ProtoListener(SCQueryHumans.class)
     public void onQueryHumans(Message message) {
         // 处理消息
-        SCQueryHumans scQueryHumans = message.getJsonObject(SCQueryHumans.class);
+        SCQueryHumans scQueryHumans = message.getProto(SCQueryHumans.class);
         if (scQueryHumans.getCode() == 0) {
             if (scQueryHumans.getHumanList().isEmpty()) {
                 // 创角
@@ -50,7 +48,7 @@ public class LoginHandler extends ClientProtoDispatcher {
     @ProtoListener(SCCreateHuman.class)
     public void onCreateHuman(Message message) {
         // 处理消息
-        SCCreateHuman scCreateHuman = message.getJsonObject(SCCreateHuman.class);
+        SCCreateHuman scCreateHuman = message.getProto(SCCreateHuman.class);
         if (scCreateHuman.isSuccess()) {
             logger.info("创建角色成功");
         } else {
@@ -62,7 +60,7 @@ public class LoginHandler extends ClientProtoDispatcher {
     @ProtoListener(SCSelectHuman.class)
     public void onSelectHuman(Message message) {
         // 处理消息
-        SCSelectHuman scSelectHuman = message.getJsonObject(SCSelectHuman.class);
+        SCSelectHuman scSelectHuman = message.getProto(SCSelectHuman.class);
         if (scSelectHuman.getCode() == 0) {
             logger.info("选择角色成功");
             // 测试
@@ -73,12 +71,32 @@ public class LoginHandler extends ClientProtoDispatcher {
         }
     }
 
+    // SCSendToClientBegin
+    @ProtoListener(SCSendToClientBegin.class)
+    public void onSendToClientBegin(Message message) {
+        // 处理消息
+        SCSendToClientBegin scSendToClientBegin = message.getProto(SCSendToClientBegin.class);
+        logger.info("开始发送数据");
+    }
+
+    // SCSendToClientEnd
+    @ProtoListener(SCSendToClientEnd.class)
+    public void onSendToClientEnd(Message message) {
+        // 处理消息
+        SCSendToClientEnd scSendToClientEnd = message.getProto(SCSendToClientEnd.class);
+        logger.info("结束发送数据");
+
+        // 测试
+        CSTest csTest = new CSTest();
+        sendMessage(csTest);
+    }
+
     // 测试
     @ProtoListener(SCTest.class)
     public void onTest(Message message) {
         // 处理消息
-        SCTest scTest = message.getJsonObject(SCTest.class);
-        logger.info("测试成功");
+        SCTest scTest = message.getProto(SCTest.class);
+        logger.info("测试结果：{}", scTest.getMessage());
     }
 
 }

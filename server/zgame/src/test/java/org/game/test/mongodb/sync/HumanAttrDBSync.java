@@ -6,7 +6,6 @@ import org.game.LogCore;
 import org.game.config.MyConfig;
 import org.game.core.db.MongoDBSyncClient;
 import org.game.dao.HumanAttrDB;
-import org.game.dao.HumanDB;
 
 public class HumanAttrDBSync {
     public static void main(String[] args) {

@@ -1,10 +1,13 @@
 package org.game.test;
 
+import org.bson.types.ObjectId;
 import org.game.BaseUtils;
 import org.game.config.MyConfig;
 import org.game.core.db.DaoScanner;
 import org.game.core.db.HumanDBManager;
 import org.game.core.db.MongoDBAsyncClient;
+import org.game.core.rpc.ToPoint;
+import org.game.dao.HumanDB;
 import org.game.human.HumanObject;
 
 public class HumanDBManagerTest {
@@ -19,7 +22,10 @@ public class HumanDBManagerTest {
 
         HumanDBManager.init();
 
-        HumanObject humanObj = new HumanObject("admin");
+        HumanDB humanDB = new HumanDB();
+        humanDB.setId(new ObjectId("admin"));
+
+        HumanObject humanObj = new HumanObject(humanDB, new ToPoint(), new ToPoint());
         humanObj.init();
 
         HumanDBManager.loadHumanModDB(humanObj);

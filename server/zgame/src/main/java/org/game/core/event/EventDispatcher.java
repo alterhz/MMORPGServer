@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class EventDispatcher {
     public static final Logger logger = LogManager.getLogger(EventDispatcher.class);
@@ -37,11 +38,33 @@ public class EventDispatcher {
                 try {
                     method.invoke(obj, args);
                 } catch (Exception e) {
-                    logger.error("EventDispatch 触发异常, eventName={}", eventName, e);
+                    logger.error("事件触发时，Method调用异常, eventName={}, method={}", eventName, method, e);
                 }
             }
         } else {
-            logger.error("EventDispatch 未注册. eventName={}", eventName);
+            logger.error("事件触发时，Event未注册. eventName={}", eventName);
+        }
+    }
+
+    /**
+     * 触发事件
+     * @param eventName 事件名称
+     * @param function 返回obj
+     * @param args 参数
+     */
+    public void dispatch(String eventName, Function<Method, Object> function, Object... args) {
+        List<Method> methods = eventMap.get(eventName);
+        if (methods != null) {
+            for (Method method : methods) {
+                try {
+                    Object obj = function.apply(method);
+                    method.invoke(obj, args);
+                } catch (Exception e) {
+                    logger.error("事件触发时，Method调用异常, eventName={}, method={}", eventName, method, e);
+                }
+            }
+        } else {
+            logger.error("事件触发时，Event未注册2. eventName={}", eventName);
         }
     }
 }
