@@ -56,16 +56,16 @@ public class ClientManager : MonoBehaviour
     }
 
 
-    public void Login(string username, string password)
+    public void Login(string account, string password)
     {
-        LoginRequest request = new LoginRequest();
-        request.username = username;
+        CSLogin request = new CSLogin();
+        request.account = account;
         request.password = password;
 
         // 发送登录请求
         client.SendObject(1001, request);
 
-        Debug.Log("发送登录请求。username: " + username + " password: " + password);
+        Debug.Log("account: " + account + " password: " + password);
     }
 
     public void RegisterHandler<T>(int protocolId, Action<T> handler)

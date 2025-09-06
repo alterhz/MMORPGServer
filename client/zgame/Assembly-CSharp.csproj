@@ -71,6 +71,7 @@
     <Compile Include="Assets\Scripts\Net\NettyClient.cs" />
     <Compile Include="Assets\Scripts\UI\LoginManager.cs" />
     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
+    <Compile Include="Assets\Scripts\Net\Protocol.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

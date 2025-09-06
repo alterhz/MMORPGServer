@@ -17,6 +17,7 @@ public class LoginManager
 
         // 给登录按钮绑定事件
         uiManager.AddButtonClickListener(CanvasName, "Button", OnLoginButtonClicked);
+        uiManager.SetInputText(CanvasName, "Username", "admin");
         string username = uiManager.GetInputText(CanvasName, "Username");
         Debug.Log(username);
 
@@ -36,10 +37,10 @@ public class LoginManager
         Debug.Log($"用户名: {username}, 密码: {password}");
 
         // 注册消息处理器（自动反序列化为对象）
-        ClientManager.Instance.RegisterHandler<LoginResponse>(1002, (response) => {
+        ClientManager.Instance.RegisterHandler<SCLogin>(1002, (response) => {
             if (response.code == 0)
             {
-                Debug.Log("登录成功，用户ID: " + response.data);
+                Debug.Log("登录成功，用户ID: " + response.message);
 
                 // 切换到主页
                 uiManager.ShowCanvas("Main");

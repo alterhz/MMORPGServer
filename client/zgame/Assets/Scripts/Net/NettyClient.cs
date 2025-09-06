@@ -249,6 +249,9 @@ public class NettyClient
     public event Action OnConnected;
     public event Action OnDisconnected;
     public event Action<string> OnError;
+    
+    // 用于避免重复注册处理器的字典，键为协议ID和处理器的组合
+    private Dictionary<int, List<NetworkEventHandler>> registeredHandlers = new Dictionary<int, List<NetworkEventHandler>>();
 
     private const int MAX_MESSAGES_PER_FRAME = 50; // 每帧处理的最大消息数
 
@@ -482,12 +485,38 @@ public class NettyClient
     /// <param name="handler">消息处理器</param>
     public void RegisterHandler(int protocolId, Action<string> handler)
     {
-        OnMessageReceived += (id, json) => {
+        // 创建处理器
+        NetworkEventHandler newHandler = (id, json) => {
             if (id == protocolId)
             {
                 handler(json);
             }
         };
+
+        // 检查是否已存在相同协议ID和处理器的组合
+        if (!registeredHandlers.ContainsKey(protocolId))
+        {
+            registeredHandlers[protocolId] = new List<NetworkEventHandler>();
+        }
+
+        // 检查是否已注册了相同的处理器
+        bool isHandlerRegistered = false;
+        foreach (var existingHandler in registeredHandlers[protocolId])
+        {
+            // 注意：直接比较委托在这里可能不准确，但在大多数情况下足够使用
+            if (existingHandler == newHandler)
+            {
+                isHandlerRegistered = true;
+                break;
+            }
+        }
+
+        // 如果尚未注册，则注册新处理器并保存引用
+        if (!isHandlerRegistered)
+        {
+            OnMessageReceived += newHandler;
+            registeredHandlers[protocolId].Add(newHandler);
+        }
     }
 
     /// <summary>
@@ -498,7 +527,8 @@ public class NettyClient
     /// <param name="handler">消息处理器</param>
     public void RegisterHandler<T>(int protocolId, Action<T> handler)
     {
-        OnMessageReceived += (id, json) => {
+        // 创建处理器
+        NetworkEventHandler newHandler = (id, json) => {
             if (id == protocolId)
             {
                 try
@@ -513,30 +543,48 @@ public class NettyClient
                 }
             }
         };
+
+        // 检查是否已存在相同协议ID的条目
+        if (!registeredHandlers.ContainsKey(protocolId))
+        {
+            registeredHandlers[protocolId] = new List<NetworkEventHandler>();
+        }
+
+        // 检查是否已注册了相同的处理器
+        bool isHandlerRegistered = false;
+        foreach (var existingHandler in registeredHandlers[protocolId])
+        {
+            // 注意：直接比较委托在这里可能不准确，但在大多数情况下足够使用
+            if (existingHandler == newHandler)
+            {
+                isHandlerRegistered = true;
+                break;
+            }
+        }
+
+        // 如果尚未注册，则注册新处理器并保存引用
+        if (!isHandlerRegistered)
+        {
+            OnMessageReceived += newHandler;
+            registeredHandlers[protocolId].Add(newHandler);
+        }
+    }
+    
+    /// <summary>
+    /// 移除指定协议ID的所有消息处理器
+    /// </summary>
+    /// <param name="protocolId">协议ID</param>
+    public void UnregisterHandler(int protocolId)
+    {
+        if (registeredHandlers.ContainsKey(protocolId))
+        {
+            foreach (var handler in registeredHandlers[protocolId])
+            {
+                OnMessageReceived -= handler;
+            }
+            registeredHandlers.Remove(protocolId);
+        }
     }
 }
 
-// 示例：定义消息数据类
-[Serializable]
-public class LoginRequest
-{
-    public string username;
-    public string password;
-}
-
-[Serializable]
-public class LoginResponse
-{
-    public int code;
-    public string message;
-    public string data;
-}
-
-[Serializable]
-public class PlayerPosition
-{
-    public int playerId;
-    public float x;
-    public float y;
-    public float z;
-}
+// 示例：定义消息数据类已移至Protocol.cs文件中
