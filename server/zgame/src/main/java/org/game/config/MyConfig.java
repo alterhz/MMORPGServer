@@ -8,7 +8,11 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
+import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class MyConfig {
     private static final Logger logger = LogManager.getLogger(MyConfig.class);
@@ -21,8 +25,19 @@ public class MyConfig {
             mapper.enable(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY);
             mapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-            // 从resources目录加载config.yaml
-            InputStream input = MyConfig.class.getClassLoader().getResourceAsStream("config.yaml");
+            
+            // 优先从外部目录加载config.yaml
+            InputStream input = null;
+            Path externalConfigPath = Paths.get("config.yaml");
+            if (Files.exists(externalConfigPath)) {
+                logger.info("从外部目录加载配置文件: {}", externalConfigPath.toAbsolutePath());
+                input = Files.newInputStream(externalConfigPath);
+            } else {
+                // 从resources目录加载config.yaml
+                logger.info("从jar包内加载配置文件");
+                input = MyConfig.class.getClassLoader().getResourceAsStream("config.yaml");
+            }
+            
             if (input == null) {
                 logger.error("找不到config.yaml配置文件");
                 throw new RuntimeException("找不到config.yaml配置文件");

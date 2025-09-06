@@ -50,3 +50,23 @@ dependencies {
 application {
     mainClass = 'org.game.GameStartUp'
 }
+
+// 配置jar包输出目录和名称
+jar {
+    destinationDirectory = file('../dist')
+    archiveFileName = 'zgame.jar'
+    
+    manifest {
+        attributes(
+            'Main-Class': 'org.game.GameStartUp'
+        )
+    }
+}
+
+// 拷贝依赖的jar包到libs目录
+task copyDependencies(type: Copy) {
+    from configurations.runtimeClasspath
+    into '../dist/libs'
+}
+
+build.dependsOn copyDependencies
