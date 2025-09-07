@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class ClientManager : MonoBehaviour
+public class ClientManager
 {
     private NettyClient client;
 
@@ -15,12 +13,7 @@ public class ClientManager : MonoBehaviour
         {
             if (_instance == null)
             {
-                _instance = FindObjectOfType<ClientManager>();
-                if (_instance == null)
-                {
-                    GameObject go = new GameObject("ClientManager");
-                    _instance = go.AddComponent<ClientManager>();
-                }
+                _instance = new ClientManager();
             }
             return _instance;
         }
@@ -41,11 +34,6 @@ public class ClientManager : MonoBehaviour
             Debug.LogError("网络错误: " + error);
         };
         
-        // 注册消息处理器（直接处理JSON字符串）
-        // client.RegisterHandler(1002, (json) => {
-        //     Debug.Log("收到协议2的消息: " + json);
-        // });
-        
         Debug.Log("初始化网络");
     }
 
@@ -54,28 +42,20 @@ public class ClientManager : MonoBehaviour
         // 连接到服务器
         client.ConnectToServer();
     }
-
-
-    public void Login(string account, string password)
+    
+    public void Send<T>(int protocolId, T dataObject)
     {
-        CSLogin request = new CSLogin();
-        request.account = account;
-        request.password = password;
-
-        // 发送登录请求
-        client.SendObject(1001, request);
-
-        Debug.Log("account: " + account + " password: " + password);
+        client.SendObject(protocolId, dataObject);
     }
 
-    public void RegisterHandler<T>(int protocolId, Action<T> handler)
-    {   
-        client.RegisterHandler<T>(protocolId, handler);
+    public void RegisterHandler(int protocolId, Action<Message> handler)
+    {
+        client?.EventDispatcher.RegisterEvent(protocolId.ToString(), handler);
     }
 
     // Update is called once per frame
     public void Run()
     {
-        client.ProcessReceivedMessages();
+        client?.ProcessReceivedMessages();
     }
 }

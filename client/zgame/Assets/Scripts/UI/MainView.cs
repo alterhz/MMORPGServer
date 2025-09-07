@@ -1,12 +1,10 @@
-using System;
-
-public class MainManager
+public class MainView
 {
     private const string CanvasName = "Main";
     private const string CanvasPath = "Main";
     
     // 构造函数，初始化主界面管理器
-    public MainManager()
+    public MainView()
     {
         // 获取UIManager单例
         UIManager uiManager = UIManager.Instance;
