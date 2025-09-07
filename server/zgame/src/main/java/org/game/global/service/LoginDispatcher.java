@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 public class LoginDispatcher extends EventDispatcher {
     public static final Logger logger = LogManager.getLogger(LoginDispatcher.class);
 
+    @Override
     public void init() {
         logger.info("MessageDispatch 初始化");
         

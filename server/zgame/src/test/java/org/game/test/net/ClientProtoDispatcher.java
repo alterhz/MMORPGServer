@@ -15,6 +15,7 @@ public class ClientProtoDispatcher extends EventDispatcher {
 
     protected Channel channel;
 
+    @Override
     public void init() {
         logger.info("消息函数监听初始化");
 

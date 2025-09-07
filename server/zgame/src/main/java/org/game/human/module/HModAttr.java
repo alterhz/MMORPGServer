@@ -4,10 +4,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.db.HumanLoader;
 import org.game.core.db.MongoDBAsyncClient;
+import org.game.core.event.EventListener;
 import org.game.dao.HumanAttrDB;
 import org.game.dao.HumanInfoDB;
 import org.game.human.HModBase;
 import org.game.human.HumanObject;
+import org.game.human.event.OnHumanLoadComplete;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,9 +45,9 @@ public class HModAttr extends HModBase {
         }
     }
 
-    @Override
-    protected void onInitAfterLoadDB() {
-        super.onInitAfterLoadDB();
+    @EventListener
+    public void OnHumanLoadComplete(OnHumanLoadComplete onHumanLoadComplete) {
+        logger.info("HumanLogin event. {}", onHumanLoadComplete);
 
         HModInfo hMod = humanObj.getHMod(HModInfo.class);
         hMod.getInfo();

@@ -4,11 +4,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.db.HumanLoader;
 import org.game.core.db.MongoDBAsyncClient;
+import org.game.core.event.EventListener;
 import org.game.core.message.ProtoListener;
 import org.game.core.net.Message;
 import org.game.dao.HumanInfoDB;
 import org.game.human.HModBase;
 import org.game.human.HumanObject;
+import org.game.human.event.OnHumanLoadComplete;
+import org.game.human.event.OnSendToClient;
 import org.game.proto.login.CSTest;
 import org.game.proto.login.SCTest;
 
@@ -43,13 +46,16 @@ public class HModInfo extends HModBase {
         }
     }
 
-    @Override
-    protected void onInitAfterLoadDB() {
-        super.onInitAfterLoadDB();
-
+    @EventListener
+    public void OnHumanLoadComplete(OnHumanLoadComplete onHumanLoadComplete) {
         HModAttr hMod = humanObj.getHMod(HModAttr.class);
         String attr = hMod.getAttr();
         logger.info("HModInfo init, attr: {}", attr);
+    }
+
+    @EventListener
+    public void OnSendToClient(OnSendToClient onSendToClient) {
+        logger.info("HModInfo OnSendToClient");
     }
 
     /**

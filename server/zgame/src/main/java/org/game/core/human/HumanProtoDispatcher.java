@@ -19,6 +19,7 @@ public class HumanProtoDispatcher extends EventDispatcher {
         return instance;
     }
 
+    @Override
     public void init() {
         // 扫描所有的HMod，获取包含@ProtoListener注解的方法，注册到HumanProtoDispatcher
         List<Class<? extends HModBase>> hModClasses = HModScanner.getHModClasses();

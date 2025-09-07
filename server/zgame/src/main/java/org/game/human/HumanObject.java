@@ -4,14 +4,16 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.TimerQueue;
+import org.game.core.event.HumanEventDispatcher;
+import org.game.core.event.IEvent;
 import org.game.core.human.HModScanner;
-import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
 import org.game.core.rpc.*;
 import org.game.dao.HumanDB;
 import org.game.core.message.ProtoScanner;
 import org.game.global.rpc.IClientService;
-import org.game.global.service.ClientService;
+import org.game.human.event.OnHumanLoadComplete;
+import org.game.human.event.OnSendToClient;
 import org.game.proto.login.SCSendToClientBegin;
 import org.game.proto.login.SCSendToClientEnd;
 
@@ -93,7 +95,7 @@ public class HumanObject {
      * 所有HMod加载完成
      */
     protected void onLoadingComplete() {
-        forEachHModInit();
+        fireEvent(new OnHumanLoadComplete());
 
         // 修改ClientService的HumanToPoint连接点，并切换阶段
         IClientService clientService = ReferenceFactory.getProxy(IClientService.class, clientPoint);
@@ -103,30 +105,27 @@ public class HumanObject {
         SCSendToClientBegin scSendToClientBegin = new SCSendToClientBegin();
         sendMessage(scSendToClientBegin);
 
-        forEachHModSendToClient();
+        fireEvent(new OnSendToClient());
 
         SCSendToClientEnd scSendToClientEnd = new SCSendToClientEnd();
         sendMessage(scSendToClientEnd);
-    }
-
-    public void forEachHModInit() {
-        for (HModBase hModBase : hModBaseMap.values()) {
-            hModBase.onInitAfterLoadDB();
-        }
-        logger.info("{} 初始化完成 {} 个HMod", this, hModBaseMap.size());
-    }
-
-    private void forEachHModSendToClient() {
-        for (HModBase hModBase : hModBaseMap.values()) {
-            hModBase.onSendToClient();
-        }
-        logger.info("{} 发送协议完成 {} 个HMod", this, hModBaseMap.size());
     }
 
     public <T> void sendMessage(T jsonObject) {
         Integer protoID = ProtoScanner.getProtoID(jsonObject.getClass());
         IClientService proxy = ReferenceFactory.getProxy(IClientService.class, clientPoint);
         proxy.sendMessage(Message.createMessage(protoID, jsonObject));
+    }
+
+    /**
+     * HumanObject事件
+     */
+    public void fireEvent(IEvent event) {
+        String eventKey = event.getClass().getSimpleName().toLowerCase();
+        HumanEventDispatcher.getInstance().dispatch(eventKey, method -> {
+            Class<?> hModClass = method.getDeclaringClass();
+            return getHModBase(hModClass);
+        }, event);
     }
 
     public String getAccount() {

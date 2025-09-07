@@ -1,6 +1,7 @@
 package org.game.human.rpc;
 
 import org.game.core.Param;
+import org.game.core.event.IEvent;
 import org.game.core.net.Message;
 import org.game.core.rpc.RPCProxy;
 
@@ -28,4 +29,8 @@ public interface IHumanService {
      */
     CompletableFuture<Object> dispatchRPC(String hModService, String methodName, List<Object> parameters, List<String> parameterTypes);
 
+    /**
+     * 转发事件
+     */
+    void fireEvent(IEvent event);
 }

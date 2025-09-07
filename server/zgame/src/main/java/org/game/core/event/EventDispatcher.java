@@ -8,10 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class EventDispatcher {
+public abstract class EventDispatcher {
     public static final Logger logger = LogManager.getLogger(EventDispatcher.class);
 
     public final Map<String, List<Method>> eventMap = new java.util.HashMap<>();
+
+    /**
+     * 初始化
+     */
+    public abstract void init();
 
     /**
      * 注册事件
