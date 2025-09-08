@@ -43,23 +43,16 @@ namespace ZGame.Mod
         {
             SCLogin scLogin = ProtoUtils.Deserialize<SCLogin>(message.ToJson());
 
+            EventBus.Trigger(new LoginResultEvent(scLogin.code, scLogin.message));
+
             if (scLogin.code == 0)
             {
                 LogUtils.Log("登录成功，用户ID: " + scLogin.message);
-                // 切换到主页
-                UIManager.Instance.ShowCanvas("Main");
             }
             else
             {
                 LogUtils.LogWarning("登录失败: " + scLogin.message);
-
-                UIManager.Instance.SetText("Login", "Message", scLogin.message);
             }
-        }
-
-        public override void ModUpdate()
-        {
-            throw new NotImplementedException();
         }
 
     }

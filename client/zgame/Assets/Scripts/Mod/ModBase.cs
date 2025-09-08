@@ -41,7 +41,10 @@ namespace ZGame.Mod
         /// <summary>
         /// Mod更新方法
         /// </summary>
-        public abstract void ModUpdate();
+        public virtual void OnUpdate()
+        {
+            // 子类可以重写此方法以实现特定逻辑
+        }
 
         /// <summary>
         /// Mod销毁时调用的方法

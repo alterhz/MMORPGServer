@@ -119,7 +119,7 @@ namespace ZGame.Mod
             {
                 if (mod.IsEnabled)
                 {
-                    mod.ModUpdate();
+                    mod.OnUpdate();
                 }
             }
         }

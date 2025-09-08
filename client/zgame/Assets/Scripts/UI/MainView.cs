@@ -1,19 +1,14 @@
-public class MainView
+public class MainView : ViewBase
 {
-    private const string CanvasName = "Main";
-    private const string CanvasPath = "Main";
     
     // 构造函数，初始化主界面管理器
     public MainView()
     {
-        // 获取UIManager单例
-        UIManager uiManager = UIManager.Instance;
-        
         // 注册Canvas
-        uiManager.RegisterCanvas(CanvasPath, false);
-        
+        RegisterCanvas(false);
+
         // 给返回按钮绑定事件
-        uiManager.AddButtonClickListener(CanvasName, "GoBack", OnGoBackButtonClicked);
+        AddButtonClickListener("GoBack", OnGoBackButtonClicked);
     }
 
     private void OnGoBackButtonClicked()
