@@ -1,23 +1,9 @@
 using UnityEngine;
 using System;
 
-public class ClientManager
+public class ClientManager : Singleton<ClientManager>
 {
     private NettyClient client;
-
-    private static ClientManager _instance;
-
-    public static ClientManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = new ClientManager();
-            }
-            return _instance;
-        }
-    }
 
     // Start is called before the first frame update
     public void InitClient()
@@ -40,12 +26,12 @@ public class ClientManager
     public void Connect()
     {
         // 连接到服务器
-        client.ConnectToServer();
+        client?.ConnectToServer();
     }
     
     public void Send<T>(int protocolId, T dataObject)
     {
-        client.SendObject(protocolId, dataObject);
+        client?.SendObject(protocolId, dataObject);
     }
 
     public void RegisterHandler(int protocolId, Action<Message> handler)
@@ -57,5 +43,11 @@ public class ClientManager
     public void Run()
     {
         client?.ProcessReceivedMessages();
+    }
+
+    internal void Destroy()
+    {
+        client?.Disconnect();
+        client = null;
     }
 }

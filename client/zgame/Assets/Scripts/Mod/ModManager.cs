@@ -6,43 +6,12 @@ namespace ZGame.Mod
     /// <summary>
     /// Mod管理器单例，用于管理所有Mod实例
     /// </summary>
-    public class ModManager
+    public class ModManager : Singleton<ModManager>
     {
-        private static ModManager _instance;
-        private static readonly object _lock = new object();
-
-        /// <summary>
-        /// Mod管理器单例实例
-        /// </summary>
-        public static ModManager Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    lock (_lock)
-                    {
-                        if (_instance == null)
-                        {
-                            _instance = new ModManager();
-                        }
-                    }
-                }
-                return _instance;
-            }
-        }
-
         /// <summary>
         /// 存储所有已注册的Mod实例
         /// </summary>
         private Dictionary<Type, ModBase> _mods = new Dictionary<Type, ModBase>();
-
-        /// <summary>
-        /// 私有构造函数，确保只能通过Instance属性访问
-        /// </summary>
-        private ModManager()
-        {
-        }
 
         /// <summary>
         /// 注册一个Mod实例
@@ -165,7 +134,6 @@ namespace ZGame.Mod
                 mod.OnDestroyMod();
             }
             _mods.Clear();
-            _instance = null;
             Console.WriteLine("ModManager destroyed");
         }
     }

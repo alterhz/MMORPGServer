@@ -7,17 +7,13 @@ public class GameInitializer : MonoBehaviour
 
     void Start()
     {
-        // 确保UIManager已初始化
-        if (UIManager.Instance == null)
-        {
-            Debug.LogError("UIManager未初始化");
-            return;
-        }
+        UIManager.Instance.InitializeUIRoot();
 
         // 初始化网络
         ClientManager.Instance.InitClient();
 
-        ModManager.Instance.RegisterMod(new ModLogin());  
+        // 模型注册
+        ModManager.Instance.RegisterMod(new ModLogin());
 
         // 创建并初始化登录管理器
         new LoginView();
@@ -29,6 +25,21 @@ public class GameInitializer : MonoBehaviour
 
     void Update()
     {
+        // 渲染相关逻辑
+
+    }
+
+    void FixedUpdate()
+    {
+        // 网络，Mod等逻辑
         ClientManager.Instance.Run();
+        ModManager.Instance.UpdateAllMods();
+    }
+    
+    void Destroy()
+    {
+        // 清理资源
+        ClientManager.Instance?.Destroy();
+        ModManager.Instance?.Destroy();
     }
 }

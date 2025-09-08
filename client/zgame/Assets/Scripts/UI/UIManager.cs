@@ -4,26 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class UIManager : MonoBehaviour
+public class UIManager : Singleton<UIManager>
 {
-    // 单例实例
-    private static UIManager _instance;
-    public static UIManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<UIManager>();
-                if (_instance == null)
-                {
-                    GameObject go = new GameObject("UIManager");
-                    _instance = go.AddComponent<UIManager>();
-                }
-            }
-            return _instance;
-        }
-    }
 
     // 存储所有Canvas的字典
     private Dictionary<string, Canvas> canvasDictionary = new Dictionary<string, Canvas>();
@@ -37,23 +19,9 @@ public class UIManager : MonoBehaviour
     // UI根节点
     private Transform uiRoot;
 
-    void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        
-        _instance = this;
-        DontDestroyOnLoad(gameObject);
-        
-        // 初始化UI根节点
-        InitializeUIRoot();
-    }
 
     // 初始化UI根节点
-    private void InitializeUIRoot()
+    public void InitializeUIRoot()
     {
         GameObject uiRootGO = GameObject.Find("UI");
         if (uiRootGO == null)

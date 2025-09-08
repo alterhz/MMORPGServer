@@ -34,6 +34,8 @@ public class LoginView
         // 执行登录逻辑
         Debug.Log($"用户名: {username}, 密码: {password}");
 
+        // 监听登录返回的事件
+
         ModManager.Instance.GetMod<ModLogin>().Login(username, password);
     }
 
