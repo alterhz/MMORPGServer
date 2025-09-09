@@ -13,16 +13,16 @@ namespace ZGame
     {
 
         // 存储所有Canvas的字典
-        private Dictionary<string, Canvas> canvasDictionary = new Dictionary<string, Canvas>();
+        private readonly Dictionary<string, ViewBase> _CanvasDictionary = new();
 
         // 当前活动的Canvas名称
         private string currentActiveCanvas = "";
 
         // Canvas历史堆栈，用于返回功能
-        private Stack<string> canvasHistory = new Stack<string>();
+        private readonly Stack<string> _CanvasHistory = new();
 
         // UI根节点
-        private Transform uiRoot;
+        private Transform _UiRoot;
 
 
         // 初始化UI根节点
@@ -34,20 +34,20 @@ namespace ZGame
                 Debug.LogError("UI根节点未找到！请确保有一个名为'UI'的GameObject");
                 return;
             }
-            uiRoot = uiRootGO.transform;
+            _UiRoot = uiRootGO.transform;
         }
 
         // 通过路径获取Canvas
         public Canvas GetCanvas(string canvasPath)
         {
-            if (uiRoot == null)
+            if (_UiRoot == null)
             {
                 Debug.LogError("UI根节点未初始化");
                 return null;
             }
 
             // 查找Canvas路径
-            Transform canvasTransform = uiRoot.Find(canvasPath);
+            Transform canvasTransform = _UiRoot.Find(canvasPath);
             if (canvasTransform == null)
             {
                 Debug.LogWarning($"未找到路径为 {canvasPath} 的Canvas");
@@ -65,15 +65,17 @@ namespace ZGame
         }
 
         // 注册Canvas到管理器中
-        public void RegisterCanvas(string canvasPath, bool setAsActive = false)
+        public void RegisterCanvas(ViewBase viewBase, bool setAsActive = false)
         {
-            Canvas canvas = GetCanvas(canvasPath);
+            Canvas canvas = GetCanvas(viewBase.CanvasPath);
             if (canvas == null) return;
 
             string canvasName = canvas.gameObject.name;
-            if (!canvasDictionary.ContainsKey(canvasName))
+            if (!_CanvasDictionary.ContainsKey(canvasName))
             {
-                canvasDictionary.Add(canvasName, canvas);
+                viewBase.Canvas = canvas;
+                _CanvasDictionary.Add(canvasName, viewBase);
+                viewBase.OnInitialize();
 
                 // 默认隐藏Canvas，除非明确设置为活动
                 if (!setAsActive)
@@ -90,6 +92,7 @@ namespace ZGame
 
                     // 显示新Canvas
                     canvas.gameObject.SetActive(true);
+                    viewBase.OnShow();
                     currentActiveCanvas = canvasName;
                 }
             }
@@ -102,7 +105,7 @@ namespace ZGame
         // 显示指定名称的Canvas
         public void ShowCanvas(string canvasName)
         {
-            if (canvasDictionary.TryGetValue(canvasName, out Canvas canvas))
+            if (_CanvasDictionary.TryGetValue(canvasName, out ViewBase viewBase))
             {
                 // 隐藏当前活动的Canvas
                 if (!string.IsNullOrEmpty(currentActiveCanvas))
@@ -113,11 +116,12 @@ namespace ZGame
                 // 将当前Canvas加入历史
                 if (!string.IsNullOrEmpty(currentActiveCanvas))
                 {
-                    canvasHistory.Push(currentActiveCanvas);
+                    _CanvasHistory.Push(currentActiveCanvas);
                 }
 
                 // 显示新Canvas
-                canvas.gameObject.SetActive(true);
+                viewBase.OnShow();
+                viewBase.Canvas.gameObject.SetActive(true);
                 currentActiveCanvas = canvasName;
             }
             else
@@ -129,9 +133,10 @@ namespace ZGame
         // 隐藏指定名称的Canvas
         public void HideCanvas(string canvasName)
         {
-            if (canvasDictionary.TryGetValue(canvasName, out Canvas canvas))
+            if (_CanvasDictionary.TryGetValue(canvasName, out ViewBase viewBase))
             {
-                canvas.gameObject.SetActive(false);
+                viewBase.Canvas.gameObject.SetActive(false);
+                viewBase.OnHide();
 
                 // 如果隐藏的是当前活动Canvas，清空当前活动Canvas
                 if (currentActiveCanvas == canvasName)
@@ -148,9 +153,17 @@ namespace ZGame
         // 切换指定Canvas的显示状态
         public void ToggleCanvas(string canvasName)
         {
-            if (canvasDictionary.TryGetValue(canvasName, out Canvas canvas))
+            if (_CanvasDictionary.TryGetValue(canvasName, out ViewBase viewBase))
             {
-                canvas.gameObject.SetActive(!canvas.gameObject.activeSelf);
+                if (viewBase.Canvas.gameObject.activeSelf)
+                {
+                    HideCanvas(canvasName);
+                }
+                else
+                {
+                    ShowCanvas(canvasName);
+                }
+                viewBase.Canvas.gameObject.SetActive(!viewBase.Canvas.gameObject.activeSelf);
             }
             else
             {
@@ -161,9 +174,9 @@ namespace ZGame
         // 返回到上一个Canvas
         public void GoBack()
         {
-            if (canvasHistory.Count > 0)
+            if (_CanvasHistory.Count > 0)
             {
-                string previousCanvas = canvasHistory.Pop();
+                string previousCanvas = _CanvasHistory.Pop();
                 ShowCanvas(previousCanvas);
             }
             else
@@ -175,13 +188,12 @@ namespace ZGame
         // 获取指定路径的UI组件
         public T GetUIComponent<T>(string canvasName, string path) where T : Component
         {
-            if (canvasDictionary.TryGetValue(canvasName, out Canvas canvas))
+            if (_CanvasDictionary.TryGetValue(canvasName, out ViewBase viewBase))
             {
-                Transform target = canvas.transform.Find(path);
+                Transform target = viewBase.Canvas.transform.Find(path);
                 if (target != null)
                 {
-                    T component = target.GetComponent<T>();
-                    if (component != null)
+                    if (target.TryGetComponent<T>(out var component))
                     {
                         return component;
                     }

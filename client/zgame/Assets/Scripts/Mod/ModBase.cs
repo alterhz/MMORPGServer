@@ -77,5 +77,10 @@ namespace ZGame
         {
             // 子类可以重写此方法以实现特定逻辑
         }
+
+        public T GetMod<T>() where T : ModBase
+        {
+            return ModManager.Instance.GetMod<T>();
+        }
     }
 }

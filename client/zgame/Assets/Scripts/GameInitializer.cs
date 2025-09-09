@@ -17,10 +17,9 @@ public class GameInitializer : MonoBehaviour
         ModManager.Instance.RegisterMod(new ModSelectPlayer());
 
         // 创建并初始化登录管理器
-        new LoginView();
-
-        // 创建并初始化主界面管理器
-        new MainView();
+        UIManager.Instance.RegisterCanvas(new LoginView(), true);
+        UIManager.Instance.RegisterCanvas(new MainView());
+        UIManager.Instance.RegisterCanvas(new SelectPlayerView());
 
     }
 

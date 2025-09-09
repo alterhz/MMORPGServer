@@ -6,13 +6,27 @@ public class LoginView : ViewBase
     // 构造函数，初始化登录管理器
     public LoginView() : base("Login")
     {
-        RegisterCanvas(true);
+    }
 
+    public override void OnInitialize()
+    {
         AddButtonClickListener("Button", OnLoginButtonClicked);
         SetInputText("Username", "admin");
         string username = GetInputText("Username");
         LogUtils.Log("account:" + username);
+    }
 
+    public override void OnShow()
+    {
+        LogUtils.Log("加载登录界面");
+        // 监听登录返回的事件
+        EventBus.Subscribe<LoginResultEvent>(OnLoginResponse);
+    }
+
+    public override void OnHide()
+    {
+        LogUtils.Log("卸载登录界面");
+        EventBus.Unsubscribe<LoginResultEvent>(OnLoginResponse);
     }
 
     private void OnLoginButtonClicked()
@@ -25,10 +39,7 @@ public class LoginView : ViewBase
         // 执行登录逻辑
         LogUtils.Log($"Attempting login with Username: {username}, Password: {password}");
 
-        // 监听登录返回的事件
-        EventBus.Subscribe<LoginResultEvent>(OnLoginResponse);
-
-        ModManager.Instance.GetMod<ModLogin>().Login(username, password);
+        GetMod<ModLogin>().Login(username, password);
     }
 
     private void OnLoginResponse(LoginResultEvent eventData)
@@ -36,7 +47,7 @@ public class LoginView : ViewBase
         if (eventData.IsSuccess)
         {
             // 切换到主页
-            UIManager.Instance.ShowCanvas("Main");
+            ShowCanvas("Main");
             HideCanvas();
         }
         else

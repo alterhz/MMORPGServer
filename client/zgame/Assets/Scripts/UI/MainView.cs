@@ -8,19 +8,27 @@ public class MainView : ViewBase
     // 构造函数，初始化主界面管理器
     public MainView() : base("Main")
     {
-        // 注册Canvas
-        RegisterCanvas(false);
+    }
 
+    public override void OnInitialize()
+    {
         // 给返回按钮绑定事件
         AddButtonClickListener("GoBack", OnGoBackButtonClicked);
     }
 
+    public override void OnShow()
+    {
+        LogUtils.Log("加载主界面");
+    }
+
+    public override void OnHide()
+    {
+        LogUtils.Log("卸载主界面");
+    }
+
     private void OnGoBackButtonClicked()
     {
-        // 获取UIManager单例
-        UIManager uiManager = UIManager.Instance;
-
         // 返回到登录界面
-        uiManager.ShowCanvas("Login");
+        ShowCanvas("Login");
     }
 }
