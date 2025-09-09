@@ -18,17 +18,15 @@ public class ModLogin : ModBase
     {
         LogUtils.Log("初始化登录模块");
     }
-    
+
     protected override void OnEnable()
     {
-        // 注册登录协议处理器
-        ClientManager.Instance.RegisterHandler(1002, OnLogin);
+        // 协议处理器会通过ProtoListener特性自动注册
     }
 
     protected override void OnDisable()
     {
-        // 注销登录协议处理器
-        ClientManager.Instance.UnregisterHandler(1002, OnLogin);
+        // 协议处理器会通过ProtoListener特性自动注销
     }
 
     /// <summary>
@@ -44,14 +42,13 @@ public class ModLogin : ModBase
             account = username,
             password = password
         };
-        ClientManager.Instance.Send(1001, request);
+        ClientManager.Instance.Send(request);
     }
 
 
-    public void OnLogin(Message message)
+    [ProtoListener]
+    public void OnLogin(SCLogin scLogin)
     {
-        SCLogin scLogin = ProtoUtils.Deserialize<SCLogin>(message.ToJson());
-
         EventBus.Trigger(new LoginResultEvent(scLogin.code, scLogin.message));
 
         if (scLogin.code == 0)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 // 示例：定义消息数据类
 [Serializable]
+[Proto(ProtoIds.CS_LOGIN)]
 public class CSLogin
 {
     public string account;
@@ -10,6 +11,7 @@ public class CSLogin
 }
 
 [Serializable]
+[Proto(ProtoIds.SC_LOGIN)]
 public class SCLogin 
 {
     public int code;
@@ -25,12 +27,14 @@ public class HumanInfo
 }
 
 [Serializable]
+[Proto(ProtoIds.CS_QUERY_HUMANS)]
 public class CSQueryHumans 
 {
 }
 
 
 [Serializable]
+[Proto(ProtoIds.SC_QUERY_HUMANS)]
 public class SCQueryHumans 
 {
     public int code;
@@ -39,6 +43,7 @@ public class SCQueryHumans
 }
 
 [Serializable]
+[Proto(ProtoIds.CS_SELECT_HUMAN)]
 public class CSSelectHuman 
 {
     public string humanId;
@@ -46,6 +51,7 @@ public class CSSelectHuman
 
 
 [Serializable]
+[Proto(ProtoIds.SC_SELECT_HUMAN)]
 public class SCSelectHuman
 {
     public int code;
@@ -53,6 +59,7 @@ public class SCSelectHuman
 }
 
 [Serializable]
+[Proto(ProtoIds.CS_CREATE_HUMAN)]
 public class CSCreateHuman 
 {
     public string name;
@@ -61,6 +68,7 @@ public class CSCreateHuman
 
 
 [Serializable]
+[Proto(ProtoIds.SC_CREATE_HUMAN)]
 public class SCCreateHuman 
 {
     public int code;
@@ -72,23 +80,27 @@ public class SCCreateHuman
 
 
 [Serializable]
+[Proto(ProtoIds.SC_SEND_TO_CLIENT_BEGIN)]
 public class SCSendToClientBegin 
 {
 }
 
 [Serializable]
+[Proto(ProtoIds.SC_SEND_TO_CLIENT_END)]
 public class SCSendToClientEnd 
 {
 }
 
 
 [Serializable]
+[Proto(ProtoIds.SC_TEST)]
 public class SCTest 
 {
     public string content;
 }
 
 [Serializable]
+[Proto(ProtoIds.CS_TEST)]
 public class CSTest 
 {
 }

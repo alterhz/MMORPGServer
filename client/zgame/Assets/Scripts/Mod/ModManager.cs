@@ -20,6 +20,7 @@ namespace ZGame
         /// <param name="mod">Mod实例</param>
         public void RegisterMod<T>(T mod) where T : ModBase
         {
+            mod.ScanProtoListeners();
             mod.Initialize();
             mod.Enable();
             Type type = typeof(T);
@@ -45,6 +46,17 @@ namespace ZGame
             if (_mods.ContainsKey(type))
             {
                 return (T)_mods[type];
+            }
+            
+            Console.WriteLine($"Mod {type.Name} not found");
+            return null;
+        }
+
+        public ModBase GetMod(Type type)
+        {
+            if (_mods.ContainsKey(type))
+            {
+                return _mods[type];
             }
             
             Console.WriteLine($"Mod {type.Name} not found");

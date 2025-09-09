@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using ZGame;
+using System.Reflection;
 
 public class ClientManager : Singleton<ClientManager>
 {
@@ -30,20 +31,33 @@ public class ClientManager : Singleton<ClientManager>
         client?.ConnectToServer();
     }
     
-    public void Send<T>(int protocolId, T dataObject)
+    public void Send<T>(T dataObject)
     {
-        client?.SendObject(protocolId, dataObject);
+        client?.SendObject(dataObject);
     }
 
-    public void RegisterHandler(int protocolId, Action<Message> handler)
+    public void RegisterProto(Type protoType, MethodInfo handler)
     {
-        client?.EventDispatcher.RegisterEvent(protocolId.ToString(), handler);
+        int protoId = ProtoScanner.GetProtoID(protoType);
+        if (protoId == -1)
+        {
+            LogUtils.LogError("RegisterHandler没有注册的协议: " + protoType);
+            return;
+        }
+        client?.EventDispatcher.RegisterEvent(protoId.ToString(), handler);
     }
 
-    public void UnregisterHandler(int protocolId, Action<Message> handler)
+    public void UnregisterProto(Type protoType, MethodInfo handler)
     {
-        client?.EventDispatcher.UnregisterEvent(protocolId.ToString(), handler);
+        int protoId = ProtoScanner.GetProtoID(protoType);
+        if (protoId == -1)
+        {
+            LogUtils.LogError("UnregisterHandler没有注册的协议: " + protoType);
+            return;
+        }
+        client?.EventDispatcher.UnregisterEvent(protoId.ToString(), handler);
     }
+
 
     // Update is called once per frame
     public void Run()

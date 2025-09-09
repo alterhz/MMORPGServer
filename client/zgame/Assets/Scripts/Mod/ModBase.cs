@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using ZGame;
 
 namespace ZGame
 {
@@ -7,6 +10,11 @@ namespace ZGame
     /// </summary>
     public abstract class ModBase
     {
+        /// <summary>
+        /// 存储当前Mod中通过ProtoListener特性注册的方法信息
+        /// </summary>
+        private readonly Dictionary<Type, MethodInfo> registeredHandlers = new();
+
         /// <summary>
         /// Mod的唯一标识符
         /// </summary>
@@ -28,6 +36,7 @@ namespace ZGame
         public virtual void Enable()
         {
             IsEnabled = true;
+            RegisterProtoListeners();
             OnEnable();
         }
 
@@ -36,6 +45,7 @@ namespace ZGame
         /// </summary>
         public virtual void Disable()
         {
+            UnregisterProtoListeners();
             IsEnabled = false;
             OnDisable();
         }
@@ -81,6 +91,64 @@ namespace ZGame
         public T GetMod<T>() where T : ModBase
         {
             return ModManager.Instance.GetMod<T>();
+        }
+
+        /// <summary>
+        /// 扫描当前类中带有ProtoListener特性的方法并自动注册
+        /// </summary>
+        public void ScanProtoListeners()
+        {
+            Type type = this.GetType();
+            MethodInfo[] methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            foreach (MethodInfo method in methods)
+            {
+                ProtoListener protoListenerAttr = method.GetCustomAttribute<ProtoListener>();
+                if (protoListenerAttr != null)
+                {
+                    ParameterInfo[] parameters = method.GetParameters();
+                    if (parameters.Length == 1)
+                    {
+                        Type paramType = parameters[0].ParameterType;
+                        // paramType包含Proto注解
+                        if (!paramType.IsDefined(typeof(Proto), false))
+                        {
+                            throw new InvalidOperationException($"方法 {method.Name} 的参数类型 {paramType.Name} 未标记为 Proto");
+                        }
+                        
+                        // 注册处理器
+                        registeredHandlers[paramType] = method;
+                        LogUtils.Log($"自动注册协议监听器: {type.Name}.{method.Name}({paramType.Name})");
+                    }
+                    else
+                    {
+                        // 抛出异常
+                        throw new InvalidOperationException($"方法 {method.Name} 必须有且仅有一个参数才能使用 ProtoListener 特性");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 扫描当前类中带有ProtoListener特性的方法并自动注册
+        /// </summary>
+        private void RegisterProtoListeners()
+        {
+            foreach (var kvp in registeredHandlers)
+            {
+                ClientManager.Instance.RegisterProto(kvp.Key, kvp.Value);
+            }
+        }
+
+        /// <summary>
+        /// 注销所有通过ProtoListener特性注册的协议处理器
+        /// </summary>
+        private void UnregisterProtoListeners()
+        {
+            foreach (var kvp in registeredHandlers)
+            {
+                ClientManager.Instance.UnregisterProto(kvp.Key, kvp.Value);
+            }
         }
     }
 }

@@ -9,6 +9,9 @@ public class GameInitializer : MonoBehaviour
     {
         UIManager.Instance.InitializeUIRoot();
 
+        // 初始化协议ID
+        ProtoScanner.Initialize();
+
         // 初始化网络
         ClientManager.Instance.InitClient();
 

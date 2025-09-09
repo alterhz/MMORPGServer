@@ -27,7 +27,7 @@ namespace ZGame
         private readonly object queueLock = new();
 
         // 网络事件
-        public EventDispatcher<Message> EventDispatcher = new();
+        public EventDispatcher EventDispatcher = new();
         public event Action OnConnected;
         public event Action OnDisconnected;
         public event Action<string> OnError;
@@ -139,10 +139,17 @@ namespace ZGame
         /// <typeparam name="T">对象类型</typeparam>
         /// <param name="protocolId">协议ID</param>
         /// <param name="dataObject">数据对象</param>
-        public void SendObject<T>(int protocolId, T dataObject)
+        public void SendObject<T>(T dataObject)
         {
+            int protoId = ProtoScanner.GetProtoID(typeof(T));
+            if (protoId == -1)
+            {
+                LogUtils.LogError("没有注册的协议: " + typeof(T).Name);
+                return;
+            }
+
             string json = JsonConvert.SerializeObject(dataObject);
-            SendJson(protocolId, json);
+            SendJson(protoId, json);
         }
 
         private void ReceiveData()
@@ -244,8 +251,16 @@ namespace ZGame
                         string jsonData = message.ToJson();
                         Debug.Log("收到JSON消息，协议ID: " + message.ProtocolId + ", 数据: " + jsonData);
 
+                        Type protoType = ProtoScanner.GetProtoClass(message.ProtocolId);
+
+                        object proto = JsonConvert.DeserializeObject(jsonData, protoType);
+
                         // 触发消息接收事件
-                        EventDispatcher.DispatchEvent("" + message.ProtocolId, message);
+                        EventDispatcher.DispatchEvent2("" + message.ProtocolId, method => {
+                            // method获取函数所属的对象
+                            Type modType = (Type)method.GetType().GetProperty("DeclaringType").GetValue(method);
+                            return ModManager.Instance.GetMod(modType);
+                        }, proto);
                     }
                     catch (Exception e)
                     {

@@ -69,11 +69,13 @@
     <Compile Include="Assets\Scripts\Event\LoginResultEvent.cs" />
     <Compile Include="Assets\Scripts\Mod\ModManager.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Scripts\Net\ProtoIds.cs" />
     <Compile Include="Assets\Scripts\ZGame\Singleton.cs" />
     <Compile Include="Assets\Scripts\Mod\LogUtils.cs" />
     <Compile Include="Assets\Scripts\ZGame\RC4.cs" />
     <Compile Include="Assets\Scripts\UI\ViewNames.cs" />
     <Compile Include="Assets\Scripts\Net\ClientManager.cs" />
+    <Compile Include="Assets\Scripts\Net\Proto.cs" />
     <Compile Include="Assets\Scripts\Mod\ModBase.cs" />
     <Compile Include="Assets\Scripts\GameInitializer.cs" />
     <Compile Include="Assets\Scripts\ZGame\EventDispatcher.cs" />
@@ -82,7 +84,9 @@
     <Compile Include="Assets\Scripts\UI\SelectPlayerView.cs" />
     <Compile Include="Assets\Scripts\Mod\ModSelectPlayer.cs" />
     <Compile Include="Assets\Scripts\Mod\ModLogin.cs" />
+    <Compile Include="Assets\Scripts\Net\ProtoListener.cs" />
     <Compile Include="Assets\Scripts\UI\ViewBase.cs" />
+    <Compile Include="Assets\Scripts\Net\ProtoScanner.cs" />
     <Compile Include="Assets\Scripts\Event\PlayerListEvent.cs" />
     <Compile Include="Assets\Scripts\ZGame\Message.cs" />
     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
