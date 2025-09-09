@@ -15,15 +15,19 @@ namespace ZGame
         protected string canvasPath;
 
         // 构造函数，初始化ViewBase
-        public ViewBase()
+        public ViewBase(string canvasPath, string canvasName = null)
         {
-            canvasName = GetType().Name;
-            // 去掉后缀"View"
-            if (canvasName.EndsWith("View"))
+            this.canvasPath = canvasPath;
+            if (string.IsNullOrEmpty(canvasName))
             {
-                canvasName = canvasName[..^4];
+                canvasName = GetType().Name;
+                // 去掉后缀"View"
+                if (canvasName.EndsWith("View"))
+                {
+                    canvasName = canvasName[..^4];
+                }
             }
-            canvasPath = canvasName;
+            this.canvasName = canvasName;
         }
 
         // 获取指定路径的UI组件

@@ -14,6 +14,7 @@ public class GameInitializer : MonoBehaviour
 
         // 模型注册
         ModManager.Instance.RegisterMod(new ModLogin());
+        ModManager.Instance.RegisterMod(new ModSelectPlayer());
 
         // 创建并初始化登录管理器
         new LoginView();

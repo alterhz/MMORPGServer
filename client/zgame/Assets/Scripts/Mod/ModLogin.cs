@@ -8,24 +8,34 @@ public class ModLogin : ModBase
 {
     public ModLogin()
     {
-        // 初始化模块
-        Initialize();
+
     }
 
     /// <summary>
     /// 初始化登录模块
     /// </summary>
-    protected override void Initialize()
+    public override void Initialize()
+    {
+        LogUtils.Log("初始化登录模块");
+    }
+    
+    protected override void OnEnable()
     {
         // 注册登录协议处理器
         ClientManager.Instance.RegisterHandler(1002, OnLogin);
+    }
+
+    protected override void OnDisable()
+    {
+        // 注销登录协议处理器
+        ClientManager.Instance.UnregisterHandler(1002, OnLogin);
     }
 
     /// <summary>
     /// 登录处理
     /// </summary>
     public void Login(string username, string password)
-    {            
+    {
         // 连接服务器，并发送登录请求
         ClientManager.Instance.Connect();
 
@@ -53,5 +63,6 @@ public class ModLogin : ModBase
             LogUtils.LogWarning("登录失败: " + scLogin.message);
         }
     }
+
 
 }

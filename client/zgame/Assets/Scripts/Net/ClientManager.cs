@@ -40,6 +40,11 @@ public class ClientManager : Singleton<ClientManager>
         client?.EventDispatcher.RegisterEvent(protocolId.ToString(), handler);
     }
 
+    public void UnregisterHandler(int protocolId, Action<Message> handler)
+    {
+        client?.EventDispatcher.UnregisterEvent(protocolId.ToString(), handler);
+    }
+
     // Update is called once per frame
     public void Run()
     {

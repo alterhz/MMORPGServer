@@ -3,11 +3,8 @@ using ZGame;
 
 public class LoginView : ViewBase
 {
-    private const string CanvasName = "Login";
-    private const string CanvasPath = "Login";
-
     // 构造函数，初始化登录管理器
-    public LoginView()
+    public LoginView() : base("Login")
     {
         RegisterCanvas(true);
 

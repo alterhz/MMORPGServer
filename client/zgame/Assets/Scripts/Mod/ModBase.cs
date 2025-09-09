@@ -20,7 +20,7 @@ namespace ZGame
         /// <summary>
         /// Mod是否已初始化
         /// </summary>
-        protected abstract void Initialize();
+        public abstract void Initialize();
 
         /// <summary>
         /// 启用Mod
@@ -63,18 +63,12 @@ namespace ZGame
         /// <summary>
         /// 当Mod被启用时调用
         /// </summary>
-        protected virtual void OnEnable()
-        {
-            // 子类可以重写此方法以实现特定逻辑
-        }
+        protected abstract void OnEnable();
 
         /// <summary>
         /// 当Mod被禁用时调用
         /// </summary>
-        protected virtual void OnDisable()
-        {
-            // 子类可以重写此方法以实现特定逻辑
-        }
+        protected abstract void OnDisable();
 
         /// <summary>
         /// 当Mod被销毁时调用

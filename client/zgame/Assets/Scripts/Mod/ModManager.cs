@@ -20,6 +20,8 @@ namespace ZGame
         /// <param name="mod">Mod实例</param>
         public void RegisterMod<T>(T mod) where T : ModBase
         {
+            mod.Initialize();
+            mod.Enable();
             Type type = typeof(T);
             if (!_mods.ContainsKey(type))
             {

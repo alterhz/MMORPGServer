@@ -5,9 +5,8 @@ using ZGame;
 /// </summary>
 public class MainView : ViewBase
 {
-
     // 构造函数，初始化主界面管理器
-    public MainView()
+    public MainView() : base("Main")
     {
         // 注册Canvas
         RegisterCanvas(false);
