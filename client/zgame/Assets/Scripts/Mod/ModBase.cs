@@ -115,6 +115,12 @@ namespace ZGame
                         {
                             throw new InvalidOperationException($"方法 {method.Name} 的参数类型 {paramType.Name} 未标记为 Proto");
                         }
+
+                        // 重复注册
+                        if (registeredHandlers.ContainsKey(paramType))
+                        {
+                            throw new InvalidOperationException($"协议类型 {paramType.Name} 已经被注册，不能重复注册");
+                        }
                         
                         // 注册处理器
                         registeredHandlers[paramType] = method;
@@ -136,7 +142,7 @@ namespace ZGame
         {
             foreach (var kvp in registeredHandlers)
             {
-                ClientManager.Instance.RegisterProto(kvp.Key, kvp.Value);
+                ClientManager.Instance.RegisterProto(kvp.Key, this, kvp.Value);
             }
         }
 
@@ -147,7 +153,7 @@ namespace ZGame
         {
             foreach (var kvp in registeredHandlers)
             {
-                ClientManager.Instance.UnregisterProto(kvp.Key, kvp.Value);
+                ClientManager.Instance.UnregisterProto(kvp.Key, this, kvp.Value);
             }
         }
     }

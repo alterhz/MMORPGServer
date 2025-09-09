@@ -34,6 +34,13 @@ public class ModSelectPlayer : ModBase
         ClientManager.Instance.Send(request);
     }
 
+    [ProtoListener]
+    public void OnLogin(SCLogin scLogin)
+    {
+        LogUtils.Log($"ModSelectPlayer 收到登录响应:{scLogin}");
+    }
+
+
     /// <summary>
     /// 角色列表响应处理
     /// </summary>

@@ -36,7 +36,7 @@ public class ClientManager : Singleton<ClientManager>
         client?.SendObject(dataObject);
     }
 
-    public void RegisterProto(Type protoType, MethodInfo handler)
+    public void RegisterProto(Type protoType, object obj, MethodInfo methodInfo)
     {
         int protoId = ProtoScanner.GetProtoID(protoType);
         if (protoId == -1)
@@ -44,10 +44,10 @@ public class ClientManager : Singleton<ClientManager>
             LogUtils.LogError("RegisterHandler没有注册的协议: " + protoType);
             return;
         }
-        client?.EventDispatcher.RegisterEvent(protoId.ToString(), handler);
+        client?.EventDispatcher.RegisterMethod(protoId.ToString(), obj, methodInfo);
     }
 
-    public void UnregisterProto(Type protoType, MethodInfo handler)
+    public void UnregisterProto(Type protoType, object obj, MethodInfo methodInfo)
     {
         int protoId = ProtoScanner.GetProtoID(protoType);
         if (protoId == -1)
@@ -55,7 +55,7 @@ public class ClientManager : Singleton<ClientManager>
             LogUtils.LogError("UnregisterHandler没有注册的协议: " + protoType);
             return;
         }
-        client?.EventDispatcher.UnregisterEvent(protoId.ToString(), handler);
+        client?.EventDispatcher.UnregisterMethod(protoId.ToString(), obj, methodInfo);
     }
 
 

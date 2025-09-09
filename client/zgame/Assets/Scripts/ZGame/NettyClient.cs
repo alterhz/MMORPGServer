@@ -27,7 +27,7 @@ namespace ZGame
         private readonly object queueLock = new();
 
         // 网络事件
-        public EventDispatcher EventDispatcher = new();
+        public MethodDispatcher EventDispatcher = new();
         public event Action OnConnected;
         public event Action OnDisconnected;
         public event Action<string> OnError;
@@ -256,11 +256,7 @@ namespace ZGame
                         object proto = JsonConvert.DeserializeObject(jsonData, protoType);
 
                         // 触发消息接收事件
-                        EventDispatcher.DispatchEvent2("" + message.ProtocolId, method => {
-                            // method获取函数所属的对象
-                            Type modType = (Type)method.GetType().GetProperty("DeclaringType").GetValue(method);
-                            return ModManager.Instance.GetMod(modType);
-                        }, proto);
+                        EventDispatcher.InvokeMethod("" + message.ProtocolId, proto);
                     }
                     catch (Exception e)
                     {
