@@ -67,6 +67,7 @@
     <Compile Include="Assets\Scripts\ZGame\NettyClient.cs" />
     <Compile Include="Assets\Scripts\ZGame\EventBus.cs" />
     <Compile Include="Assets\Scripts\Event\LoginResultEvent.cs" />
+    <Compile Include="Assets\Scripts\UI\ViewScanner.cs" />
     <Compile Include="Assets\Scripts\Mod\ModManager.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\Net\ProtoIds.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Assets\Scripts\Net\Proto.cs" />
     <Compile Include="Assets\Scripts\Mod\ModBase.cs" />
     <Compile Include="Assets\Scripts\GameInitializer.cs" />
+    <Compile Include="Assets\Scripts\Mod\ModScanner.cs" />
     <Compile Include="Assets\Scripts\Event\BalanceQueryResultEvent.cs" />
     <Compile Include="Assets\Scripts\ZGame\MethodDispatcher.cs" />
     <Compile Include="Assets\Scripts\UI\MainView.cs" />

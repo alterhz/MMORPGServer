@@ -18,12 +18,12 @@ namespace ZGame
         /// </summary>
         /// <typeparam name="T">Mod类型</typeparam>
         /// <param name="mod">Mod实例</param>
-        public void RegisterMod<T>(T mod) where T : ModBase
+        public void RegisterMod(ModBase mod)
         {
             mod.ScanProtoListeners();
             mod.Initialize();
             mod.Enable();
-            Type type = typeof(T);
+            Type type = mod.GetType();
             if (!_mods.ContainsKey(type))
             {
                 _mods[type] = mod;

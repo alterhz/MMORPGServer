@@ -7,23 +7,24 @@ public class GameInitializer : MonoBehaviour
 
     void Start()
     {
-        UIManager.Instance.InitializeUIRoot();
-
+        LogUtils.Log("GameInitializer Start");
         // 初始化协议ID
         ProtoScanner.Initialize();
 
         // 初始化网络
         ClientManager.Instance.InitClient();
 
-        // 模型注册
-        ModManager.Instance.RegisterMod(new ModLogin());
-        ModManager.Instance.RegisterMod(new ModSelectPlayer());
+        // 注册Mod
+        ModScanner.ScanAndRegisterMods();
 
-        // 创建并初始化登录管理器
-        UIManager.Instance.RegisterCanvas(new LoginView(), true);
-        UIManager.Instance.RegisterCanvas(new MainView());
-        UIManager.Instance.RegisterCanvas(new SelectPlayerView());
+        // 初始化UI系统
+        UIManager.Instance.InitializeUIRoot();
+        // 注册View
+        ViewScanner.ScanAndRegisterViews();
 
+        UIManager.Instance.ShowCanvas(ViewNames.LOGIN);
+
+        LogUtils.Log("GameInitializer End");
     }
 
     void Update()

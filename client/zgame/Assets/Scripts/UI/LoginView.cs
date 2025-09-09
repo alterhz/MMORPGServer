@@ -31,7 +31,6 @@ public class LoginView : ViewBase
 
     private void OnLoginButtonClicked()
     {
-
         // 获取用户名和密码
         string username = GetInputText("Username");
         string password = GetInputText("Password");
