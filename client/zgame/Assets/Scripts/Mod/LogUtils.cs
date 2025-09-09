@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace ZGame.Mod
+namespace ZGame
 {
     /// <summary>
     /// 日志工具类，用于统一处理Unity中的日志输出

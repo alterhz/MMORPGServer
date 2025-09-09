@@ -1,5 +1,5 @@
 using UnityEngine;
-using ZGame.Mod;
+using ZGame;
 
 public class GameInitializer : MonoBehaviour
 {

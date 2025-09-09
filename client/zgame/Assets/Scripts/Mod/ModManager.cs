@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ZGame.Mod
+namespace ZGame
 {
     /// <summary>
     /// Mod管理器单例，用于管理所有Mod实例

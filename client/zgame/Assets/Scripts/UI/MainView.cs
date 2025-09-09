@@ -1,6 +1,11 @@
+using ZGame;
+
+/// <summary>
+/// 主界面管理器，负责主界面的UI逻辑
+/// </summary>
 public class MainView : ViewBase
 {
-    
+
     // 构造函数，初始化主界面管理器
     public MainView()
     {
@@ -15,7 +20,7 @@ public class MainView : ViewBase
     {
         // 获取UIManager单例
         UIManager uiManager = UIManager.Instance;
-        
+
         // 返回到登录界面
         uiManager.ShowCanvas("Login");
     }

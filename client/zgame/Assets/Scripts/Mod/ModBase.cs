@@ -1,4 +1,6 @@
-namespace ZGame.Mod
+using System;
+
+namespace ZGame
 {
     /// <summary>
     /// 所有Mod类的基类，提供Mod的基本生命周期和通用功能
@@ -9,7 +11,7 @@ namespace ZGame.Mod
         /// Mod的唯一标识符
         /// </summary>
         public string ModId { get; private set; }
-        
+
         /// <summary>
         /// Mod是否已启用
         /// </summary>

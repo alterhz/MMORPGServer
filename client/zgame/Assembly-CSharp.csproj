@@ -78,6 +78,7 @@
     <Compile Include="Assets\Scripts\ZGame\EventDispatcher.cs" />
     <Compile Include="Assets\Scripts\Event\BalanceQueryResultEvent.cs" />
     <Compile Include="Assets\Scripts\UI\MainView.cs" />
+    <Compile Include="Assets\Scripts\Mod\ModSelectPlayer.cs" />
     <Compile Include="Assets\Scripts\Mod\ModLogin.cs" />
     <Compile Include="Assets\Scripts\UI\ViewBase.cs" />
     <Compile Include="Assets\Scripts\ZGame\Message.cs" />

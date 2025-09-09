@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using ZGame;
 
 public class ClientManager : Singleton<ClientManager>
 {
