@@ -72,6 +72,7 @@
     <Compile Include="Assets\Scripts\ZGame\Singleton.cs" />
     <Compile Include="Assets\Scripts\Mod\LogUtils.cs" />
     <Compile Include="Assets\Scripts\ZGame\RC4.cs" />
+    <Compile Include="Assets\Scripts\UI\ViewNames.cs" />
     <Compile Include="Assets\Scripts\Net\ClientManager.cs" />
     <Compile Include="Assets\Scripts\Mod\ModBase.cs" />
     <Compile Include="Assets\Scripts\GameInitializer.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Assets\Scripts\Mod\ModSelectPlayer.cs" />
     <Compile Include="Assets\Scripts\Mod\ModLogin.cs" />
     <Compile Include="Assets\Scripts\UI\ViewBase.cs" />
+    <Compile Include="Assets\Scripts\Event\PlayerListEvent.cs" />
     <Compile Include="Assets\Scripts\ZGame\Message.cs" />
     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
     <Compile Include="Assets\Scripts\UI\LoginView.cs" />

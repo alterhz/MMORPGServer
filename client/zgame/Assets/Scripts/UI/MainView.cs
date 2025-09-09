@@ -6,7 +6,7 @@ using ZGame;
 public class MainView : ViewBase
 {
     // 构造函数，初始化主界面管理器
-    public MainView() : base("Main")
+    public MainView() : base(ViewNames.MAIN)
     {
     }
 
@@ -29,6 +29,6 @@ public class MainView : ViewBase
     private void OnGoBackButtonClicked()
     {
         // 返回到登录界面
-        ShowCanvas("Login");
+        ShowCanvas(ViewNames.LOGIN);
     }
 }

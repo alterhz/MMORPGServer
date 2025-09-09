@@ -4,7 +4,7 @@ using ZGame;
 public class LoginView : ViewBase
 {
     // 构造函数，初始化登录管理器
-    public LoginView() : base("Login")
+    public LoginView() : base(ViewNames.LOGIN)
     {
     }
 
@@ -47,7 +47,7 @@ public class LoginView : ViewBase
         if (eventData.IsSuccess)
         {
             // 切换到主页
-            ShowCanvas("Main");
+            ShowCanvas(ViewNames.SELECT_PLAYER);
             HideCanvas();
         }
         else

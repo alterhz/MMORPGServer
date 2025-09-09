@@ -4,6 +4,8 @@ using ZGame;
 
 public class ModSelectPlayer : ModBase
 {
+    private readonly List<HumanInfo> _playerList = new();
+
     public override void Initialize()
     {
         LogUtils.Log("ModSelectPlayer Initialized");
@@ -40,15 +42,26 @@ public class ModSelectPlayer : ModBase
     private void OnQueryHumans(Message message)
     {
         SCQueryHumans scQueryHumans = ProtoUtils.Deserialize<SCQueryHumans>(message.ToJson());
-        
+
         if (scQueryHumans.code == 0)
         {
+            _playerList.Clear();
+            _playerList.AddRange(scQueryHumans.humanList);
+
             LogUtils.Log("获取角色列表成功，角色数量: " + scQueryHumans.humanList.Count);
-            // 在这里可以触发事件通知UI更新等操作
+            // 触发角色列表事件
+            EventBus.Trigger(PlayerListEvent.Success(scQueryHumans.humanList, scQueryHumans.message));
         }
         else
         {
             LogUtils.LogWarning("获取角色列表失败: " + scQueryHumans.message);
+            // 触发角色列表事件（失败）
+            EventBus.Trigger(PlayerListEvent.Failure(scQueryHumans.message));
         }
+    }
+    
+    public List<HumanInfo> GetPlayerList()
+    {
+        return new List<HumanInfo>(_playerList);
     }
 }
