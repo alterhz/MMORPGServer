@@ -64,37 +64,37 @@
     <Analyzer Include="D:\Program Files\Unity\Hub\Editor\2022.3.62f1c1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\ZGame\NettyClient.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Net\NettyClient.cs" />
     <Compile Include="Assets\Scripts\ZGame\EventBus.cs" />
     <Compile Include="Assets\Scripts\Event\LoginResultEvent.cs" />
-    <Compile Include="Assets\Scripts\UI\ViewScanner.cs" />
-    <Compile Include="Assets\Scripts\Mod\ModManager.cs" />
+    <Compile Include="Assets\Scripts\ZGame\UI\ViewBase.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Net\Proto.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Net\ProtoScanner.cs" />
     <Compile Include="Assets\Scripts\Net\ProtoIds.cs" />
     <Compile Include="Assets\Scripts\ZGame\Singleton.cs" />
-    <Compile Include="Assets\Scripts\Mod\LogUtils.cs" />
-    <Compile Include="Assets\Scripts\ZGame\RC4.cs" />
     <Compile Include="Assets\Scripts\UI\ViewNames.cs" />
-    <Compile Include="Assets\Scripts\Net\ClientManager.cs" />
-    <Compile Include="Assets\Scripts\Net\Proto.cs" />
-    <Compile Include="Assets\Scripts\Mod\ModBase.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Net\ProtoListener.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Mod\ModBase.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Mod\ModManager.cs" />
+    <Compile Include="Assets\Scripts\ZGame\UI\UIManager.cs" />
     <Compile Include="Assets\Scripts\GameInitializer.cs" />
-    <Compile Include="Assets\Scripts\Mod\ModScanner.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Mod\ModScanner.cs" />
     <Compile Include="Assets\Scripts\Event\BalanceQueryResultEvent.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Net\RC4.cs" />
     <Compile Include="Assets\Scripts\ZGame\MethodDispatcher.cs" />
     <Compile Include="Assets\Scripts\UI\MainView.cs" />
     <Compile Include="Assets\Scripts\UI\SelectPlayerView.cs" />
     <Compile Include="Assets\Scripts\Mod\ModSelectPlayer.cs" />
     <Compile Include="Assets\Scripts\Mod\ModLogin.cs" />
-    <Compile Include="Assets\Scripts\Net\ProtoListener.cs" />
-    <Compile Include="Assets\Scripts\UI\ViewBase.cs" />
-    <Compile Include="Assets\Scripts\Net\ProtoScanner.cs" />
+    <Compile Include="Assets\Scripts\ZGame\UI\ViewScanner.cs" />
     <Compile Include="Assets\Scripts\Event\PlayerListEvent.cs" />
-    <Compile Include="Assets\Scripts\ZGame\Message.cs" />
-    <Compile Include="Assets\Scripts\UI\UIManager.cs" />
+    <Compile Include="Assets\Scripts\ZGame\LogUtils.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Net\ClientManager.cs" />
     <Compile Include="Assets\Scripts\UI\LoginView.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Net\ProtoUtils.cs" />
     <Compile Include="Assets\Scripts\Net\Protocol.cs" />
-    <Compile Include="Assets\Scripts\ZGame\ProtoUtils.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Net\Message.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
