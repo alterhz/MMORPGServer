@@ -241,7 +241,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         String account = loginInfo.account;
         MongoDBAsyncClient.getCollection(HumanDB.class)
                 .find(Filters.eq("account", account))
-                .subscribe(new QuerySubscriber<>() {
+                .subscribe(new QuerySubscriber<>(Long.MAX_VALUE) {
                     @Override
                     protected void onLoadDB(List<HumanDB> humanDBS) {
                         List<HumanInfo> humanList = new ArrayList<>();
