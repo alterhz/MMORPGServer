@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\ZGame\EventBus.cs" />
     <Compile Include="Assets\Scripts\Event\LoginResultEvent.cs" />
     <Compile Include="Assets\Scripts\ZGame\UI\ViewBase.cs" />
+    <Compile Include="Assets\Scripts\Event\SelectHumanEvent.cs" />
     <Compile Include="Assets\Scripts\ZGame\Net\Proto.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\ZGame\Net\ProtoScanner.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Assets\Scripts\ZGame\UI\ViewScanner.cs" />
     <Compile Include="Assets\Scripts\Event\PlayerListEvent.cs" />
     <Compile Include="Assets\Scripts\ZGame\LogUtils.cs" />
+    <Compile Include="Assets\Scripts\Event\CreateHumanEvent.cs" />
     <Compile Include="Assets\Scripts\ZGame\Net\ClientManager.cs" />
     <Compile Include="Assets\Scripts\UI\LoginView.cs" />
     <Compile Include="Assets\Scripts\ZGame\Net\ProtoUtils.cs" />

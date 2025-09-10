@@ -6,6 +6,8 @@ public class ModSelectPlayer : ModBase
 {
     private readonly List<HumanInfo> _playerList = new();
 
+    private string selectedHumanId;
+
     public override void Initialize()
     {
         LogUtils.Log("ModSelectPlayer Initialized");
@@ -31,15 +33,8 @@ public class ModSelectPlayer : ModBase
     public void QueryHumans()
     {
         CSQueryHumans request = new();
-        ClientManager.Instance.Send(request);
+        Send(request);
     }
-
-    [ProtoListener]
-    public void OnLogin(SCLogin scLogin)
-    {
-        LogUtils.Log($"ModSelectPlayer 收到登录响应:{scLogin}");
-    }
-
 
     /// <summary>
     /// 角色列表响应处理
@@ -63,9 +58,79 @@ public class ModSelectPlayer : ModBase
             EventBus.Trigger(PlayerListEvent.Failure(scQueryHumans.message));
         }
     }
+
+    /// <summary>
+    /// 选择角色进入游戏
+    /// </summary>
+    /// <param name="humanId">角色ID</param>
+    public void SelectHuman(string humanId)
+    {
+        CSSelectHuman request = new();
+        request.humanId = humanId;
+        Send(request);
+        selectedHumanId = humanId;
+        LogUtils.Log("请求选择角色: " + humanId);
+    }
+
+    /// <summary>
+    /// 选择角色响应处理
+    /// </summary>
+    [ProtoListener]
+    private void OnSelectHuman(SCSelectHuman scSelectHuman)
+    {
+        if (scSelectHuman.code == 0)
+        {
+            LogUtils.Log("选择角色成功");
+            // 触发选择角色事件（成功）
+            EventBus.Trigger(SelectHumanEvent.Success(selectedHumanId, scSelectHuman.message));
+        }
+        else
+        {
+            LogUtils.LogWarning("选择角色失败: " + scSelectHuman.message);
+            // 触发选择角色事件（失败）
+            EventBus.Trigger(SelectHumanEvent.Failure(selectedHumanId, scSelectHuman.message));
+        }
+    }
+
     
     public List<HumanInfo> GetPlayerList()
     {
         return new List<HumanInfo>(_playerList);
+    }
+
+    /// <summary>
+    /// 创建角色
+    /// </summary>
+    /// <param name="name">角色名</param>
+    /// <param name="profession">职业</param>
+    public void CreateHuman(string name, string profession)
+    {
+        CSCreateHuman request = new()
+        {
+            name = name,
+            profession = profession
+        };
+        Send(request);
+        LogUtils.Log($"请求创建角色: {name}, 职业: {profession}");
+    }
+
+    /// <summary>
+    /// 创建角色响应处理
+    /// </summary>
+    [ProtoListener]
+    private void OnCreateHuman(SCCreateHuman scCreateHuman)
+    {
+        if (scCreateHuman.code == 0)
+        {
+            LogUtils.Log("创建角色成功");
+            // 触发创建角色成功事件
+            EventBus.Trigger(CreateHumanEvent.Success(scCreateHuman.message));
+        }
+        else
+        {
+            LogUtils.LogWarning("创建角色失败: " + scCreateHuman.message);
+            // 触发创建角色失败事件
+            EventBus.Trigger(CreateHumanEvent.Failure(scCreateHuman.message));
+        }
     }
 }

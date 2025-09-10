@@ -94,6 +94,12 @@ namespace ZGame
             UIManager.Instance.SetText(CanvasName, path, text);
         }
 
+        // 设置指定路径按钮的文本内容
+        protected void SetButtonText(string path, string text)
+        {
+            UIManager.Instance.SetButtonText(CanvasName, path, text);
+        }
+
         protected void ShowCanvas(string canvasName)
         {
             UIManager.Instance.ShowCanvas(canvasName);
@@ -114,6 +120,21 @@ namespace ZGame
         protected void HideCanvas()
         {
             UIManager.Instance.HideCanvas(CanvasName);
+        }
+
+        protected void ShowComponent(string path)
+        {
+            UIManager.Instance.SetComponentActive(CanvasName, path, true);
+        }
+
+        protected void HideComponent(string path)
+        {
+            UIManager.Instance.SetComponentActive(CanvasName, path, false);
+        }
+
+        protected void ToggleComponent(string path)
+        {
+            UIManager.Instance.ToggleComponentActive(CanvasName, path);
         }
 
         // 注册Canvas

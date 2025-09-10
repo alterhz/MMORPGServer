@@ -284,5 +284,65 @@ namespace ZGame
                 tmpText.text = text;
             }
         }
+
+        // 设置指定路径按钮的文本内容
+        public void SetButtonText(string canvasName, string path, string text)
+        {
+            Button button = GetButton(canvasName, path);
+            if (button != null)
+            {
+                TMP_Text textComponent = button.GetComponentInChildren<TMP_Text>();
+                if (textComponent != null)
+                {
+                    textComponent.text = text;
+                }
+                else
+                {
+                    Debug.LogWarning($"在按钮 {path} 下未找到TextMeshPro文本组件");
+                }
+            }
+        }
+
+        // 设置指定路径组件的激活状态
+        public void SetComponentActive(string canvasName, string path, bool active)
+        {
+            if (_CanvasDictionary.TryGetValue(canvasName, out ViewBase viewBase))
+            {
+                Transform target = viewBase.Canvas.transform.Find(path);
+                if (target != null)
+                {
+                    target.gameObject.SetActive(active);
+                }
+                else
+                {
+                    Debug.LogWarning($"在Canvas {canvasName} 下未找到路径为 {path} 的UI元素");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"未找到名为 {canvasName} 的Canvas");
+            }
+        }
+
+        // 切换指定路径组件的激活状态
+        public void ToggleComponentActive(string canvasName, string path)
+        {
+            if (_CanvasDictionary.TryGetValue(canvasName, out ViewBase viewBase))
+            {
+                Transform target = viewBase.Canvas.transform.Find(path);
+                if (target != null)
+                {
+                    target.gameObject.SetActive(!target.gameObject.activeSelf);
+                }
+                else
+                {
+                    Debug.LogWarning($"在Canvas {canvasName} 下未找到路径为 {path} 的UI元素");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"未找到名为 {canvasName} 的Canvas");
+            }
+        }
     }
 }

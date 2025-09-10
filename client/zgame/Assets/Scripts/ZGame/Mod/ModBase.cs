@@ -92,6 +92,16 @@ namespace ZGame
         {
             return ModManager.Instance.GetMod<T>();
         }
+        
+        /// <summary>
+        /// 发送数据对象到服务器
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dataObject"></param>
+        public void Send<T>(T dataObject)
+        {
+            ClientManager.Instance.Send(dataObject);
+        }
 
         /// <summary>
         /// 扫描当前类中带有ProtoListener特性的方法并自动注册
@@ -121,7 +131,7 @@ namespace ZGame
                         {
                             throw new InvalidOperationException($"协议类型 {paramType.Name} 已经被注册，不能重复注册");
                         }
-                        
+
                         // 注册处理器
                         registeredHandlers[paramType] = method;
                         LogUtils.Log($"自动注册协议监听器: {type.Name}.{method.Name}({paramType.Name})");
