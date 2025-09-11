@@ -110,29 +110,31 @@ public class SelectPlayerView : ViewBase
     {
         if (playerListEvent.IsSuccess)
         {
-            // 设置Player1-4按钮内容都为空
-            for (int i = 0; i < 4; i++)
-            {
-                SetButtonText($"Player{i + 1}", "空");
-            }
-
-            var playerList = GetMod<ModSelectPlayer>().GetPlayerList();
-            // 遍历角色列表，将角色信息显示在按钮上
-            for (int i = 0; i < playerList.Count; i++)
-            {
-                HumanInfo humanInfo = playerList[i];
-                SetButtonText($"Player{i + 1}", $"{humanInfo.name}");
-            }
-
-            LogUtils.Log($"接收到角色列表，共有 {playerList.Count} 个角色");
-            // 在这里处理角色列表UI更新逻辑
-            // 例如：创建角色按钮、显示角色信息等
+            DisplayPlayerList();
         }
         else
         {
             LogUtils.LogWarning($"获取角色列表失败: {playerListEvent.Message}");
-            // 在这里处理获取角色列表失败的UI提示逻辑
         }
+    }
+
+    private void DisplayPlayerList()
+    {
+        // 设置Player1-4按钮内容都为空
+        for (int i = 0; i < 4; i++)
+        {
+            SetButtonText($"Player{i + 1}", "空");
+        }
+
+        var playerList = GetMod<ModSelectPlayer>().GetPlayerList();
+        // 遍历角色列表，将角色信息显示在按钮上
+        for (int i = 0; i < playerList.Count; i++)
+        {
+            HumanInfo humanInfo = playerList[i];
+            SetButtonText($"Player{i + 1}", $"{humanInfo.name}");
+        }
+
+        LogUtils.Log($"接收到角色列表，共有 {playerList.Count} 个角色");
     }
 
     // 选择角色事件处理函数
@@ -204,8 +206,7 @@ public class SelectPlayerView : ViewBase
         {
             LogUtils.Log($"删除角色成功: {deleteHumanEvent.HumanId}");
             SetText("Tips", "删除成功");
-            // 刷新角色列表
-            GetMod<ModSelectPlayer>().QueryHumans();
+            DisplayPlayerList();
         }
         else
         {

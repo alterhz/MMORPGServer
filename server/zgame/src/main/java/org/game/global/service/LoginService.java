@@ -174,7 +174,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
             return;
         }
         if (loginInfo.loginPeriod != LoginPeriod.QUERY_HUMANS) {
-            logger.error("删除角色, 不在查询角色阶段: clientID={}, loginPeriod={}", clientID, loginInfo.loginPeriod);
+            logger.error("删除角色, 不在选择角色阶段: clientID={}, loginPeriod={}", clientID, loginInfo.loginPeriod);
             return;
         }
 
@@ -184,10 +184,11 @@ public class LoginService extends GameServiceBase implements ILoginService {
         // 判断是否存在这个角色
         if (!loginInfo.humans.contains(humanId)) {
             logger.error("删除角色不存在: humanId={}", humanId);
-            SCSelectHuman scSelectHuman = new SCSelectHuman();
-            scSelectHuman.setCode(1);
-            scSelectHuman.setMessage("选择失败");
-            sendProto(clientPoint, scSelectHuman);
+            SCDeleteHuman scDeleteHumanResp = new SCDeleteHuman();
+            scDeleteHumanResp.setCode(1);
+            scDeleteHumanResp.setHumanId(humanId);
+            scDeleteHumanResp.setMessage("删除角色不存在");
+            sendProto(clientPoint, scDeleteHumanResp);
             return;
         }
 
@@ -195,11 +196,11 @@ public class LoginService extends GameServiceBase implements ILoginService {
 
         // 根据角色ID删除角色
         MongoDBAsyncClient.getCollection(HumanDB.class)
-                .deleteOne(Filters.eq("id", new ObjectId(humanId)))
-                .subscribe(new QuerySubscriber<>() {
+                .deleteOne(Filters.eq("_id", new ObjectId(humanId)))
+                .subscribe(new QuerySubscriber<>(Long.MAX_VALUE) {
                     @Override
                     protected void onLoadDB(List<DeleteResult> dbCollections) {
-                        if (dbCollections.isEmpty()) {
+                        if (dbCollections.isEmpty() || dbCollections.get(0).getDeletedCount() == 0) {
                             // 角色不存在
                             logger.error("DB删除角色不存在: humanId={}", humanId);
                             SCDeleteHuman scDeleteHuman = new SCDeleteHuman();
@@ -222,7 +223,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                         SCDeleteHuman scDeleteHuman = new SCDeleteHuman();
                         scDeleteHuman.setCode(2);
                         scDeleteHuman.setHumanId(humanId);
-                        scDeleteHuman.setMessage("删除角色异常");
+                        scDeleteHuman.setMessage("删除角色异常: " + errMessage);
                         sendProto(clientPoint, scDeleteHuman);
                     }
                 });
