@@ -156,11 +156,11 @@ public class ModSelectPlayer : ModBase
     {
         if (scDeleteHuman.code == 0)
         {
-            LogUtils.Log("删除角色成功");
+            LogUtils.Log($"删除角色成功{scDeleteHuman.humanId}");
+            _playerList.RemoveAll(h => h.id == scDeleteHuman.humanId);
+
             // 触发删除角色成功事件
             EventBus.Trigger(DeleteHumanEvent.Success(scDeleteHuman.humanId, scDeleteHuman.message));
-
-            _playerList.RemoveAll(h => h.id == scDeleteHuman.humanId);
         }
         else
         {

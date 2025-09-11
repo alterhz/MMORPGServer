@@ -46,6 +46,7 @@ public class SelectPlayerView : ViewBase
         EventBus.Subscribe<PlayerListEvent>(OnPlayerListEvent);
         EventBus.Subscribe<SelectHumanEvent>(OnSelectHumanEvent);
         EventBus.Subscribe<CreateHumanEvent>(OnCreateHumanEvent);
+        EventBus.Subscribe<DeleteHumanEvent>(OnDeleteHumanEvent);
         LogUtils.Log("加载选择角色界面");
     }
 
@@ -54,6 +55,7 @@ public class SelectPlayerView : ViewBase
         EventBus.Unsubscribe<PlayerListEvent>(OnPlayerListEvent);
         EventBus.Unsubscribe<SelectHumanEvent>(OnSelectHumanEvent);
         EventBus.Unsubscribe<CreateHumanEvent>(OnCreateHumanEvent);
+        EventBus.Unsubscribe<DeleteHumanEvent>(OnDeleteHumanEvent);
         LogUtils.Log("卸载选择角色界面");
     }
 
@@ -124,6 +126,8 @@ public class SelectPlayerView : ViewBase
         for (int i = 0; i < 4; i++)
         {
             SetButtonText($"Player{i + 1}", "空");
+            // 隐藏删除按钮
+            HideComponent($"Player{i + 1}/Delete");
         }
 
         var playerList = GetMod<ModSelectPlayer>().GetPlayerList();
@@ -132,6 +136,8 @@ public class SelectPlayerView : ViewBase
         {
             HumanInfo humanInfo = playerList[i];
             SetButtonText($"Player{i + 1}", $"{humanInfo.name}");
+            // 显示删除按钮
+            ShowComponent($"Player{i + 1}/Delete");
         }
 
         LogUtils.Log($"接收到角色列表，共有 {playerList.Count} 个角色");
@@ -189,9 +195,17 @@ public class SelectPlayerView : ViewBase
         {
             // 获取选中的角色ID
             string humanId = playerList[index].id;
+            // 角色名
+            string humanName = playerList[index].name;
 
-            // 请求删除角色
-            GetMod<ModSelectPlayer>().DeleteHuman(humanId);
+            ConfirmPanel.Create($"确定要删除该角色（{humanName}）吗？", () =>
+            {
+                LogUtils.Log($"确认删除角色: {humanName} (ID: {humanId})");
+                // 请求删除角色
+                GetMod<ModSelectPlayer>().DeleteHuman(humanId);
+            }, null).Show();
+
+            
         }
         else
         {

@@ -85,7 +85,9 @@
     <Compile Include="Assets\Scripts\ZGame\Net\RC4.cs" />
     <Compile Include="Assets\Scripts\ZGame\MethodDispatcher.cs" />
     <Compile Include="Assets\Scripts\UI\MainView.cs" />
+    <Compile Include="Assets\Scripts\UI\ConfirmPanel.cs" />
     <Compile Include="Assets\Scripts\UI\SelectPlayerView.cs" />
+    <Compile Include="Assets\Scripts\ZGame\UI\PanelBase.cs" />
     <Compile Include="Assets\Scripts\Mod\ModSelectPlayer.cs" />
     <Compile Include="Assets\Scripts\Mod\ModLogin.cs" />
     <Compile Include="Assets\Scripts\Proto\ProtoIds.cs" />
@@ -97,6 +99,7 @@
     <Compile Include="Assets\Scripts\ZGame\Net\ClientManager.cs" />
     <Compile Include="Assets\Scripts\UI\LoginView.cs" />
     <Compile Include="Assets\Scripts\ZGame\Net\ProtoUtils.cs" />
+    <Compile Include="Assets\Scripts\ZGame\UI\UIBase.cs" />
     <Compile Include="Assets\Scripts\ZGame\Net\Message.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -22,7 +22,7 @@ namespace ZGame
         private readonly Stack<string> _CanvasHistory = new();
 
         // UI根节点
-        private Transform _UiRoot;
+        private Transform _uiRoot;
 
 
         // 初始化UI根节点
@@ -34,30 +34,30 @@ namespace ZGame
                 Debug.LogError("UI根节点未找到！请确保有一个名为'UI'的GameObject");
                 return;
             }
-            _UiRoot = uiRootGO.transform;
+            _uiRoot = uiRootGO.transform;
         }
 
         // 通过路径获取Canvas
         public Canvas GetCanvas(string canvasPath)
         {
-            if (_UiRoot == null)
+            if (_uiRoot == null)
             {
                 Debug.LogError("UI根节点未初始化");
                 return null;
             }
 
             // 查找Canvas路径
-            Transform canvasTransform = _UiRoot.Find(canvasPath);
+            Transform canvasTransform = _uiRoot.Find(canvasPath);
             if (canvasTransform == null)
             {
-                Debug.LogWarning($"未找到路径为 {canvasPath} 的Canvas");
+                Debug.LogError($"未找到路径为 {canvasPath} 的Canvas");
                 return null;
             }
 
             Canvas canvas = canvasTransform.GetComponent<Canvas>();
             if (canvas == null)
             {
-                Debug.LogWarning($"路径为 {canvasPath} 的对象没有Canvas组件");
+                Debug.LogError($"路径为 {canvasPath} 的对象没有Canvas组件");
                 return null;
             }
 
@@ -98,7 +98,7 @@ namespace ZGame
             }
             else
             {
-                Debug.LogWarning($"已存在同名Canvas: {canvasName}");
+                Debug.LogError($"已存在同名Canvas: {canvasName}");
             }
         }
 
@@ -126,7 +126,7 @@ namespace ZGame
             }
             else
             {
-                Debug.LogWarning($"未找到名为 {canvasName} 的Canvas");
+                Debug.LogError($"未找到名为 {canvasName} 的Canvas");
             }
         }
 
@@ -146,7 +146,7 @@ namespace ZGame
             }
             else
             {
-                Debug.LogWarning($"未找到名为 {canvasName} 极速Canvas");
+                Debug.LogError($"未找到名为 {canvasName} 极速Canvas");
             }
         }
 
@@ -167,7 +167,7 @@ namespace ZGame
             }
             else
             {
-                Debug.LogWarning($"未找到名为 {canvasName} 的Canvas");
+                Debug.LogError($"未找到名为 {canvasName} 的Canvas");
             }
         }
 
@@ -199,17 +199,17 @@ namespace ZGame
                     }
                     else
                     {
-                        Debug.LogWarning($"在路径 {path} 未找到{typeof(T).Name}组件.target={target}");
+                        Debug.LogError($"在路径 {path} 未找到{typeof(T).Name}组件.target={target}");
                     }
                 }
                 else
                 {
-                    Debug.LogWarning($"在Canvas {canvasName} 下未找到路径为 {path} 的UI元素");
+                    Debug.LogError($"在Canvas {canvasName} 下未找到路径为 {path} 的UI元素");
                 }
             }
             else
             {
-                Debug.LogWarning($"未找到名为 {canvasName} 的Canvas");
+                Debug.LogError($"未找到名为 {canvasName} 的Canvas");
             }
             return null;
         }
@@ -298,7 +298,7 @@ namespace ZGame
                 }
                 else
                 {
-                    Debug.LogWarning($"在按钮 {path} 下未找到TextMeshPro文本组件");
+                    Debug.LogError($"在按钮 {path} 下未找到TextMeshPro文本组件");
                 }
             }
         }
@@ -315,12 +315,12 @@ namespace ZGame
                 }
                 else
                 {
-                    Debug.LogWarning($"在Canvas {canvasName} 下未找到路径为 {path} 的UI元素");
+                    Debug.LogError($"在Canvas {canvasName} 下未找到路径为 {path} 的UI元素");
                 }
             }
             else
             {
-                Debug.LogWarning($"未找到名为 {canvasName} 的Canvas");
+                Debug.LogError($"未找到名为 {canvasName} 的Canvas");
             }
         }
 
@@ -336,12 +336,12 @@ namespace ZGame
                 }
                 else
                 {
-                    Debug.LogWarning($"在Canvas {canvasName} 下未找到路径为 {path} 的UI元素");
+                    Debug.LogError($"在Canvas {canvasName} 下未找到路径为 {path} 的UI元素");
                 }
             }
             else
             {
-                Debug.LogWarning($"未找到名为 {canvasName} 的Canvas");
+                Debug.LogError($"未找到名为 {canvasName} 的Canvas");
             }
         }
     }
