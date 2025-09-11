@@ -92,7 +92,7 @@ namespace ZGame
 
                     // 显示新Canvas
                     canvas.gameObject.SetActive(true);
-                    viewBase.OnShow();
+                    viewBase.Show();
                     currentActiveCanvas = canvasName;
                 }
             }
@@ -120,7 +120,7 @@ namespace ZGame
                 }
 
                 // 显示新Canvas
-                viewBase.OnShow();
+                viewBase.Show();
                 viewBase.Canvas.gameObject.SetActive(true);
                 currentActiveCanvas = canvasName;
             }
@@ -136,7 +136,7 @@ namespace ZGame
             if (_CanvasDictionary.TryGetValue(canvasName, out ViewBase viewBase))
             {
                 viewBase.Canvas.gameObject.SetActive(false);
-                viewBase.OnHide();
+                viewBase.Hide();
 
                 // 如果隐藏的是当前活动Canvas，清空当前活动Canvas
                 if (currentActiveCanvas == canvasName)

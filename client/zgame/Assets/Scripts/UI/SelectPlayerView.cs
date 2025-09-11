@@ -34,7 +34,7 @@ public class SelectPlayerView : ViewBase
         AddButtonClickListener("Player4/Delete", () => OnDeleteRoleButtonClicked(3));
     }
 
-    public override void OnShow()
+    protected override void OnShow()
     {
         HideComponent("CreateRole");
         SetText("Tips", "");
@@ -42,20 +42,11 @@ public class SelectPlayerView : ViewBase
         // 清空输入框
         SetInputText("CreateRole/Name", "");
 
-        // 监听事件
-        EventBus.Subscribe<PlayerListEvent>(OnPlayerListEvent);
-        EventBus.Subscribe<SelectHumanEvent>(OnSelectHumanEvent);
-        EventBus.Subscribe<CreateHumanEvent>(OnCreateHumanEvent);
-        EventBus.Subscribe<DeleteHumanEvent>(OnDeleteHumanEvent);
         LogUtils.Log("加载选择角色界面");
     }
 
-    public override void OnHide()
+    protected override void OnHide()
     {
-        EventBus.Unsubscribe<PlayerListEvent>(OnPlayerListEvent);
-        EventBus.Unsubscribe<SelectHumanEvent>(OnSelectHumanEvent);
-        EventBus.Unsubscribe<CreateHumanEvent>(OnCreateHumanEvent);
-        EventBus.Unsubscribe<DeleteHumanEvent>(OnDeleteHumanEvent);
         LogUtils.Log("卸载选择角色界面");
     }
 
@@ -108,6 +99,7 @@ public class SelectPlayerView : ViewBase
     }
 
     // 角色列表事件处理函数
+    [EventListener]
     private void OnPlayerListEvent(PlayerListEvent playerListEvent)
     {
         if (playerListEvent.IsSuccess)
@@ -144,6 +136,7 @@ public class SelectPlayerView : ViewBase
     }
 
     // 选择角色事件处理函数
+    [EventListener]
     private void OnSelectHumanEvent(SelectHumanEvent selectHumanEvent)
     {
         if (selectHumanEvent.IsSuccess)
@@ -163,6 +156,7 @@ public class SelectPlayerView : ViewBase
     }
 
     // 创建角色事件处理函数
+    [EventListener]
     private void OnCreateHumanEvent(CreateHumanEvent createHumanEvent)
     {
         // 隐藏创建角色面板
@@ -214,6 +208,7 @@ public class SelectPlayerView : ViewBase
     }
 
     // 删除角色事件处理函数
+    [EventListener]
     private void OnDeleteHumanEvent(DeleteHumanEvent deleteHumanEvent)
     {
         if (deleteHumanEvent.IsSuccess)

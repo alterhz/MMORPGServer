@@ -16,12 +16,12 @@ public class MainView : ViewBase
         AddButtonClickListener("GoBack", OnGoBackButtonClicked);
     }
 
-    public override void OnShow()
+    protected override void OnShow()
     {
         LogUtils.Log("加载主界面");
     }
 
-    public override void OnHide()
+    protected override void OnHide()
     {
         LogUtils.Log("卸载主界面");
     }

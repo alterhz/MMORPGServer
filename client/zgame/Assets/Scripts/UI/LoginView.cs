@@ -16,17 +16,14 @@ public class LoginView : ViewBase
         LogUtils.Log("account:" + username);
     }
 
-    public override void OnShow()
+    protected override void OnShow()
     {
         LogUtils.Log("加载登录界面");
-        // 监听登录返回的事件
-        EventBus.Subscribe<LoginResultEvent>(OnLoginResponse);
     }
 
-    public override void OnHide()
+    protected override void OnHide()
     {
         LogUtils.Log("卸载登录界面");
-        EventBus.Unsubscribe<LoginResultEvent>(OnLoginResponse);
     }
 
     private void OnLoginButtonClicked()
@@ -41,6 +38,7 @@ public class LoginView : ViewBase
         GetMod<ModLogin>().Login(username, password);
     }
 
+    [EventListener]
     private void OnLoginResponse(LoginResultEvent eventData)
     {
         if (eventData.IsSuccess)

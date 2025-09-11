@@ -34,6 +34,8 @@ public class ModLogin : ModBase
     /// </summary>
     public void Login(string username, string password)
     {
+        // EventManager.Instance.Trigger(new LoginResultEvent(0, "正在登录..."));
+
         // 连接服务器，并发送登录请求
         ClientManager.Instance.Connect();
 
@@ -49,7 +51,7 @@ public class ModLogin : ModBase
     [ProtoListener]
     public void OnLogin(SCLogin scLogin)
     {
-        EventBus.Trigger(new LoginResultEvent(scLogin.code, scLogin.message));
+        EventManager.Instance.Trigger(new LoginResultEvent(scLogin.code, scLogin.message));
 
         if (scLogin.code == 0)
         {

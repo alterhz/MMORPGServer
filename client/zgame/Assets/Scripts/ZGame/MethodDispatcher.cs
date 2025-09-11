@@ -66,8 +66,16 @@ namespace ZGame
         {
             if (_EventMethodDic.ContainsKey(eventType))
             {
-                // 便利_EventMethodDic[eventType]
+                // 拷贝_EventMethodDic[eventType]
+                var copiedEventMethods = new Dictionary<object, List<MethodInfo>>();
+
                 foreach (var objMethodsPair in _EventMethodDic[eventType])
+                {
+                    copiedEventMethods[objMethodsPair.Key] = new List<MethodInfo>(objMethodsPair.Value);
+                }
+
+                // 便利copiedEventMethods
+                foreach (var objMethodsPair in copiedEventMethods)
                 {
                     var obj = objMethodsPair.Key;
                     var methods = objMethodsPair.Value;
@@ -102,7 +110,7 @@ namespace ZGame
         /// <summary>
         /// 清除所有事件处理器
         /// </summary>
-        public void ClearAllEvents()
+        public void ClearAll()
         {
             _EventMethodDic.Clear();
         }

@@ -49,13 +49,13 @@ public class ModSelectPlayer : ModBase
 
             LogUtils.Log("获取角色列表成功，角色数量: " + scQueryHumans.humanList.Count);
             // 触发角色列表事件
-            EventBus.Trigger(PlayerListEvent.Success(scQueryHumans.humanList, scQueryHumans.message));
+            EventManager.Instance.Trigger(PlayerListEvent.Success(scQueryHumans.humanList, scQueryHumans.message));
         }
         else
         {
             LogUtils.LogWarning("获取角色列表失败: " + scQueryHumans.message);
             // 触发角色列表事件（失败）
-            EventBus.Trigger(PlayerListEvent.Failure(scQueryHumans.message));
+            EventManager.Instance.Trigger(PlayerListEvent.Failure(scQueryHumans.message));
         }
     }
 
@@ -82,13 +82,13 @@ public class ModSelectPlayer : ModBase
         {
             LogUtils.Log("选择角色成功");
             // 触发选择角色事件（成功）
-            EventBus.Trigger(SelectHumanEvent.Success(selectedHumanId, scSelectHuman.message));
+            EventManager.Instance.Trigger(SelectHumanEvent.Success(selectedHumanId, scSelectHuman.message));
         }
         else
         {
             LogUtils.LogWarning("选择角色失败: " + scSelectHuman.message);
             // 触发选择角色事件（失败）
-            EventBus.Trigger(SelectHumanEvent.Failure(selectedHumanId, scSelectHuman.message));
+            EventManager.Instance.Trigger(SelectHumanEvent.Failure(selectedHumanId, scSelectHuman.message));
         }
     }
 
@@ -124,13 +124,13 @@ public class ModSelectPlayer : ModBase
         {
             LogUtils.Log("创建角色成功");
             // 触发创建角色成功事件
-            EventBus.Trigger(CreateHumanEvent.Success(scCreateHuman.message));
+            EventManager.Instance.Trigger(CreateHumanEvent.Success(scCreateHuman.message));
         }
         else
         {
             LogUtils.LogWarning("创建角色失败: " + scCreateHuman.message);
             // 触发创建角色失败事件
-            EventBus.Trigger(CreateHumanEvent.Failure(scCreateHuman.message));
+            EventManager.Instance.Trigger(CreateHumanEvent.Failure(scCreateHuman.message));
         }
     }
     
@@ -160,13 +160,13 @@ public class ModSelectPlayer : ModBase
             _playerList.RemoveAll(h => h.id == scDeleteHuman.humanId);
 
             // 触发删除角色成功事件
-            EventBus.Trigger(DeleteHumanEvent.Success(scDeleteHuman.humanId, scDeleteHuman.message));
+            EventManager.Instance.Trigger(DeleteHumanEvent.Success(scDeleteHuman.humanId, scDeleteHuman.message));
         }
         else
         {
             LogUtils.LogWarning("删除角色失败: " + scDeleteHuman.message);
             // 触发删除角色失败事件
-            EventBus.Trigger(DeleteHumanEvent.Failure(scDeleteHuman.humanId, scDeleteHuman.message));
+            EventManager.Instance.Trigger(DeleteHumanEvent.Failure(scDeleteHuman.humanId, scDeleteHuman.message));
         }
     }
 

@@ -65,7 +65,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\ZGame\Net\NettyClient.cs" />
-    <Compile Include="Assets\Scripts\ZGame\EventBus.cs" />
     <Compile Include="Assets\Scripts\Event\LoginResultEvent.cs" />
     <Compile Include="Assets\Scripts\ZGame\UI\ViewBase.cs" />
     <Compile Include="Assets\Scripts\Event\SelectHumanEvent.cs" />
@@ -84,6 +83,7 @@
     <Compile Include="Assets\Scripts\Event\BalanceQueryResultEvent.cs" />
     <Compile Include="Assets\Scripts\ZGame\Net\RC4.cs" />
     <Compile Include="Assets\Scripts\ZGame\MethodDispatcher.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Event\EventListener.cs" />
     <Compile Include="Assets\Scripts\UI\MainView.cs" />
     <Compile Include="Assets\Scripts\UI\ConfirmPanel.cs" />
     <Compile Include="Assets\Scripts\UI\SelectPlayerView.cs" />
@@ -92,6 +92,7 @@
     <Compile Include="Assets\Scripts\Mod\ModLogin.cs" />
     <Compile Include="Assets\Scripts\Proto\ProtoIds.cs" />
     <Compile Include="Assets\Scripts\ZGame\UI\ViewScanner.cs" />
+    <Compile Include="Assets\Scripts\ZGame\Event\EventManager.cs" />
     <Compile Include="Assets\Scripts\Event\DeleteHumanEvent.cs" />
     <Compile Include="Assets\Scripts\Event\PlayerListEvent.cs" />
     <Compile Include="Assets\Scripts\ZGame\LogUtils.cs" />
