@@ -92,7 +92,7 @@ public class ModSelectPlayer : ModBase
         }
     }
 
-    
+
     public List<HumanInfo> GetPlayerList()
     {
         return new List<HumanInfo>(_playerList);
@@ -133,4 +133,41 @@ public class ModSelectPlayer : ModBase
             EventBus.Trigger(CreateHumanEvent.Failure(scCreateHuman.message));
         }
     }
+    
+    /// <summary>
+    /// 删除角色
+    /// </summary>
+    /// <param name="humanId">角色ID</param>
+    public void DeleteHuman(string humanId)
+    {
+        CSDeleteHuman request = new()
+        {
+            humanId = humanId
+        };
+        Send(request);
+        LogUtils.Log($"请求删除角色: {humanId}");
+    }
+
+    /// <summary>
+    /// 删除角色响应处理
+    /// </summary>
+    [ProtoListener]
+    private void OnDeleteHuman(SCDeleteHuman scDeleteHuman)
+    {
+        if (scDeleteHuman.code == 0)
+        {
+            LogUtils.Log("删除角色成功");
+            // 触发删除角色成功事件
+            EventBus.Trigger(DeleteHumanEvent.Success(scDeleteHuman.humanId, scDeleteHuman.message));
+
+            _playerList.RemoveAll(h => h.id == scDeleteHuman.humanId);
+        }
+        else
+        {
+            LogUtils.LogWarning("删除角色失败: " + scDeleteHuman.message);
+            // 触发删除角色失败事件
+            EventBus.Trigger(DeleteHumanEvent.Failure(scDeleteHuman.humanId, scDeleteHuman.message));
+        }
+    }
+
 }

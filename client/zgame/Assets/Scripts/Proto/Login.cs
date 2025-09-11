@@ -77,6 +77,23 @@ public class SCCreateHuman
     public bool success;
 }
 
+[Serializable]
+[Proto(ProtoIds.CS_DELETE_HUMAN)]
+public class CSDeleteHuman
+{
+    public string humanId;
+}
+
+[Serializable]
+[Proto(ProtoIds.SC_DELETE_HUMAN)]
+public class SCDeleteHuman
+{
+    public int code;
+
+    public string humanId;
+
+    public string message;
+}
 
 
 [Serializable]
