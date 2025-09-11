@@ -1,6 +1,7 @@
 package org.game.global.service;
 
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -14,6 +15,7 @@ import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.QuerySubscriber;
 import org.game.core.human.HumanLookup;
 import org.game.core.human.HumanThread;
+import org.game.core.message.Proto;
 import org.game.core.message.ProtoListener;
 import org.game.core.message.ProtoScanner;
 import org.game.core.net.ClientPeriod;
@@ -154,6 +156,74 @@ public class LoginService extends GameServiceBase implements ILoginService {
                     @Override
                     protected void onError(String errMessage) {
                         logger.info("创建角色失败: {}", errMessage);
+                    }
+                });
+
+    }
+
+    /**
+     * 删除角色
+     */
+    @ProtoListener(CSDeleteHuman.class)
+    private void CSDeleteHuman(Message message, ToPoint clientPoint) {
+        logger.info("接收到消息CS_DELETE_HUMAN: {}", message);
+        long clientID = NumberUtils.toLong(clientPoint.getGameServiceName());
+        LoginInfo loginInfo = loginInfoMap.get(clientID);
+        if (loginInfo == null) {
+            logger.error("删除角色，loginInfo == null: clientID={}", clientID);
+            return;
+        }
+        if (loginInfo.loginPeriod != LoginPeriod.QUERY_HUMANS) {
+            logger.error("删除角色, 不在查询角色阶段: clientID={}, loginPeriod={}", clientID, loginInfo.loginPeriod);
+            return;
+        }
+
+        CSDeleteHuman csDeleteHuman = message.getProto(CSDeleteHuman.class);
+        String humanId = csDeleteHuman.getHumanId();
+
+        // 判断是否存在这个角色
+        if (!loginInfo.humans.contains(humanId)) {
+            logger.error("删除角色不存在: humanId={}", humanId);
+            SCSelectHuman scSelectHuman = new SCSelectHuman();
+            scSelectHuman.setCode(1);
+            scSelectHuman.setMessage("选择失败");
+            sendProto(clientPoint, scSelectHuman);
+            return;
+        }
+
+        loginInfo.humans.remove(humanId);
+
+        // 根据角色ID删除角色
+        MongoDBAsyncClient.getCollection(HumanDB.class)
+                .deleteOne(Filters.eq("id", new ObjectId(humanId)))
+                .subscribe(new QuerySubscriber<>() {
+                    @Override
+                    protected void onLoadDB(List<DeleteResult> dbCollections) {
+                        if (dbCollections.isEmpty()) {
+                            // 角色不存在
+                            logger.error("DB删除角色不存在: humanId={}", humanId);
+                            SCDeleteHuman scDeleteHuman = new SCDeleteHuman();
+                            scDeleteHuman.setCode(1);
+                            scDeleteHuman.setHumanId(humanId);
+                            scDeleteHuman.setMessage("删除角色失败");
+                            sendProto(clientPoint, scDeleteHuman);
+                        } else {
+                            // 角色删除成功
+                            SCDeleteHuman scDeleteHuman = new SCDeleteHuman();
+                            scDeleteHuman.setCode(0);
+                            scDeleteHuman.setHumanId(humanId);
+                            scDeleteHuman.setMessage("删除角色成功");
+                            sendProto(clientPoint, scDeleteHuman);
+                        }
+                    }
+
+                    @Override
+                    protected void onError(String errMessage) {
+                        SCDeleteHuman scDeleteHuman = new SCDeleteHuman();
+                        scDeleteHuman.setCode(2);
+                        scDeleteHuman.setHumanId(humanId);
+                        scDeleteHuman.setMessage("删除角色异常");
+                        sendProto(clientPoint, scDeleteHuman);
                     }
                 });
 
@@ -329,7 +399,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
     }
 
     private <T> void sendProto(ToPoint clientPoint, T proto) {
-        Integer protoID = ProtoScanner.getProtoID(proto.getClass());
+        int protoID = ProtoScanner.getProtoID(proto.getClass());
         IClientService clientService = ReferenceFactory.getProxy(IClientService.class, clientPoint);
         clientService.sendMessage(Message.createMessage(protoID, proto));
     }

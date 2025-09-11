@@ -1,22 +1,17 @@
 package org.game.proto.login;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.game.core.message.Proto;
 import org.game.proto.ProtoIds;
 
 @Proto(ProtoIds.SC_CREATE_HUMAN)
 public class SCCreateHuman {
-    @JsonProperty("code")
     private int code;
     
-    @JsonProperty("humanId")
     private String humanId;
     
-    @JsonProperty("message")
     private String message;
     
-    @JsonProperty("success")
     private boolean success;
 
     public SCCreateHuman() {

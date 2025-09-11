@@ -1,16 +1,13 @@
 package org.game.proto.login;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.game.core.message.Proto;
 import org.game.proto.ProtoIds;
 
 @Proto(ProtoIds.SC_LOGIN)
 public class SCLogin {
-    @JsonProperty("code")
     private int code;
 
-    @JsonProperty("message")
     private String message;
 
     public SCLogin() {

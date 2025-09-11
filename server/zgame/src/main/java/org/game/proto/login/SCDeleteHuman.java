@@ -4,48 +4,53 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.game.core.message.Proto;
 import org.game.proto.ProtoIds;
 
-@Proto(ProtoIds.SC_SELECT_HUMAN)
-public class SCSelectHuman {
-
+@Proto(ProtoIds.SC_DELETE_HUMAN)
+public class SCDeleteHuman {
+    
     private int code;
+    
+    private String humanId;
     
     private String message;
 
-    public SCSelectHuman()
-    {
-
+    public SCDeleteHuman() {
     }
 
-    public SCSelectHuman(int code, String message)
-    {
+    public SCDeleteHuman(int code, String message) {
         this.code = code;
         this.message = message;
     }
 
-    public int getCode()
-    {
+    public int getCode() {
         return code;
     }
 
-    public void setCode(int code)
-    {
+    public void setCode(int code) {
         this.code = code;
     }
 
-    public String getMessage()
-    {
+    public String getHumanId() {
+        return humanId;
+    }
+
+    public void setHumanId(String humanId) {
+        this.humanId = humanId;
+    }
+
+    public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message)
-    {
+    public void setMessage(String message) {
         this.message = message;
     }
+
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("code", code)
+                .append("humanId", humanId)
                 .append("message", message)
                 .toString();
     }

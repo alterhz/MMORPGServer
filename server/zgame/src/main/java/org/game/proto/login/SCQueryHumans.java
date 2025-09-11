@@ -1,6 +1,5 @@
 package org.game.proto.login;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.game.core.message.Proto;
 import org.game.proto.ProtoIds;
@@ -10,13 +9,10 @@ import java.util.List;
 
 @Proto(ProtoIds.SC_QUERY_HUMANS)
 public class SCQueryHumans {
-    @JsonProperty("code")
     private int code;
     
-    @JsonProperty("humanList")
     private List<HumanInfo> humanList;
     
-    @JsonProperty("message")
     private String message;
 
     public SCQueryHumans()

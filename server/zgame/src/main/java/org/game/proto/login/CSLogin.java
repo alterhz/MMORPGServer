@@ -1,6 +1,5 @@
 package org.game.proto.login;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.game.core.message.Proto;
 import org.game.proto.ProtoIds;
 
@@ -11,10 +10,8 @@ import org.game.proto.ProtoIds;
 @Proto(ProtoIds.CS_LOGIN)
 public class CSLogin {
     
-    @JsonProperty("account")
     private String account;
     
-    @JsonProperty("password")
     private String password;
     
     /**
