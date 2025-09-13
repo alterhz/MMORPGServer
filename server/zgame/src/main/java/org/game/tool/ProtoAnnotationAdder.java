@@ -29,10 +29,10 @@ public class ProtoAnnotationAdder {
 
         // 如果包含一个参数，则作为ini路径，否则使用默认的ini路径
         String iniFilePath = args.length > 0 ? args[0] : "../../proto/json/ProtoIds.ini";
+        String rootPath = args.length > 1 ? args[1] : "src/main/java/org/game/proto"; // 根目录
 
         protoIds = readProtoIdsFromIni(iniFilePath);
 
-        String rootPath = "src/main/java/org/game/proto"; // 根目录
         addProtoAnnotationToAllJavaFiles(rootPath);
     }
 
@@ -41,9 +41,7 @@ public class ProtoAnnotationAdder {
         // 尝试在项目根目录下查找ProtoIds.ini文件
         Path iniPath = Paths.get(iniFilePath);
         if (!Files.exists(iniPath)) {
-            System.out.println("未找到ProtoIds.ini文件: " + iniPath.toString());
-            System.out.println("将使用默认的ProtoIds.java文件中的定义");
-            return protoIds;
+            throw new RuntimeException("ProtoIds.ini文件不存在:" + iniFilePath);
         }
         
         try (BufferedReader reader = Files.newBufferedReader(iniPath)) {

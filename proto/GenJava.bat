@@ -37,4 +37,11 @@ for /D %%F in (%PROTO_DIR%\*) do (
 )
 
 echo All JSON files processed!
+
+cd ../server/dist
+call GenProtoIds.bat
+
+echo 注解添加完毕
+
 pause
+
