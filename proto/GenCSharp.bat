@@ -18,7 +18,7 @@ for /D %%F in (%PROTO_DIR%\*) do (
         set "OUTPUT_FILE=!OUTPUT_DIR!\!JSON_FILE!.cs"
         set "FULL_JSON_PATH=%%J"
 
-        echo Generating !JSON_FILE!.java from %%J ...
+        echo Generating !JSON_FILE!.cs from %%J ...
 
         :: 创建输出目录（如果不存在）
         if not exist "!OUTPUT_DIR!" (
@@ -28,9 +28,9 @@ for /D %%F in (%PROTO_DIR%\*) do (
 		call quicktype -l csharp --array-type list --features just-types --namespace ZGame --src "!FULL_JSON_PATH!" -o "!OUTPUT_FILE!"
 
         if !errorlevel! equ 0 (
-            echo ? Successfully generated !JSON_FILE!.java
+            echo ? Successfully generated !JSON_FILE!.cs
         ) else (
-            echo ? Failed to generate !JSON_FILE!.java
+            echo ? Failed to generate !JSON_FILE!.cs
         )
     )
 )
