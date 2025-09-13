@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-set PROTO_DIR=Proto
+set PROTO_DIR=json
 set CSHARP_OUT_DIR=csharp
 
 for /D %%F in (%PROTO_DIR%\*) do (

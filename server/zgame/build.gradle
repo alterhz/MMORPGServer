@@ -45,6 +45,12 @@ dependencies {
     implementation 'org.mongodb:mongodb-driver-reactivestreams:4.11.0'
     // MongoDB Java Driver
     implementation 'org.mongodb:mongodb-driver-sync:4.11.0'
+
+    // 工具
+    // 添加 JavaParser 核心库
+    implementation 'com.github.javaparser:javaparser-core:3.25.8'
+    // 如果您需要解析符号，可以添加符号解析模块
+    implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.25.8'
 }
 
 application {

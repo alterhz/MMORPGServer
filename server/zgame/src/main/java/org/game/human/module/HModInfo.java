@@ -6,7 +6,6 @@ import org.game.core.db.HumanLoader;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.event.EventListener;
 import org.game.core.message.ProtoListener;
-import org.game.core.net.Message;
 import org.game.dao.HumanInfoDB;
 import org.game.human.HModBase;
 import org.game.human.HumanObject;
@@ -65,7 +64,8 @@ public class HModInfo extends HModBase {
     private void CSTest(CSTest csTest) {
         logger.info("接收到消息CS_TEST: {}", csTest);
 
-        SCTest scTest = new SCTest("角色DB加载成功测试");
+        SCTest scTest = new SCTest();
+        scTest.setMessage("这是测试消息");
         humanObj.sendMessage(scTest);
     }
 

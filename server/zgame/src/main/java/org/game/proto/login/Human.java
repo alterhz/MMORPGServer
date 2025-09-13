@@ -1,8 +1,12 @@
 package org.game.proto.login;
 
-public class CSCreateHuman {
+public class Human {
+    private String id;
     private String name;
     private String profession;
+
+    public String getid() { return id; }
+    public void setid(String value) { this.id = value; }
 
     public String getName() { return name; }
     public void setName(String value) { this.name = value; }

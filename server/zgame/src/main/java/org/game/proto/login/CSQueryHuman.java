@@ -1,4 +1,4 @@
 package org.game.proto.login;
 
-public class SCSendToClientEnd {
+public class CSQueryHuman {
 }

@@ -1,0 +1,21 @@
+{
+  "code": 0,
+  "message": "查询成功",
+  "human": [
+    {
+      "id": "1001",
+      "name": "勇者艾丹",
+      "profession": "战士"
+    },
+    {
+      "id": "1002",
+      "name": "法师莉莉丝",
+      "profession": "法师"
+    },
+    {
+      "id": "1003",
+      "name": "弓箭手罗宾",
+      "profession": "弓箭手"
+    }
+  ]
+}

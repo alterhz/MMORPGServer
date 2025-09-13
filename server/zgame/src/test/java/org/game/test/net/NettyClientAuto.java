@@ -92,7 +92,9 @@ public class NettyClientAuto {
     }
 
     private void login(String account) {
-        CSLogin csLogin = new CSLogin(account, "");
+        CSLogin csLogin = new CSLogin();
+        csLogin.setAccount(account);
+        csLogin.setPassword("password");
         Integer protoID = ProtoScanner.getProtoID(CSLogin.class);
         Message message = Message.createMessage(protoID, csLogin);
 

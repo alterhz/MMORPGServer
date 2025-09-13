@@ -19,16 +19,16 @@ public class LoginHandler extends ClientProtoDispatcher {
     public void onLogin(Message message) {
         logger.info("登录成功");
         // 请求获取角色列表
-        CSQueryHumans csQueryHumans = new CSQueryHumans();
+        CSQueryHuman csQueryHumans = new CSQueryHuman();
         sendMessage(csQueryHumans);
     }
 
-    @ProtoListener(SCQueryHumans.class)
+    @ProtoListener(SCQueryHuman.class)
     public void onQueryHumans(Message message) {
         // 处理消息
-        SCQueryHumans scQueryHumans = message.getProto(SCQueryHumans.class);
+        SCQueryHuman scQueryHumans = message.getProto(SCQueryHuman.class);
         if (scQueryHumans.getCode() == 0) {
-            if (scQueryHumans.getHumanList().isEmpty()) {
+            if (scQueryHumans.getHuman().isEmpty()) {
                 // 创角
                 logger.info("创建角色");
                 CSCreateHuman csCreateHuman = new CSCreateHuman();
@@ -39,7 +39,7 @@ public class LoginHandler extends ClientProtoDispatcher {
             } else {
                 logger.info("选择角色");
                 CSSelectHuman csSelectHuman = new CSSelectHuman();
-                csSelectHuman.setHumanId(scQueryHumans.getHumanList().get(0).getId());
+                csSelectHuman.setHumanId(scQueryHumans.getHuman().get(0).getid());
                 sendMessage(csSelectHuman);
             }
         }
@@ -49,7 +49,7 @@ public class LoginHandler extends ClientProtoDispatcher {
     public void onCreateHuman(Message message) {
         // 处理消息
         SCCreateHuman scCreateHuman = message.getProto(SCCreateHuman.class);
-        if (scCreateHuman.isSuccess()) {
+        if (scCreateHuman.getSuccess()) {
             logger.info("创建角色成功");
         } else {
             logger.info("创建角色失败");

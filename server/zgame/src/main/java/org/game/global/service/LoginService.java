@@ -15,7 +15,6 @@ import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.QuerySubscriber;
 import org.game.core.human.HumanLookup;
 import org.game.core.human.HumanThread;
-import org.game.core.message.Proto;
 import org.game.core.message.ProtoListener;
 import org.game.core.message.ProtoScanner;
 import org.game.core.net.ClientPeriod;
@@ -25,7 +24,6 @@ import org.game.core.rpc.ToPoint;
 import org.game.dao.HumanDB;
 import org.game.human.module.MyStruct;
 import org.game.human.rpc.IHumanInfoService;
-import org.game.proto.common.HumanInfo;
 import org.game.proto.login.*;
 import org.game.global.rpc.IClientService;
 import org.game.global.rpc.ILoginService;
@@ -110,7 +108,8 @@ public class LoginService extends GameServiceBase implements ILoginService {
         humanInfoService.getInfo(33, "dfsd", myStruct).thenAccept(humanInfo -> {
             logger.info("调用HumanRPC，成功: {}", humanInfo);
         });
-        SCTest scTest = new SCTest("登录成功测试");
+        SCTest scTest = new SCTest();
+        scTest.setMessage("登录成功测试");
         sendProto(clientPoint, scTest);
     }
 
@@ -268,7 +267,9 @@ public class LoginService extends GameServiceBase implements ILoginService {
                             HumanThread.loadHumanObject(selectHumanDB, clientPoint);
 
                             // 选择角色成功
-                            SCSelectHuman scSelectHuman = new SCSelectHuman(0, "选择角色成功");
+                            SCSelectHuman scSelectHuman = new SCSelectHuman();
+                            scSelectHuman.setCode(0);
+                            scSelectHuman.setMessage("选择角色成功");
                             sendProto(clientPoint, scSelectHuman);
                         } else {
                             logger.error("选择的角色不存在: humanId={}", humanId);
@@ -284,7 +285,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                         logger.error("查询角色失败: {}", errMessage);
 
                         // 角色列表查询失败
-                        SCQueryHumans scQueryHumans = new SCQueryHumans();
+                        SCQueryHuman scQueryHumans = new SCQueryHuman();
                         scQueryHumans.setCode(1);
                         scQueryHumans.setMessage("查询失败");
                         sendProto(clientPoint, scQueryHumans);
@@ -292,7 +293,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                 });
     }
 
-    @ProtoListener(CSQueryHumans.class)
+    @ProtoListener(CSQueryHuman.class)
     private void CSQueryHumans(Message message, ToPoint fromPoint) {
         logger.info("接收到消息CS_QUERY_HUMANS: {}", message);
         long clientID = NumberUtils.toLong(fromPoint.getGameServiceName());
@@ -315,13 +316,13 @@ public class LoginService extends GameServiceBase implements ILoginService {
                 .subscribe(new QuerySubscriber<>(Long.MAX_VALUE) {
                     @Override
                     protected void onLoadDB(List<HumanDB> humanDBS) {
-                        List<HumanInfo> humanList = new ArrayList<>();
+                        List<Human> humanList = new ArrayList<>();
                         for (HumanDB humanDB : humanDBS) {
                             // 创建角色信息对象
                             String hexHumanId = humanDB.getId().toHexString();
 
-                            HumanInfo humanInfo = new HumanInfo();
-                            humanInfo.setId(hexHumanId);
+                            Human humanInfo = new Human();
+                            humanInfo.setid(hexHumanId);
                             humanInfo.setName(humanDB.getName());
                             // 这里暂时将职业字段设置为默认值，因为在HumanDB中没有找到职业字段
                             humanInfo.setProfession("未知职业");
@@ -331,9 +332,9 @@ public class LoginService extends GameServiceBase implements ILoginService {
                             loginInfo.humans.add(hexHumanId);
                         }
 
-                        SCQueryHumans scQueryHumans = new SCQueryHumans();
+                        SCQueryHuman scQueryHumans = new SCQueryHuman();
                         scQueryHumans.setCode(0);
-                        scQueryHumans.setHumanList(humanList);
+                        scQueryHumans.setHuman(humanList);
                         scQueryHumans.setMessage("查询成功");
 
                         sendProto(fromPoint, scQueryHumans);
@@ -344,7 +345,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                         logger.error("查询角色列表失败: {}", errMessage);
 
                         // 角色列表查询失败
-                        SCQueryHumans scQueryHumans = new SCQueryHumans();
+                        SCQueryHuman scQueryHumans = new SCQueryHuman();
                         scQueryHumans.setCode(1);
                         scQueryHumans.setMessage("查询失败");
                         sendProto(fromPoint, scQueryHumans);

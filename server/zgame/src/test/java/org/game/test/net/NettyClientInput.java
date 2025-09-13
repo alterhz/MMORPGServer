@@ -105,7 +105,9 @@ public class NettyClientInput {
                     byte[] content = input.getBytes();
                     String name = new String(content);
 
-                    CSLogin CSLogin = new CSLogin(name, "admin");
+                    CSLogin CSLogin = new CSLogin();
+                    CSLogin.setAccount(name);
+                    CSLogin.setPassword("");
 
                     Message message = Message.createMessage(1001, CSLogin);
                     content = message.toBytes();
