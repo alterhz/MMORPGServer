@@ -119,7 +119,7 @@ public class ProtoAnnotationAdder {
 
             // 只有在protoIds中存在该类名时才处理
             if (!protoIds.containsKey(className)) {
-                System.out.println("跳过不存在ProtoIds.ini文件中的类: " + javaFilePath + " (类名: " + className + ")");
+                System.err.println("跳过不存在ProtoIds.ini文件中的类: " + javaFilePath + " (类名: " + className + ")");
                 return;
             }
             

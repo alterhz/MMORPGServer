@@ -1,57 +1,37 @@
 package org.game.proto.login;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.game.core.message.Proto;
-import org.game.proto.ProtoIds;
 
-@Proto(ProtoIds.SC_DELETE_HUMAN)
+@Proto(value = 1010)
 public class SCDeleteHuman {
-    
-    private int code;
-    
+
+    private long code;
+
     private String humanId;
-    
+
     private String message;
 
-    public SCDeleteHuman() {
-    }
-
-    public SCDeleteHuman(int code, String message) {
-        this.code = code;
-        this.message = message;
-    }
-
-    public int getCode() {
+    public long getCode() {
         return code;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public void setCode(long value) {
+        this.code = value;
     }
 
     public String getHumanId() {
         return humanId;
     }
 
-    public void setHumanId(String humanId) {
-        this.humanId = humanId;
+    public void setHumanId(String value) {
+        this.humanId = value;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("code", code)
-                .append("humanId", humanId)
-                .append("message", message)
-                .toString();
+    public void setMessage(String value) {
+        this.message = value;
     }
 }

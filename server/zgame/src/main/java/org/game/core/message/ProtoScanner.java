@@ -21,7 +21,11 @@ public class ProtoScanner {
 
     // 类查找协议ID
     public static int getProtoID(Class<?> clazz) {
-        return PROTO_ID_MAP.get(clazz);
+        Integer protoID = PROTO_ID_MAP.get(clazz);
+        if (protoID == null) {
+            throw new RuntimeException("未找到协议类" + clazz);
+        }
+        return protoID;
     }
 
     // 协议ID查找类
