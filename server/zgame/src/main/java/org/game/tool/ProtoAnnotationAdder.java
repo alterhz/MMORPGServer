@@ -17,6 +17,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * ProtoAnnotationAdder工具类用于自动为Java协议类添加Proto注解
+ * 
+ * 该工具会读取ProtoIds.ini配置文件，根据其中定义的协议ID映射关系，
+ * 自动遍历指定目录下的Java文件，并为匹配的类添加相应的@Proto注解。
+ * 
+ * 使用方法：
+ * 1. 默认情况下，工具会从../../proto/json/ProtoIds.ini读取协议ID配置
+ * 2. 默认处理src/main/java/org/game/proto目录下的所有Java文件
+ * 3. 可通过命令行参数指定配置文件路径和源码根路径：
+ *    java ProtoAnnotationAdder [配置文件路径] [源码根路径]
+ * 
+ * 注意事项：
+ * - 只会处理在ProtoIds.ini中定义的类
+ * - 已经包含@Proto注解的类会被跳过，避免重复添加
+ * - 工具会自动添加必要的import语句
+ */
 public class ProtoAnnotationAdder {
 
     private static final JavaParser javaParser = new JavaParser();
@@ -60,9 +77,31 @@ public class ProtoAnnotationAdder {
                     String valueStr = line.substring(equalsIndex + 1).trim();
                     try {
                         int value = Integer.parseInt(valueStr);
+                        
+                        // 检查ID是否有效（大于0）
+                        if (value <= 0) {
+                            throw new RuntimeException("协议ID必须大于0: " + line);
+                        }
+                        
+                        // 检查是否重复ID
+                        if (protoIds.containsValue(value)) {
+                            // 找到具有相同值的键
+                            String existingKey = null;
+                            for (Map.Entry<String, Integer> entry : protoIds.entrySet()) {
+                                if (entry.getValue().equals(value)) {
+                                    existingKey = entry.getKey();
+                                    break;
+                                }
+                            }
+                            throw new RuntimeException("检测到重复的协议ID: " + value + 
+                                " 在条目 '" + existingKey + "' 和 '" + key + "'");
+                        }
+                        
                         protoIds.put(key, value);
+                        System.out.println("成功添加协议ID: " + key + "=" + value);
                     } catch (NumberFormatException e) {
                         System.err.println("无法解析协议ID: " + line);
+                        throw e;
                     }
                 }
             }
