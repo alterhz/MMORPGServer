@@ -25,7 +25,7 @@ for /D %%F in (%PROTO_DIR%\*) do (
             mkdir "!OUTPUT_DIR!"
         )
 		
-		call quicktype -l csharp --array-type list --features just-types --namespace ZGame --keep-property-name --src "!FULL_JSON_PATH!" -o "!OUTPUT_FILE!"
+		call quicktype -l csharp --array-type list --features just-types-and-namespace --namespace ZGame --keep-property-name --src "!FULL_JSON_PATH!" -o "!OUTPUT_FILE!"
 
         if !errorlevel! equ 0 (
             echo ? Successfully generated !JSON_FILE!.cs
