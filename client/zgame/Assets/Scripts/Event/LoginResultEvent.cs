@@ -5,10 +5,10 @@ using System;
 /// </summary>
 public class LoginResultEvent : EventArgs
 {
-    public int Code { get; } // 是否查询成功
+    public long Code { get; } // 是否查询成功
     public string Message { get; } // 提示信息（失败时有效）
 
-    public LoginResultEvent(int code, string message)
+    public LoginResultEvent(long code, string message)
     {
         Code = code;
         Message = message;

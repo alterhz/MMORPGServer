@@ -4,7 +4,7 @@ using ZGame;
 
 public class ModSelectPlayer : ModBase
 {
-    private readonly List<HumanInfo> _playerList = new();
+    private readonly List<Human> _playerList = new();
 
     private string selectedHumanId;
 
@@ -32,7 +32,7 @@ public class ModSelectPlayer : ModBase
     /// </summary>
     public void QueryHumans()
     {
-        CSQueryHumans request = new();
+        CsQueryHuman request = new();
         Send(request);
     }
 
@@ -40,22 +40,22 @@ public class ModSelectPlayer : ModBase
     /// 角色列表响应处理
     /// </summary>
     [ProtoListener]
-    private void OnQueryHumans(SCQueryHumans scQueryHumans)
+    private void OnQueryHumans(ScQueryHuman scQueryHuman)
     {
-        if (scQueryHumans.code == 0)
+        if (scQueryHuman.code == 0)
         {
             _playerList.Clear();
-            _playerList.AddRange(scQueryHumans.humanList);
+            _playerList.AddRange(scQueryHuman.human);
 
-            LogUtils.Log("获取角色列表成功，角色数量: " + scQueryHumans.humanList.Count);
+            LogUtils.Log("获取角色列表成功，角色数量: " + scQueryHuman.human.Count);
             // 触发角色列表事件
-            EventManager.Instance.Trigger(PlayerListEvent.Success(scQueryHumans.humanList, scQueryHumans.message));
+            EventManager.Instance.Trigger(PlayerListEvent.Success(scQueryHuman.human, scQueryHuman.message));
         }
         else
         {
-            LogUtils.LogWarning("获取角色列表失败: " + scQueryHumans.message);
+            LogUtils.LogWarning("获取角色列表失败: " + scQueryHuman.message);
             // 触发角色列表事件（失败）
-            EventManager.Instance.Trigger(PlayerListEvent.Failure(scQueryHumans.message));
+            EventManager.Instance.Trigger(PlayerListEvent.Failure(scQueryHuman.message));
         }
     }
 
@@ -65,8 +65,10 @@ public class ModSelectPlayer : ModBase
     /// <param name="humanId">角色ID</param>
     public void SelectHuman(string humanId)
     {
-        CSSelectHuman request = new();
-        request.humanId = humanId;
+        CsSelectHuman request = new()
+        {
+            humanId = humanId
+        };
         Send(request);
         selectedHumanId = humanId;
         LogUtils.Log("请求选择角色: " + humanId);
@@ -76,7 +78,7 @@ public class ModSelectPlayer : ModBase
     /// 选择角色响应处理
     /// </summary>
     [ProtoListener]
-    private void OnSelectHuman(SCSelectHuman scSelectHuman)
+    private void OnSelectHuman(ScSelectHuman scSelectHuman)
     {
         if (scSelectHuman.code == 0)
         {
@@ -93,9 +95,9 @@ public class ModSelectPlayer : ModBase
     }
 
 
-    public List<HumanInfo> GetPlayerList()
+    public List<Human> GetPlayerList()
     {
-        return new List<HumanInfo>(_playerList);
+        return new List<Human>(_playerList);
     }
 
     /// <summary>
@@ -105,7 +107,7 @@ public class ModSelectPlayer : ModBase
     /// <param name="profession">职业</param>
     public void CreateHuman(string name, string profession)
     {
-        CSCreateHuman request = new()
+        CsCreateHuman request = new()
         {
             name = name,
             profession = profession
@@ -118,7 +120,7 @@ public class ModSelectPlayer : ModBase
     /// 创建角色响应处理
     /// </summary>
     [ProtoListener]
-    private void OnCreateHuman(SCCreateHuman scCreateHuman)
+    private void OnCreateHuman(ScCreateHuman scCreateHuman)
     {
         if (scCreateHuman.code == 0)
         {
@@ -140,7 +142,7 @@ public class ModSelectPlayer : ModBase
     /// <param name="humanId">角色ID</param>
     public void DeleteHuman(string humanId)
     {
-        CSDeleteHuman request = new()
+        CsDeleteHuman request = new()
         {
             humanId = humanId
         };
@@ -152,7 +154,7 @@ public class ModSelectPlayer : ModBase
     /// 删除角色响应处理
     /// </summary>
     [ProtoListener]
-    private void OnDeleteHuman(SCDeleteHuman scDeleteHuman)
+    private void OnDeleteHuman(ScDeleteHuman scDeleteHuman)
     {
         if (scDeleteHuman.code == 0)
         {

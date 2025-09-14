@@ -35,7 +35,9 @@ public class LoginView : ViewBase
         // 执行登录逻辑
         LogUtils.Log($"Attempting login with Username: {username}, Password: {password}");
 
-        GetMod<ModLogin>().Login(username, password);
+        ModLogin modLogin = GetMod<ModLogin>();
+
+        modLogin.Login(username, password);
     }
 
     [EventListener]

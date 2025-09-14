@@ -126,7 +126,7 @@ public class SelectPlayerView : ViewBase
         // 遍历角色列表，将角色信息显示在按钮上
         for (int i = 0; i < playerList.Count; i++)
         {
-            HumanInfo humanInfo = playerList[i];
+            Human humanInfo = playerList[i];
             SetButtonText($"Player{i + 1}", $"{humanInfo.name}");
             // 显示删除按钮
             ShowComponent($"Player{i + 1}/Delete");

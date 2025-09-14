@@ -27,11 +27,11 @@ namespace ZGame
             if (!_mods.ContainsKey(type))
             {
                 _mods[type] = mod;
-                Console.WriteLine($"Mod {type.Name} registered successfully");
+                LogUtils.Log($"Mod {type.Name} registered successfully");
             }
             else
             {
-                Console.WriteLine($"Mod {type.Name} is already registered");
+                LogUtils.LogError($"Mod {type.Name} is already registered");
             }
         }
 
@@ -48,7 +48,7 @@ namespace ZGame
                 return (T)_mods[type];
             }
             
-            Console.WriteLine($"Mod {type.Name} not found");
+            LogUtils.LogError($"Mod {type.Name} not found");
             return null;
         }
 
@@ -59,7 +59,7 @@ namespace ZGame
                 return _mods[type];
             }
             
-            Console.WriteLine($"Mod {type.Name} not found");
+            LogUtils.LogError($"Mod {type.Name} not found");
             return null;
         }
 
@@ -86,11 +86,11 @@ namespace ZGame
                 // 调用Mod的销毁方法
                 _mods[type].OnDestroyMod();
                 _mods.Remove(type);
-                Console.WriteLine($"Mod {type.Name} unregistered successfully");
+                LogUtils.Log($"Mod {type.Name} unregistered successfully");
             }
             else
             {
-                Console.WriteLine($"Mod {type.Name} not found for unregistering");
+                LogUtils.LogError($"Mod {type.Name} not found");
             }
         }
 
@@ -106,7 +106,7 @@ namespace ZGame
                     mod.Enable();
                 }
             }
-            Console.WriteLine("All mods enabled");
+            LogUtils.Log("All mods enabled");
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace ZGame
                     mod.Disable();
                 }
             }
-            Console.WriteLine("All mods disabled");
+            LogUtils.Log("All mods disabled");
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace ZGame
                 mod.OnDestroyMod();
             }
             _mods.Clear();
-            Console.WriteLine("ModManager destroyed");
+            LogUtils.Log("ModManager destroyed");
         }
     }
 }

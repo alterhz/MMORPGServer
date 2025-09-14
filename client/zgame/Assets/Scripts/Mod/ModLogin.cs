@@ -39,7 +39,7 @@ public class ModLogin : ModBase
         // 连接服务器，并发送登录请求
         ClientManager.Instance.Connect();
 
-        CSLogin request = new()
+        CsLogin request = new()
         {
             account = username,
             password = password
@@ -49,7 +49,7 @@ public class ModLogin : ModBase
 
 
     [ProtoListener]
-    public void OnLogin(SCLogin scLogin)
+    public void OnLogin(ScLogin scLogin)
     {
         EventManager.Instance.Trigger(new LoginResultEvent(scLogin.code, scLogin.message));
 
