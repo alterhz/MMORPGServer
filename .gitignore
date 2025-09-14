@@ -26,3 +26,5 @@ hs_err_pid*
 /client/zgame/Library
 /client/zgame/Temp
 /client/zgame/UserSettings
+/tools/GenClientProto/obj
+/tools/GenClientProto/.vs
