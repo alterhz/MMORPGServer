@@ -28,7 +28,7 @@ public class DBService extends GameServiceBase implements IDBService {
         // 初始化数据库连接等操作
         logger.info("DBService 初始化");
 
-        // TODO 同步查询表:server_info,不存在，则创建
+        // 同步查询表:server_info,不存在，则创建
         MongoCollection<Document> createCollection = MongoDBSyncClient.getOrCreateCollection("server_info");
         Document first = createCollection.find().first();
         if (first == null) {
@@ -50,7 +50,7 @@ public class DBService extends GameServiceBase implements IDBService {
     }
 
     @Override
-    public void pulse(long now) {
+    public void onPulse(long now) {
         // 数据库相关的心跳逻辑
     }
 

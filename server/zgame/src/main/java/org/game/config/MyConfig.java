@@ -66,6 +66,7 @@ public class MyConfig {
         private GameThreadConfig game_thread;
         private HumanThreadConfig human_thread;
         private ConnThreadConfig conn_thread;
+        private StageThreadConfig stage_thread;
         private MongoDbConfig mongodb;
 
         public ServerConfig getServer() {
@@ -98,6 +99,14 @@ public class MyConfig {
 
         public void setConnThread(ConnThreadConfig conn_thread) {
             this.conn_thread = conn_thread;
+        }
+        
+        public StageThreadConfig getStageThread() {
+            return stage_thread;
+        }
+
+        public void setStageThread(StageThreadConfig stage_thread) {
+            this.stage_thread = stage_thread;
         }
 
         public MongoDbConfig getMongodb() {
@@ -164,6 +173,18 @@ public class MyConfig {
 
         public void setFrameMessageCount(int frame_message_count) {
             this.frame_message_count = frame_message_count;
+        }
+    }
+    
+    public static class StageThreadConfig {
+        private int count;
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
         }
     }
 

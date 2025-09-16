@@ -84,7 +84,7 @@ public class ClientService  extends GameServiceBase implements IClientService {
     }
 
     @Override
-    public void pulse(long now) {
+    public void onPulse(long now) {
         // 在心跳中消费消息队列中的消息
         consumeMessages();
         

@@ -68,7 +68,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
     }
 
     @Override
-    public void pulse(long now) {
+    public void onPulse(long now) {
         // 心跳逻辑
     }
 

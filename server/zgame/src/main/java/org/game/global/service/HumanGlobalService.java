@@ -44,7 +44,7 @@ public class HumanGlobalService extends GameServiceBase implements IHumanGlobalS
     }
 
     @Override
-    public void pulse(long now) {
+    public void onPulse(long now) {
         // 使用TickTimer执行定时任务
         if (tickTimer.update(System.currentTimeMillis())) {
             // 每隔5秒执行一次的逻辑

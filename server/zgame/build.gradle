@@ -51,6 +51,9 @@ dependencies {
     implementation 'com.github.javaparser:javaparser-core:3.25.8'
     // 如果您需要解析符号，可以添加符号解析模块
     implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.25.8'
+    
+    // hutool工具库
+    implementation 'cn.hutool:hutool-all:5.8.22'
 }
 
 application {

@@ -199,7 +199,7 @@ public class HumanObject {
 
     public void disconnect() {
         logger.info("断开连接");
-        // TODO 保存数据
+
         saveHumanData();
 
         IClientService proxy = ReferenceFactory.getProxy(IClientService.class, clientPoint);
@@ -208,5 +208,6 @@ public class HumanObject {
 
     private void saveHumanData() {
         logger.info("保存数据");
+        // TODO 保存数据
     }
 }

@@ -1,5 +1,7 @@
 package org.game;
 
+import cn.hutool.core.lang.Snowflake;
+import cn.hutool.core.util.IdUtil;
 import org.game.config.MyConfig;
 import org.game.core.GameProcess;
 import org.game.core.GameServiceBase;
@@ -12,16 +14,22 @@ import org.game.core.event.HumanEventDispatcher;
 import org.game.core.human.HumanProtoDispatcher;
 import org.game.core.net.NettyServer;
 import org.game.core.rpc.RPCProxy;
+import org.game.core.stage.StageThread;
 import org.game.core.utils.ScanClassUtils;
 import org.game.core.human.HumanThread;
 import org.game.core.message.ProtoScanner;
+import org.game.core.utils.SnowflakeIdGenerator;
+import org.game.stage.service.StageService;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
 
 public class GameStartUp {
     public static void main(String[] args) {
-        BaseUtils.init(20001);
+
+        int serverId = 20001;
+        BaseUtils.init(serverId);
+        SnowflakeIdGenerator.init(serverId);
 
         try {
             // 1. 载入配置文件
@@ -60,6 +68,9 @@ public class GameStartUp {
 
             // 3. 创建GameThread01
             createGameThreads();
+
+            // 创建场景线程
+            createStageThreads();
 
             // 4. 扫描@ServiceConfig注解
             Set<Class<?>> serviceClasses = ScanClassUtils.scanGlobalServiceClasses();
@@ -100,6 +111,21 @@ public class GameStartUp {
         for (int i = 0; i < humanThreadCount; i++) {
             HumanThread humanThread = new HumanThread(i);
             humanThread.start();
+        }
+    }
+
+    // StageThread 创建
+    private static void createStageThreads() {
+        int stageThreadCount = MyConfig.getConfig().getStageThread().getCount();
+        for (int i = 0; i < stageThreadCount; i++) {
+            StageThread stageThread = new StageThread(i);
+            stageThread.start();
+
+            // 添加StageService服务，每个线程一个
+            stageThread.runTask(() -> {
+                StageService stageService = new StageService();
+                stageThread.addGameService(stageService);
+            });
         }
     }
 

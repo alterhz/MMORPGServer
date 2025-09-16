@@ -20,6 +20,8 @@ public abstract class GameServiceBase {
      */
     protected final TimerQueue timerQueue = new TimerQueue();
 
+    private final TickTimer pulseSecondTimer = new TickTimer(1000);
+
     /**
      * 当前服务所属的线程
      */
@@ -71,7 +73,19 @@ public abstract class GameServiceBase {
     public abstract void startup();
 
     // 心跳
-    public abstract void pulse(long now);
+    public final void pulse(long now) {
+        if (pulseSecondTimer.update(now)) {
+            onPulseSec(now);
+        }
+    }
+
+    protected void onPulse(long now) {
+
+    }
+
+    protected void onPulseSec(long now) {
+
+    }
 
     // 销毁
     public abstract void destroy();

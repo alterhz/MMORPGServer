@@ -51,7 +51,7 @@ public class HumanService extends GameServiceBase implements IHumanService {
     }
 
     @Override
-    public void pulse(long now) {
+    public void onPulse(long now) {
         humanObj.pulse(now);
     }
 
