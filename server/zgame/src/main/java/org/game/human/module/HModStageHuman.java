@@ -5,11 +5,13 @@ import org.apache.logging.log4j.Logger;
 import org.game.core.Param;
 import org.game.core.event.EventListener;
 import org.game.core.rpc.ReferenceFactory;
+import org.game.core.rpc.ToPoint;
 import org.game.global.rpc.IStageGlobalService;
 import org.game.human.HModBase;
 import org.game.human.HumanObject;
 import org.game.human.event.OnHumanLoadComplete;
-import org.game.proto.scene.SCEnterScene;
+import org.game.stage.StageHumanData;
+import org.game.stage.rpc.IStageObjectService;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -37,16 +39,16 @@ public class HModStageHuman extends HModBase {
 
             long stageId = param.getLong("stageId");
             int stageSn = param.getInt("stageSn");
+            ToPoint stageToPoint = param.get("toPoint");
 
-            // 通知场景服务该玩家进入场景
-            stageGlobalService.humanEnter(stageId);
+            StageHumanData stageHumanData = new StageHumanData(humanObj.getId());
 
-            // 向客户端发送进入场景的消息
-            SCEnterScene scEnterScene = new SCEnterScene();
-            scEnterScene.setStageSn(stageSn);
-            scEnterScene.setX(100);
-            scEnterScene.setY(100);
-            humanObj.sendMessage(scEnterScene);
+            IStageObjectService stageObjectService = ReferenceFactory.getProxy(IStageObjectService.class, stageToPoint);
+            stageObjectService.registerStageHuman(stageHumanData);
+
+
+
+
 
             logger.info("玩家进入场景成功: stageId={}, stageSn={}", stageId, stageSn);
         }).exceptionally(throwable -> {
