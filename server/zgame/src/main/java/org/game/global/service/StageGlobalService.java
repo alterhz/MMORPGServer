@@ -10,6 +10,7 @@ import org.game.core.rpc.ToPoint;
 import org.game.core.stage.StageThread;
 import org.game.core.utils.SnowflakeIdGenerator;
 import org.game.global.rpc.IStageGlobalService;
+import org.game.stage.rpc.IStageService;
 import org.game.stage.service.StageService;
 
 import java.util.HashMap;
@@ -161,9 +162,12 @@ public class StageGlobalService extends GameServiceBase implements IStageGlobalS
         stageInfos.put(stageId, stageInfo);
 
         // TODO 调用StageService创建场景
-        StageService stageService = ReferenceFactory.getProxy(StageService.class, stageInfo.toPoint);
-        stageService.createCommonStage(stageSn);
-        
+        IStageService stageService = ReferenceFactory.getProxy(IStageService.class, stageInfo.toPoint);
+        CompletableFuture<Param> commonStage = stageService.createCommonStage(stageSn, stageId);
+        commonStage.thenAccept(param -> {
+            logger.info("创建新场景成功: {}", param);
+        });
+
         // 构造返回结果
         Param result = new Param();
         result.put("stageSn", stageSn);

@@ -7,7 +7,7 @@ import org.game.test.net.handler.LoginHandler;
 
 public class RobotLogin {
     public static void main(String[] args) throws InterruptedException {
-        BaseUtils.init(20000);
+        BaseUtils.init(20001);
 
         ProtoScanner.init();
 

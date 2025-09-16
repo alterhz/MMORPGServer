@@ -17,7 +17,7 @@ public interface IStageService {
      * @param stageSn 场景配置SN
      * @return 场景信息
      */
-    CompletableFuture<Param> createCommonStage(int stageSn);
+    CompletableFuture<Param> createCommonStage(int stageSn, long stageId);
 
     /**
      * 热修复

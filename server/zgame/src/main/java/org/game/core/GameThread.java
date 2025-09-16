@@ -162,7 +162,6 @@ public class GameThread extends Thread {
     private void pulse(long now) {
         // 执行所有GameService的心跳
         for (GameServiceBase service : gameServices.values()) {
-            service.timerQueue.update(now);
             service.pulse(now);
         }
 

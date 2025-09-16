@@ -121,12 +121,21 @@ public class GameStartUp {
             StageThread stageThread = new StageThread(i);
             stageThread.start();
 
-            // 添加StageService服务，每个线程一个
             stageThread.runTask(() -> {
-                StageService stageService = new StageService();
-                stageThread.addGameService(stageService);
+                // 添加StageService服务，每个线程一个
+                addStageService(stageThread);
             });
         }
+    }
+
+    private static void addStageService(StageThread stageThread) {
+        StageService stageService = new StageService();
+        stageThread.addGameService(stageService);
+        stageThread.runTask(() -> {
+            stageService.init();
+            stageService.startup();
+            LogCore.logger.info("stageService={}", stageService);
+        });
     }
 
     /**

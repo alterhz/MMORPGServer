@@ -166,14 +166,14 @@ public class Param {
     /**
      * 便捷方法：获取 Integer 值。
      */
-    public Integer getInteger(String key) {
+    public Integer getInt(String key) {
         return get(key, (Integer) null);
     }
 
     /**
      * 便捷方法：获取 Integer 值，提供默认值。
      */
-    public Integer getInteger(String key, Integer defaultValue) {
+    public Integer getInt(String key, Integer defaultValue) {
         return get(key, defaultValue);
     }
 

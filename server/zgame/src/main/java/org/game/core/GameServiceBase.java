@@ -74,6 +74,8 @@ public abstract class GameServiceBase {
 
     // 心跳
     public final void pulse(long now) {
+        onPulse(now);
+        timerQueue.update(now);
         if (pulseSecondTimer.update(now)) {
             onPulseSec(now);
         }

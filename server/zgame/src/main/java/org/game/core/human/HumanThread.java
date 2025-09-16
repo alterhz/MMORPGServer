@@ -74,18 +74,15 @@ public class HumanThread extends GameThread {
 
         HumanObject humanObj = new HumanObject(humanDB, clientPoint, humanPoint);
         HumanService humanService = new HumanService(humanObj);
-
         humanThread.addGameService(humanService);
-        humanService.bindGameThread(humanThread);
-
-        HumanLookup.add(humanObj.getId(), humanObj.getAccount(), humanThread.getName());
-
         humanThread.runTask(() -> {
             humanService.init();
             humanService.startup();
 
             HumanDBManager.loadHumanModDB(humanObj);
         });
+
+        HumanLookup.add(humanObj.getId(), humanObj.getAccount(), humanThread.getName());
 
     }
 
