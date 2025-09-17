@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 > nul
-set JDK_HOME=C:\Users\Administrator\.jdks\ms-11.0.28
+set JDK_HOME=C:\Users\Administrator\.jdks\corretto-11.0.28
 set JAVA=%JDK_HOME%\bin\java.exe
 
 echo Starting zgame server...

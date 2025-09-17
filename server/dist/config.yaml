@@ -1,8 +1,9 @@
 server:
   prefix: "GameServer" # 服务器名称前缀
+  port: 11001 # 服务器端口号
 
 game_thread:
-  count: 3 # GameThread 的数量
+  count: 2 # GameThread 的数量
 
 human_thread:
   count: 2 # HumanThread 的数量
@@ -10,6 +11,9 @@ human_thread:
 conn_thread:
   count: 2 # ConnThread 的数量
   frame_message_count : 100 # 每帧处理消息数量
+
+stage_thread:
+  count: 2 # StageThread 的数量
 
 mongodb:
   uri: "mongodb://localhost:27017"

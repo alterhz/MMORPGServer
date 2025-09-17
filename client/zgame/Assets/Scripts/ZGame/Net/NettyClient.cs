@@ -20,7 +20,7 @@ namespace ZGame
         private Thread receiveThread;
         private bool isConnected = false;
         public string serverHost = "127.0.0.1";
-        public int serverPort = 1080;
+        public int serverPort = 11001;
         private readonly string rc4Key = "your_rc4_key";
 
         private readonly Queue<Message> receivedMessages = new();
