@@ -4,23 +4,23 @@ setlocal enabledelayedexpansion
 set PROTO_DIR=json
 set JAVA_OUT_DIR=..\client\zgame\Assets\Scripts\Proto
 
-:: éå† PROTO_DIR ä¸‹çš„æ¯ä¸ªå­æ–‡ä»¶å¤¹
+:: ±éÀú PROTO_DIR ÏÂµÄÃ¿¸ö×ÓÎÄ¼ş¼Ğ
 for /D %%F in (%PROTO_DIR%\*) do (
     set "FOLDER=%%~nxF"
-    set "PACKAGE=!FOLDER: =_!"  # æ›¿æ¢ç©ºæ ¼ä¸ºä¸‹åˆ’çº¿
+    set "PACKAGE=!FOLDER: =_!"  # Ìæ»»¿Õ¸ñÎªÏÂ»®Ïß
 
     echo Processing folder: !FOLDER!
 
-    :: éå†å­æ–‡ä»¶å¤¹ä¸­çš„æ¯ä¸ª .json æ–‡ä»¶
+    :: ±éÀú×ÓÎÄ¼ş¼ĞÖĞµÄÃ¿¸ö .json ÎÄ¼ş
     for %%J in ("%%F\*.json") do (
-        set "JSON_FILE=%%~nJ"          # è·å–æ–‡ä»¶åï¼ˆæ— æ‰©å±•åï¼‰
+        set "JSON_FILE=%%~nJ"          # »ñÈ¡ÎÄ¼şÃû£¨ÎŞÀ©Õ¹Ãû£©
         set "OUTPUT_DIR=!JAVA_OUT_DIR!\!FOLDER!"
         set "OUTPUT_FILE=!OUTPUT_DIR!\!JSON_FILE!.cs"
         set "FULL_JSON_PATH=%%J"
 
         echo Generating !JSON_FILE!.cs from %%J ...
 
-        :: åˆ›å»ºè¾“å‡ºç›®å½•ï¼ˆå¦‚æœä¸å­˜åœ¨ï¼‰
+        :: ´´½¨Êä³öÄ¿Â¼£¨Èç¹û²»´æÔÚ£©
         if not exist "!OUTPUT_DIR!" (
             mkdir "!OUTPUT_DIR!"
         )
@@ -39,6 +39,6 @@ echo All JSON files processed!
 
 GenClientProto\Debug\net8.0\GenClientProto.exe json\ProtoIds.ini ..\client\zgame\Assets\Scripts\Proto\
 
-echo åè®®IDå±æ€§æ·»åŠ å®Œæ¯•
+echo Ğ­ÒéIDÊôĞÔÌí¼ÓÍê±Ï
 
 pause
