@@ -41,7 +41,8 @@ public class HModStageHuman extends HModBase {
             int stageSn = param.getInt("stageSn");
             ToPoint stageToPoint = param.get("toPoint");
 
-            StageHumanData stageHumanData = new StageHumanData(humanObj.getId());
+            StageHumanData stageHumanData = new StageHumanData();
+            stageHumanData.setHumanId(humanObj.getId());
 
             IStageObjectService stageObjectService = ReferenceFactory.getProxy(IStageObjectService.class, stageToPoint);
             stageObjectService.registerStageHuman(stageHumanData);

@@ -1,5 +1,6 @@
 server:
   prefix: "GameServer" # 服务器名称前缀
+  port: 11001 # 服务器端口号
 
 game_thread:
   count: 2 # GameThread 的数量

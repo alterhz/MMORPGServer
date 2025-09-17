@@ -85,7 +85,8 @@ public class GameStartUp {
             assignServicesToThreads(services);
 
             // 8. 启动网络 服务
-            NettyServer server = new NettyServer(1080, "your_rc4_key");
+            int port = MyConfig.getConfig().getServer().getPort();
+            NettyServer server = new NettyServer(port, "your_rc4_key");
             server.start();
 
             LogCore.logger.info("游戏服务启动成功");

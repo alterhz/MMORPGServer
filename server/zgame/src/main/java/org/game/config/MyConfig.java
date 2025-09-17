@@ -120,6 +120,7 @@ public class MyConfig {
 
     public static class ServerConfig {
         private String prefix;
+        private int port;
 
         public String getPrefix() {
             return prefix;
@@ -127,6 +128,14 @@ public class MyConfig {
 
         public void setPrefix(String prefix) {
             this.prefix = prefix;
+        }
+        
+        public int getPort() {
+            return port;
+        }
+        
+        public void setPort(int port) {
+            this.port = port;
         }
     }
 
