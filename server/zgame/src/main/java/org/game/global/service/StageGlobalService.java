@@ -158,16 +158,13 @@ public class StageGlobalService extends GameServiceBase implements IStageGlobalS
         String gameProcessName = GameProcess.getGameProcessName();
         String stageThreadName = StageThread.getStageThreadName(threadIndex);
         stageInfo.toPoint = new ToPoint(gameProcessName, stageThreadName, String.valueOf(stageId));
-        
+
         stageInfos.put(stageId, stageInfo);
 
         // 调用StageService创建场景
         ToPoint stageServicePoint = new ToPoint(gameProcessName, stageThreadName, StageService.NAME);
         IStageService stageService = ReferenceFactory.getProxy(IStageService.class, stageServicePoint);
         CompletableFuture<Param> commonStage = stageService.createCommonStage(stageSn, stageId);
-        commonStage.thenAccept(param -> {
-            logger.info("创建新场景成功: {}", param);
-        });
 
         // 构造返回结果
         Param result = new Param();
@@ -176,7 +173,10 @@ public class StageGlobalService extends GameServiceBase implements IStageGlobalS
         result.put("toPoint", stageInfo.toPoint);
         
         logger.info("创建新场景成功: {}", result);
-        return CompletableFuture.completedFuture(result);
+        return commonStage.thenApply(param -> {
+            logger.info("创建新场景成功: {}", param);
+            return result;
+        });
     }
     
     @Override

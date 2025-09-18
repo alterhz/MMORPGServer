@@ -11,6 +11,8 @@ import org.game.stage.StageObject;
 import org.game.stage.rpc.IStageObjectService;
 import org.game.stage.human.HumanObject;
 
+import java.util.concurrent.CompletableFuture;
+
 public class StageObjectService extends GameServiceBase implements IStageObjectService {
 
     public static final Logger logger = LogManager.getLogger(StageObjectService.class);
@@ -43,7 +45,7 @@ public class StageObjectService extends GameServiceBase implements IStageObjectS
     }
 
     @Override
-    public void registerStageHuman(HumanObjectData humanObjectData) {
+    public CompletableFuture<Boolean> registerStageHuman(HumanObjectData humanObjectData) {
         GameThread currentGameThread = GameThread.getCurrentGameThread();
         if (currentGameThread.getGameService(humanObjectData.getPlayerId()) != null) {
             logger.error("角色已经在当前线程: {}。humanId={}", currentGameThread.getName(), humanObjectData.getPlayerId());
@@ -59,5 +61,7 @@ public class StageObjectService extends GameServiceBase implements IStageObjectS
             stageHumanObjectService.init();
             stageHumanObjectService.startup();
         });
+
+        return CompletableFuture.completedFuture(true);
     }
 }

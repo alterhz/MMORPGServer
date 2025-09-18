@@ -301,8 +301,10 @@ public class GameThread extends Thread {
             if (result instanceof CompletableFuture) {
                 // 先获取结果，然后构造RPCResponse
                 CompletableFuture<?> future = (CompletableFuture<?>) result;
-                RPCResponse response = new RPCResponse(request.getRequestId(), request.getInvocation().getFromPoint(), future.get(), null);
-                handleResponse(response);
+                future.thenAccept(data -> {
+                    RPCResponse response = new RPCResponse(request.getRequestId(), request.getInvocation().getFromPoint(), data, null);
+                    handleResponse(response);
+                });
             } else if (result == null) {
                 // 返回值为void或null的情况，不做处理
                 RPCResponse response = new RPCResponse(request.getRequestId(), request.getInvocation().getFromPoint(), null, null);
@@ -316,10 +318,6 @@ public class GameThread extends Thread {
             logger.error("Failed to invoke method: {}", request.getInvocation().getMethodName(), e);
         } catch (IllegalAccessException e) {
             logger.error("Access denied to method: {}", request.getInvocation().getMethodName(), e);
-        } catch (ExecutionException e) {
-            logger.error("Error executing method: {}", request.getInvocation().getMethodName(), e);
-        } catch (InterruptedException e) {
-            logger.error("Interrupted while executing method: {}", request.getInvocation().getMethodName(), e);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

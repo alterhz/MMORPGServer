@@ -4,6 +4,8 @@ import org.game.core.Param;
 import org.game.core.rpc.RPCProxy;
 import org.game.stage.human.HumanObjectData;
 
+import java.util.concurrent.CompletableFuture;
+
 @RPCProxy(startupType = RPCProxy.StartupType.MANUAL)
 public interface IStageObjectService {
     /**
@@ -12,5 +14,5 @@ public interface IStageObjectService {
      */
     void hotfix(Param param);
 
-    void registerStageHuman(HumanObjectData humanObjectData);
+    CompletableFuture<Boolean> registerStageHuman(HumanObjectData humanObjectData);
 }

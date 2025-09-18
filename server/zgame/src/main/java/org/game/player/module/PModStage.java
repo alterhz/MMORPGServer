@@ -46,15 +46,16 @@ public class PModStage extends PlayerModBase {
             humanObjectData.setClientPoint(playerObj.getClientPoint());
 
             IStageObjectService stageObjectService = ReferenceFactory.getProxy(IStageObjectService.class, stageToPoint);
-            stageObjectService.registerStageHuman(humanObjectData);
-
-
-
-
-
-            logger.info("玩家进入场景成功: stageId={}, stageSn={}", stageId, stageSn);
+            CompletableFuture<Boolean> future = stageObjectService.registerStageHuman(humanObjectData);
+            future.thenAccept(success -> {
+                if (!success) {
+                    logger.error("玩家注册场景失败: stageId={}, stageSn={}, player={}", stageId, stageSn, playerObj);
+                    return;
+                }
+                logger.info("玩家注册场景成功: stageId={}, stageSn={}, playerObj={}", stageId, stageSn, playerObj);
+            });
         }).exceptionally(throwable -> {
-            logger.error("进入场景失败", throwable);
+            logger.error("进入场景失败. playerObj={}", playerObj, throwable);
             return null;
         });
     }
