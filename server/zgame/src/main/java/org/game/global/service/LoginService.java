@@ -13,17 +13,17 @@ import org.game.core.GameServiceBase;
 import org.game.core.Param;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.QuerySubscriber;
-import org.game.core.human.HumanLookup;
-import org.game.core.human.HumanThread;
+import org.game.core.human.PlayerLookup;
+import org.game.core.human.PlayerThread;
 import org.game.core.message.ProtoListener;
 import org.game.core.message.ProtoScanner;
 import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
-import org.game.dao.HumanDB;
-import org.game.human.module.MyStruct;
-import org.game.human.rpc.IHumanInfoService;
+import org.game.dao.PlayerDB;
+import org.game.player.module.MyStruct;
+import org.game.player.rpc.IPlayerInfoService;
 import org.game.proto.login.*;
 import org.game.global.rpc.IClientService;
 import org.game.global.rpc.ILoginService;
@@ -98,58 +98,58 @@ public class LoginService extends GameServiceBase implements ILoginService {
             logger.error("CSTest，loginInfo == null: clientID={}", clientID);
             return;
         }
-        String humanId = loginInfo.humans.get(0);
-        IHumanInfoService humanInfoService = ReferenceFactory.getHumanProxy(IHumanInfoService.class, humanId);
+        String PlayerId = loginInfo.Players.get(0);
+        IPlayerInfoService PlayerInfoService = ReferenceFactory.getHumanProxy(IPlayerInfoService.class, PlayerId);
         MyStruct myStruct = new MyStruct();
         myStruct.setId(1);
         myStruct.setName("张三");
         myStruct.setSex(true);
         myStruct.setDesc("测试");
-        humanInfoService.getInfo(33, "dfsd", myStruct).thenAccept(humanInfo -> {
-            logger.info("调用HumanRPC，成功: {}", humanInfo);
+        PlayerInfoService.getInfo(33, "dfsd", myStruct).thenAccept(PlayerInfo -> {
+            logger.info("调用PlayerRPC，成功: {}", PlayerInfo);
         });
         SCTest scTest = new SCTest();
         scTest.setMessage("登录成功测试");
         sendProto(clientPoint, scTest);
     }
 
-    @ProtoListener(CSCreateHuman.class)
-    private void CSCreateHuman(Message message, ToPoint clientPoint) {
-        logger.info("接收到消息CS_CREATE_HUMAN: {}", message);
+    @ProtoListener(CSCreatePlayer.class)
+    private void CSCreatePlayer(Message message, ToPoint clientPoint) {
+        logger.info("接收到消息CS_CREATE_PLAYER: {}", message);
         long clientID = NumberUtils.toLong(clientPoint.getGameServiceName());
         LoginInfo loginInfo = loginInfoMap.get(clientID);
         if (loginInfo == null) {
             logger.error("创建角色，loginInfo == null: clientID={}", clientID);
             return;
         }
-        if (loginInfo.loginPeriod != LoginPeriod.QUERY_HUMANS) {
+        if (loginInfo.loginPeriod != LoginPeriod.QUERY_PlayerS) {
             logger.error("创建角色，不在查询角色阶段: clientID={}, loginPeriod={}", clientID, loginInfo.loginPeriod);
             return;
         }
-        loginInfo.loginPeriod = LoginPeriod.CREATE_HUMAN;
+        loginInfo.loginPeriod = LoginPeriod.CREATE_Player;
 
-        CSCreateHuman csCreateHuman = message.getProto(CSCreateHuman.class);
+        CSCreatePlayer csCreatePlayer = message.getProto(CSCreatePlayer.class);
 
         // TODO 创建角色
-        HumanDB humanDB = new HumanDB();
-        humanDB.setId(null);
-        humanDB.setAccount(loginInfo.account);
-        humanDB.setName(csCreateHuman.getName());
+        PlayerDB playerDB = new PlayerDB();
+        playerDB.setId(null);
+        playerDB.setAccount(loginInfo.account);
+        playerDB.setName(csCreatePlayer.getName());
 
-        MongoDBAsyncClient.getCollection(HumanDB.class)
-                .insertOne(humanDB)
+        MongoDBAsyncClient.getCollection(PlayerDB.class)
+                .insertOne(playerDB)
                 .subscribe(new QuerySubscriber<>() {
                     @Override
                     protected void onLoadDB(List<InsertOneResult> dbCollections) {
                         BsonValue insertedId = dbCollections.get(0).getInsertedId();
                         logger.info("创建角色成功: insertedId={}", insertedId);
-                        SCCreateHuman scCreateHuman = new SCCreateHuman();
-                        scCreateHuman.setCode(0);
-                        scCreateHuman.setHumanId(insertedId.asObjectId().getValue().toHexString());
-                        scCreateHuman.setSuccess(true);
-                        sendProto(clientPoint, scCreateHuman);
+                        SCCreatePlayer scCreatePlayer = new SCCreatePlayer();
+                        scCreatePlayer.setCode(0);
+                        scCreatePlayer.setPlayerId(insertedId.asObjectId().getValue().toHexString());
+                        scCreatePlayer.setSuccess(true);
+                        sendProto(clientPoint, scCreatePlayer);
 
-                        HumanThread.loadHumanObject(humanDB, clientPoint);
+                        PlayerThread.loadPlayerObj(playerDB, clientPoint);
                     }
 
                     @Override
@@ -163,120 +163,120 @@ public class LoginService extends GameServiceBase implements ILoginService {
     /**
      * 删除角色
      */
-    @ProtoListener(CSDeleteHuman.class)
-    private void CSDeleteHuman(Message message, ToPoint clientPoint) {
-        logger.info("接收到消息CS_DELETE_HUMAN: {}", message);
+    @ProtoListener(CSDeletePlayer.class)
+    private void CSDeletePlayer(Message message, ToPoint clientPoint) {
+        logger.info("接收到消息CS_DELETE_Player: {}", message);
         long clientID = NumberUtils.toLong(clientPoint.getGameServiceName());
         LoginInfo loginInfo = loginInfoMap.get(clientID);
         if (loginInfo == null) {
             logger.error("删除角色，loginInfo == null: clientID={}", clientID);
             return;
         }
-        if (loginInfo.loginPeriod != LoginPeriod.QUERY_HUMANS) {
+        if (loginInfo.loginPeriod != LoginPeriod.QUERY_PlayerS) {
             logger.error("删除角色, 不在选择角色阶段: clientID={}, loginPeriod={}", clientID, loginInfo.loginPeriod);
             return;
         }
 
-        CSDeleteHuman csDeleteHuman = message.getProto(CSDeleteHuman.class);
-        String humanId = csDeleteHuman.getHumanId();
+        CSDeletePlayer csDeletePlayer = message.getProto(CSDeletePlayer.class);
+        String PlayerId = csDeletePlayer.getPlayerId();
 
         // 判断是否存在这个角色
-        if (!loginInfo.humans.contains(humanId)) {
-            logger.error("删除角色不存在: humanId={}", humanId);
-            SCDeleteHuman scDeleteHumanResp = new SCDeleteHuman();
-            scDeleteHumanResp.setCode(1);
-            scDeleteHumanResp.setHumanId(humanId);
-            scDeleteHumanResp.setMessage("删除角色不存在");
-            sendProto(clientPoint, scDeleteHumanResp);
+        if (!loginInfo.Players.contains(PlayerId)) {
+            logger.error("删除角色不存在: PlayerId={}", PlayerId);
+            SCDeletePlayer scDeletePlayerResp = new SCDeletePlayer();
+            scDeletePlayerResp.setCode(1);
+            scDeletePlayerResp.setPlayerId(PlayerId);
+            scDeletePlayerResp.setMessage("删除角色不存在");
+            sendProto(clientPoint, scDeletePlayerResp);
             return;
         }
 
-        loginInfo.humans.remove(humanId);
+        loginInfo.Players.remove(PlayerId);
 
         // 根据角色ID删除角色
-        MongoDBAsyncClient.getCollection(HumanDB.class)
-                .deleteOne(Filters.eq("_id", new ObjectId(humanId)))
+        MongoDBAsyncClient.getCollection(PlayerDB.class)
+                .deleteOne(Filters.eq("_id", new ObjectId(PlayerId)))
                 .subscribe(new QuerySubscriber<>(Long.MAX_VALUE) {
                     @Override
                     protected void onLoadDB(List<DeleteResult> dbCollections) {
                         if (dbCollections.isEmpty() || dbCollections.get(0).getDeletedCount() == 0) {
                             // 角色不存在
-                            logger.error("DB删除角色不存在: humanId={}", humanId);
-                            SCDeleteHuman scDeleteHuman = new SCDeleteHuman();
-                            scDeleteHuman.setCode(1);
-                            scDeleteHuman.setHumanId(humanId);
-                            scDeleteHuman.setMessage("删除角色失败");
-                            sendProto(clientPoint, scDeleteHuman);
+                            logger.error("DB删除角色不存在: PlayerId={}", PlayerId);
+                            SCDeletePlayer scDeletePlayer = new SCDeletePlayer();
+                            scDeletePlayer.setCode(1);
+                            scDeletePlayer.setPlayerId(PlayerId);
+                            scDeletePlayer.setMessage("删除角色失败");
+                            sendProto(clientPoint, scDeletePlayer);
                         } else {
                             // 角色删除成功
-                            SCDeleteHuman scDeleteHuman = new SCDeleteHuman();
-                            scDeleteHuman.setCode(0);
-                            scDeleteHuman.setHumanId(humanId);
-                            scDeleteHuman.setMessage("删除角色成功");
-                            sendProto(clientPoint, scDeleteHuman);
+                            SCDeletePlayer scDeletePlayer = new SCDeletePlayer();
+                            scDeletePlayer.setCode(0);
+                            scDeletePlayer.setPlayerId(PlayerId);
+                            scDeletePlayer.setMessage("删除角色成功");
+                            sendProto(clientPoint, scDeletePlayer);
                         }
                     }
 
                     @Override
                     protected void onError(String errMessage) {
-                        SCDeleteHuman scDeleteHuman = new SCDeleteHuman();
-                        scDeleteHuman.setCode(2);
-                        scDeleteHuman.setHumanId(humanId);
-                        scDeleteHuman.setMessage("删除角色异常: " + errMessage);
-                        sendProto(clientPoint, scDeleteHuman);
+                        SCDeletePlayer scDeletePlayer = new SCDeletePlayer();
+                        scDeletePlayer.setCode(2);
+                        scDeletePlayer.setPlayerId(PlayerId);
+                        scDeletePlayer.setMessage("删除角色异常: " + errMessage);
+                        sendProto(clientPoint, scDeletePlayer);
                     }
                 });
 
     }
 
-    @ProtoListener(CSSelectHuman.class)
-    private void CSSelectHuman(Message message, ToPoint clientPoint) {
-        logger.info("接收到消息CS_SELECT_HUMAN: {}", message);
+    @ProtoListener(CSSelectPlayer.class)
+    private void CSSelectPlayer(Message message, ToPoint clientPoint) {
+        logger.info("接收到消息CS_SELECT_Player: {}", message);
         long clientID = NumberUtils.toLong(clientPoint.getGameServiceName());
         LoginInfo loginInfo = loginInfoMap.get(clientID);
         if (loginInfo == null) {
             logger.error("选择角色，loginInfo == null: clientID={}", clientID);
             return;
         }
-        if (loginInfo.loginPeriod != LoginPeriod.QUERY_HUMANS) {
+        if (loginInfo.loginPeriod != LoginPeriod.QUERY_PlayerS) {
             logger.error("选择角色，不在查询角色阶段: clientID={}, loginPeriod={}", clientID, loginInfo.loginPeriod);
             return;
         }
-        loginInfo.loginPeriod = LoginPeriod.SELECT_HUMAN;
+        loginInfo.loginPeriod = LoginPeriod.SELECT_Player;
 
-        CSSelectHuman csSelectHuman = message.getProto(CSSelectHuman.class);
-        String humanId = csSelectHuman.getHumanId();
+        CSSelectPlayer csSelectPlayer = message.getProto(CSSelectPlayer.class);
+        String PlayerId = csSelectPlayer.getPlayerId();
 
-        // 是否存在HumanId
-        if (!loginInfo.humans.contains(humanId)) {
-            logger.error("选择的角色不存在: humanId={}", humanId);
-            SCSelectHuman scSelectHuman = new SCSelectHuman();
-            scSelectHuman.setCode(1);
-            scSelectHuman.setMessage("选择失败");
-            sendProto(clientPoint, scSelectHuman);
+        // 是否存在PlayerId
+        if (!loginInfo.Players.contains(PlayerId)) {
+            logger.error("选择的角色不存在: PlayerId={}", PlayerId);
+            SCSelectPlayer scSelectPlayer = new SCSelectPlayer();
+            scSelectPlayer.setCode(1);
+            scSelectPlayer.setMessage("选择失败");
+            sendProto(clientPoint, scSelectPlayer);
             return;
         }
 
-        MongoDBAsyncClient.getCollection(HumanDB.class)
-                .find(Filters.eq("_id", new ObjectId(humanId)))
+        MongoDBAsyncClient.getCollection(PlayerDB.class)
+                .find(Filters.eq("_id", new ObjectId(PlayerId)))
                 .subscribe(new QuerySubscriber<>() {
                     @Override
-                    protected void onLoadDB(List<HumanDB> humanDBS) {
-                        if (!humanDBS.isEmpty()) {
-                            HumanDB selectHumanDB = humanDBS.get(0);
-                            HumanThread.loadHumanObject(selectHumanDB, clientPoint);
+                    protected void onLoadDB(List<PlayerDB> playerDBS) {
+                        if (!playerDBS.isEmpty()) {
+                            PlayerDB selectPlayerDB = playerDBS.get(0);
+                            PlayerThread.loadPlayerObj(selectPlayerDB, clientPoint);
 
                             // 选择角色成功
-                            SCSelectHuman scSelectHuman = new SCSelectHuman();
-                            scSelectHuman.setCode(0);
-                            scSelectHuman.setMessage("选择角色成功");
-                            sendProto(clientPoint, scSelectHuman);
+                            SCSelectPlayer scSelectPlayer = new SCSelectPlayer();
+                            scSelectPlayer.setCode(0);
+                            scSelectPlayer.setMessage("选择角色成功");
+                            sendProto(clientPoint, scSelectPlayer);
                         } else {
-                            logger.error("选择的角色不存在: humanId={}", humanId);
-                            SCSelectHuman scSelectHuman = new SCSelectHuman();
-                            scSelectHuman.setCode(1);
-                            scSelectHuman.setMessage("选择失败");
-                            sendProto(clientPoint, scSelectHuman);
+                            logger.error("选择的角色不存在: PlayerId={}", PlayerId);
+                            SCSelectPlayer scSelectPlayer = new SCSelectPlayer();
+                            scSelectPlayer.setCode(1);
+                            scSelectPlayer.setMessage("选择失败");
+                            sendProto(clientPoint, scSelectPlayer);
                         }
                     }
 
@@ -285,17 +285,17 @@ public class LoginService extends GameServiceBase implements ILoginService {
                         logger.error("查询角色失败: {}", errMessage);
 
                         // 角色列表查询失败
-                        SCQueryHuman scQueryHumans = new SCQueryHuman();
-                        scQueryHumans.setCode(1);
-                        scQueryHumans.setMessage("查询失败");
-                        sendProto(clientPoint, scQueryHumans);
+                        SCQueryPlayer scQueryPlayers = new SCQueryPlayer();
+                        scQueryPlayers.setCode(1);
+                        scQueryPlayers.setMessage("查询失败");
+                        sendProto(clientPoint, scQueryPlayers);
                     }
                 });
     }
 
-    @ProtoListener(CSQueryHuman.class)
-    private void CSQueryHumans(Message message, ToPoint fromPoint) {
-        logger.info("接收到消息CS_QUERY_HUMANS: {}", message);
+    @ProtoListener(CSQueryPlayer.class)
+    private void CSQueryPlayers(Message message, ToPoint fromPoint) {
+        logger.info("接收到消息CS_QUERY_PlayerS: {}", message);
         long clientID = NumberUtils.toLong(fromPoint.getGameServiceName());
         LoginInfo loginInfo = loginInfoMap.get(clientID);
         if (loginInfo == null) {
@@ -308,36 +308,36 @@ public class LoginService extends GameServiceBase implements ILoginService {
             return;
         }
         // 记录请求角色列表
-        loginInfo.loginPeriod = LoginPeriod.QUERY_HUMANS;
+        loginInfo.loginPeriod = LoginPeriod.QUERY_PlayerS;
 
         String account = loginInfo.account;
-        MongoDBAsyncClient.getCollection(HumanDB.class)
+        MongoDBAsyncClient.getCollection(PlayerDB.class)
                 .find(Filters.eq("account", account))
                 .subscribe(new QuerySubscriber<>(Long.MAX_VALUE) {
                     @Override
-                    protected void onLoadDB(List<HumanDB> humanDBS) {
-                        List<Human> humanList = new ArrayList<>();
-                        for (HumanDB humanDB : humanDBS) {
+                    protected void onLoadDB(List<PlayerDB> playerDBS) {
+                        List<Player> PlayerList = new ArrayList<>();
+                        for (PlayerDB playerDB : playerDBS) {
                             // 创建角色信息对象
-                            String hexHumanId = humanDB.getId().toHexString();
+                            String hexPlayerId = playerDB.getId().toHexString();
 
-                            Human humanInfo = new Human();
-                            humanInfo.setid(hexHumanId);
-                            humanInfo.setName(humanDB.getName());
-                            // 这里暂时将职业字段设置为默认值，因为在HumanDB中没有找到职业字段
-                            humanInfo.setProfession("未知职业");
-                            humanList.add(humanInfo);
+                            Player PlayerInfo = new Player();
+                            PlayerInfo.setid(hexPlayerId);
+                            PlayerInfo.setName(playerDB.getName());
+                            // 这里暂时将职业字段设置为默认值，因为在PlayerDB中没有找到职业字段
+                            PlayerInfo.setProfession("未知职业");
+                            PlayerList.add(PlayerInfo);
 
                             // 记录角色列表ID
-                            loginInfo.humans.add(hexHumanId);
+                            loginInfo.Players.add(hexPlayerId);
                         }
 
-                        SCQueryHuman scQueryHumans = new SCQueryHuman();
-                        scQueryHumans.setCode(0);
-                        scQueryHumans.setHuman(humanList);
-                        scQueryHumans.setMessage("查询成功");
+                        SCQueryPlayer scQueryPlayers = new SCQueryPlayer();
+                        scQueryPlayers.setCode(0);
+                        scQueryPlayers.setPlayer(PlayerList);
+                        scQueryPlayers.setMessage("查询成功");
 
-                        sendProto(fromPoint, scQueryHumans);
+                        sendProto(fromPoint, scQueryPlayers);
                     }
 
                     @Override
@@ -345,10 +345,10 @@ public class LoginService extends GameServiceBase implements ILoginService {
                         logger.error("查询角色列表失败: {}", errMessage);
 
                         // 角色列表查询失败
-                        SCQueryHuman scQueryHumans = new SCQueryHuman();
-                        scQueryHumans.setCode(1);
-                        scQueryHumans.setMessage("查询失败");
-                        sendProto(fromPoint, scQueryHumans);
+                        SCQueryPlayer scQueryPlayers = new SCQueryPlayer();
+                        scQueryPlayers.setCode(1);
+                        scQueryPlayers.setMessage("查询失败");
+                        sendProto(fromPoint, scQueryPlayers);
                     }
                 });
     }
@@ -382,7 +382,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         }
 
         // 踢掉在线的角色
-        HumanLookup.KickHumanByAccount(account);
+        PlayerLookup.KickPlayerByAccount(account);
 
         // 记录账号登录信息
         LoginInfo loginInfo = new LoginInfo(account, fromPoint);
@@ -392,7 +392,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
 
         // 切换到选择角色阶段
         IClientService clientService = ReferenceFactory.getProxy(IClientService.class, fromPoint);
-        clientService.changePeriod(ClientPeriod.SELECT_HUMAN);
+        clientService.changePeriod(ClientPeriod.SELECT_PLAYER);
 
         SCLogin scLogin = new SCLogin();
         scLogin.setCode(0);
@@ -408,17 +408,17 @@ public class LoginService extends GameServiceBase implements ILoginService {
 
     enum LoginPeriod {
         LOGIN,
-        QUERY_HUMANS,
-        SELECT_HUMAN,
-        CREATE_HUMAN,
+        QUERY_PlayerS,
+        SELECT_Player,
+        CREATE_Player,
     }
 
     static class LoginInfo {
         String account;
         ToPoint clientPoint;
         LoginPeriod loginPeriod = LoginPeriod.LOGIN;
-        // 账号对应的HumanDB列表
-        List<String> humans = new ArrayList<>();
+        // 账号对应的PlayerDB列表
+        List<String> Players = new ArrayList<>();
 
         LoginInfo(String account, ToPoint clientPoint) {
             this.account = account;

@@ -19,10 +19,11 @@ HumanRPC 主要由以下几个组件构成：
 首先创建一个接口并使用 `@HumanRPCProxy` 注解标记：
 
 ```java
-package org.game.human.rpc;
+package org.game.player.rpc;
 
 import org.game.core.rpc.HumanRPCProxy;
-import org.game.human.module.MyStruct;
+import org.game.player.module.MyStruct;
+
 import java.util.concurrent.CompletableFuture;
 
 @HumanRPCProxy
@@ -41,12 +42,13 @@ public interface IHumanInfoService {
 创建服务实现类，继承 [HumanServiceBase](file:///D:/MyZiegler/ZRepo/github/MMORPGServer/server/zgame/src/main/java/org/game/core/rpc/HumanServiceBase.java#L8-L16) 并实现对应的接口：
 
 ```java
-package org.game.human.service;
+package org.game.player.service;
 
 import org.game.core.rpc.HumanServiceBase;
-import org.game.human.HumanObject;
-import org.game.human.module.MyStruct;
-import org.game.human.rpc.IHumanInfoService;
+import org.game.player.PlayerObject;
+import org.game.player.module.MyStruct;
+import org.game.player.rpc.IPlayerInfoService;
+
 import java.util.concurrent.CompletableFuture;
 
 public class HumanInfoService extends HumanServiceBase implements IHumanInfoService {

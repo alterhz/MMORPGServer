@@ -157,12 +157,13 @@ public class StageGlobalService extends GameServiceBase implements IStageGlobalS
         stageInfo.stageId = stageId;
         String gameProcessName = GameProcess.getGameProcessName();
         String stageThreadName = StageThread.getStageThreadName(threadIndex);
-        stageInfo.toPoint = new ToPoint(gameProcessName, stageThreadName, StageService.NAME);
+        stageInfo.toPoint = new ToPoint(gameProcessName, stageThreadName, String.valueOf(stageId));
         
         stageInfos.put(stageId, stageInfo);
 
-        // TODO 调用StageService创建场景
-        IStageService stageService = ReferenceFactory.getProxy(IStageService.class, stageInfo.toPoint);
+        // 调用StageService创建场景
+        ToPoint stageServicePoint = new ToPoint(gameProcessName, stageThreadName, StageService.NAME);
+        IStageService stageService = ReferenceFactory.getProxy(IStageService.class, stageServicePoint);
         CompletableFuture<Param> commonStage = stageService.createCommonStage(stageSn, stageId);
         commonStage.thenAccept(param -> {
             logger.info("创建新场景成功: {}", param);

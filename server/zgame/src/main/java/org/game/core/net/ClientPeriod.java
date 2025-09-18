@@ -2,7 +2,7 @@ package org.game.core.net;
 
 public enum ClientPeriod {
     LOGIN(0),
-    SELECT_HUMAN(1),
+    SELECT_PLAYER(1),
     PLAYING(2),
     DISCONNECT(3);
 

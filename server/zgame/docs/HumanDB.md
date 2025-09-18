@@ -44,18 +44,18 @@ public class HModInfo extends HModBase {
 
     // 使用@HumanLoader注解标记加载方法，指定对应的实体类
     @HumanLoader(entity = HumanInfoDB.class)
-    public void loadHumanInfo(List<HumanInfoDB> humanInfoDBs) {
+    public void loadHumanInfo(List<HumanInfoDB> playerInfoDBS) {
         // 处理加载的数据
-        logger.info("加载HumanInfoDB：{}", humanInfoDBs);
+        logger.info("加载HumanInfoDB：{}", playerInfoDBS);
         
         // 可以在这里处理数据，例如：
         // 1. 如果没有数据，则插入默认数据
-        if (humanInfoDBs.isEmpty()) {
-            HumanInfoDB humanInfoDB = new HumanInfoDB();
-            humanInfoDB.setHumanId(humanObj.getId());
-            humanInfoDB.setInfo("这是测试数据");
+        if (playerInfoDBS.isEmpty()) {
+            HumanInfoDB playerInfoDB = new HumanInfoDB();
+            playerInfoDB.setHumanId(humanObj.getId());
+            playerInfoDB.setInfo("这是测试数据");
             
-            MongoDBAsyncClient.insertOne(humanInfoDB);
+            MongoDBAsyncClient.insertOne(playerInfoDB);
         }
         // 2. 将数据保存到模块内部供后续使用
         // 3. 进行数据验证或其他处理

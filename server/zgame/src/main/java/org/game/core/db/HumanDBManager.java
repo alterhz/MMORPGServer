@@ -3,9 +3,9 @@ package org.game.core.db;
 import com.mongodb.client.model.Filters;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.game.core.human.HModScanner;
-import org.game.human.HModBase;
-import org.game.human.HumanObject;
+import org.game.core.human.PlayerModScanner;
+import org.game.player.PlayerModBase;
+import org.game.player.PlayerObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,7 +29,7 @@ public class HumanDBManager {
     /**
      * 加载Human相关DB
      */
-    public static void loadHumanModDB(HumanObject humanObj) {
+    public static void loadHumanModDB(PlayerObject humanObj) {
         for (HumanLoaderMethodInfo humanLoaderMethodInfo : humanLoaderMethodInfos) {
             humanObj.addLoadingHModDB(humanLoaderMethodInfo.getCollectionName());
 
@@ -40,8 +40,8 @@ public class HumanDBManager {
                         protected void onLoadDB(List<Object> dbCollections) {
                             try {
                                 Class<?> hModClass = humanLoaderMethodInfo.getMethod().getDeclaringClass();
-                                HModBase hModBase = humanObj.getHModBase(hModClass);
-                                humanLoaderMethodInfo.getMethod().invoke(hModBase, dbCollections);
+                                PlayerModBase playerModBase = humanObj.getModBase(hModClass);
+                                humanLoaderMethodInfo.getMethod().invoke(playerModBase, dbCollections);
                                 humanObj.removeLoadingHModDB(humanLoaderMethodInfo.getCollectionName());
                                 humanObj.loadHModComplete();
                             } catch (IllegalAccessException | InvocationTargetException e) {
@@ -65,16 +65,16 @@ public class HumanDBManager {
      */
     public static List<HumanLoaderMethodInfo> scanHumanLoaderMethods() {
         List<HumanLoaderMethodInfo> humanLoaderMethodInfos = new ArrayList<>();
-        List<Class<? extends HModBase>> hModClasses = HModScanner.getHModClasses();
+        List<Class<? extends PlayerModBase>> hModClasses = PlayerModScanner.getPlayerModClasses();
         for (Class<?> hModClazz : hModClasses) {
             // 不是HModBase子类，跳过
-            if (!HModBase.class.isAssignableFrom(hModClazz) || hModClazz == HModBase.class) {
+            if (!PlayerModBase.class.isAssignableFrom(hModClazz) || hModClazz == PlayerModBase.class) {
                 continue;
             }
 
             // 遍历类中的所有方法，查找包含@HumanLoader注解的静态方法
             for (Method method : hModClazz.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(HumanLoader.class) && !Modifier.isStatic(method.getModifiers())) {
+                if (method.isAnnotationPresent(PlayerLoader.class) && !Modifier.isStatic(method.getModifiers())) {
                     // 获取HumanLoader注解的值
                     HumanLoaderMethodInfo humanLoaderMethodInfo = createHumanLoaderMethodInfo(method);
                     humanLoaderMethodInfos.add(humanLoaderMethodInfo);
@@ -85,7 +85,7 @@ public class HumanDBManager {
     }
 
     private static HumanLoaderMethodInfo createHumanLoaderMethodInfo(Method method) {
-        HumanLoader loader = method.getAnnotation(HumanLoader.class);
+        PlayerLoader loader = method.getAnnotation(PlayerLoader.class);
         Class<?> entity = loader.entity();
         // 判断entity类是否包含@Entity注解
         if (!entity.isAnnotationPresent(Entity.class)) {

@@ -2,7 +2,7 @@ package org.game.proto.scene;
 
 import org.game.core.message.Proto;
 
-@Proto(value = 2002)
+@Proto(value = 50002)
 public class SCEnterScene {
 
     private long stageSn;

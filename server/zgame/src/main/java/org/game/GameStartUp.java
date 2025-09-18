@@ -1,7 +1,5 @@
 package org.game;
 
-import cn.hutool.core.lang.Snowflake;
-import cn.hutool.core.util.IdUtil;
 import org.game.config.MyConfig;
 import org.game.core.GameProcess;
 import org.game.core.GameServiceBase;
@@ -10,14 +8,15 @@ import org.game.core.db.DaoScanner;
 import org.game.core.db.HumanDBManager;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.MongoDBSyncClient;
-import org.game.core.event.HumanEventDispatcher;
-import org.game.core.human.HumanProtoDispatcher;
+import org.game.core.event.PlayerEventDispatcher;
+import org.game.core.human.PlayerProtoDispatcher;
+import org.game.core.human.PlayerThread;
+import org.game.core.message.ProtoScanner;
 import org.game.core.net.NettyServer;
 import org.game.core.rpc.RPCProxy;
+import org.game.core.stage.HumanProtoDispatcher;
 import org.game.core.stage.StageThread;
 import org.game.core.utils.ScanClassUtils;
-import org.game.core.human.HumanThread;
-import org.game.core.message.ProtoScanner;
 import org.game.core.utils.SnowflakeIdGenerator;
 import org.game.stage.service.StageService;
 
@@ -38,10 +37,12 @@ public class GameStartUp {
             // 初始化Proto
             ProtoScanner.init();
 
-            // HumanProtoListener初始化
-            HumanProtoDispatcher.getInstance().init();
+            // player初始化
+            PlayerProtoDispatcher.getInstance().init();
+            PlayerEventDispatcher.getInstance().init();
 
-            HumanEventDispatcher.getInstance().init();
+            // human初始化
+            HumanProtoDispatcher.getInstance().init();
 
             // DB实体扫描
             DaoScanner.init();
@@ -110,8 +111,8 @@ public class GameStartUp {
     private static void createHumanThreads() {
         int humanThreadCount = MyConfig.getConfig().getHumanThread().getCount();
         for (int i = 0; i < humanThreadCount; i++) {
-            HumanThread humanThread = new HumanThread(i);
-            humanThread.start();
+            PlayerThread playerThread = new PlayerThread(i);
+            playerThread.start();
         }
     }
 

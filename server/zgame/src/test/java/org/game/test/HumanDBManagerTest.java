@@ -7,8 +7,8 @@ import org.game.core.db.DaoScanner;
 import org.game.core.db.HumanDBManager;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.rpc.ToPoint;
-import org.game.dao.HumanDB;
-import org.game.human.HumanObject;
+import org.game.dao.PlayerDB;
+import org.game.player.PlayerObject;
 
 public class HumanDBManagerTest {
     public static void main(String[] args) throws InterruptedException {
@@ -22,10 +22,10 @@ public class HumanDBManagerTest {
 
         HumanDBManager.init();
 
-        HumanDB humanDB = new HumanDB();
-        humanDB.setId(new ObjectId("admin"));
+        PlayerDB playerDB = new PlayerDB();
+        playerDB.setId(new ObjectId("admin"));
 
-        HumanObject humanObj = new HumanObject(humanDB, new ToPoint(), new ToPoint());
+        PlayerObject humanObj = new PlayerObject(playerDB, new ToPoint());
         humanObj.init();
 
         HumanDBManager.loadHumanModDB(humanObj);

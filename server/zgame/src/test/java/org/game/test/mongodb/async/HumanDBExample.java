@@ -6,7 +6,7 @@ import org.game.LogCore;
 import org.game.config.MyConfig;
 import org.game.core.db.DaoScanner;
 import org.game.core.db.MongoDBAsyncClient;
-import org.game.dao.HumanDB;
+import org.game.dao.PlayerDB;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -24,26 +24,26 @@ public class HumanDBExample {
 
         MongoDBAsyncClient.init(MyConfig.getConfig().getMongodb().getUri(), MyConfig.getConfig().getMongodb().getDbName());
 
-        MongoCollection<HumanDB> humans = MongoDBAsyncClient.getCollection(HumanDB.class);
+        MongoCollection<PlayerDB> humans = MongoDBAsyncClient.getCollection(PlayerDB.class);
 
         try {
             // 创建测试对象
-            HumanDB humanDB = new HumanDB();
-            humanDB.setId(null); // 插入时通常为 null，由数据库生成
-            humanDB.setAccount("testuser001");
-            humanDB.setPassword("encodedPassword123"); // 实际应使用 BCrypt 加密
-            humanDB.setName("张三");
-            humanDB.setSex(true); // true 表示男性
-            humanDB.setEmail("zhangsan@example.com");
-            humanDB.setPhoneNumber("13800138000");
-            humanDB.setBirthDate(java.time.LocalDate.of(1990, 5, 20));
-            humanDB.setAddress("北京市朝阳区");
-            humanDB.setIdCardNumber("110101199005201234");
-            humanDB.setRegisterTime(java.time.LocalDateTime.now());
-            humanDB.setLastLoginTime(java.time.LocalDateTime.now());
-            humanDB.setIsActive(true);
-            humanDB.setAvatarUrl("https://example.com/avatar/zhangsan.jpg");
-            humanDB.setNickname("三哥");
+            PlayerDB playerDB = new PlayerDB();
+            playerDB.setId(null); // 插入时通常为 null，由数据库生成
+            playerDB.setAccount("testuser001");
+            playerDB.setPassword("encodedPassword123"); // 实际应使用 BCrypt 加密
+            playerDB.setName("张三");
+            playerDB.setSex(true); // true 表示男性
+            playerDB.setEmail("zhangsan@example.com");
+            playerDB.setPhoneNumber("13800138000");
+            playerDB.setBirthDate(java.time.LocalDate.of(1990, 5, 20));
+            playerDB.setAddress("北京市朝阳区");
+            playerDB.setIdCardNumber("110101199005201234");
+            playerDB.setRegisterTime(java.time.LocalDateTime.now());
+            playerDB.setLastLoginTime(java.time.LocalDateTime.now());
+            playerDB.setIsActive(true);
+            playerDB.setAvatarUrl("https://example.com/avatar/zhangsan.jpg");
+            playerDB.setNickname("三哥");
 
             // 插入一条数据（假设 insertOne 返回 Mono<HumanDB>）
 //            humans.insertOne(humanDB)

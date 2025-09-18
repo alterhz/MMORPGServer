@@ -6,14 +6,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.config.MyConfig;
 import org.game.core.*;
-import org.game.core.human.HumanThread;
 import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.global.rpc.IClientService;
 import org.game.global.rpc.ILoginService;
-import org.game.human.rpc.IHumanService;
+import org.game.player.rpc.IPlayerService;
+import org.game.stage.rpc.IHumanService;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -50,8 +50,10 @@ public class ClientService  extends GameServiceBase implements IClientService {
     private final BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
 
     private String humanId;
-    // 角色连接点
-    private ToPoint humanToPoint;
+    // 玩家连接点
+    private ToPoint playerPoint;
+    // 场景连接点
+    private ToPoint humanPoint;
 
     public ClientService(long clientID, Channel channel) {
         super(String.valueOf(clientID));
@@ -110,10 +112,17 @@ public class ClientService  extends GameServiceBase implements IClientService {
     }
 
     @Override
-    public void setHumanToPoint(String humanId, ToPoint humanPoint) {
+    public void setPlayerPoint(String humanId, ToPoint playerPoint) {
         this.humanId = humanId;
-        this.humanToPoint = humanPoint;
+        this.playerPoint = playerPoint;
         this.period = ClientPeriod.PLAYING;
+        logger.info("ClientService 设置Player连接点, id={}, humanId={}, playerPoint={}", getName(), humanId, playerPoint);
+    }
+
+    @Override
+    public void setStageHumanToPoint(ToPoint humanPoint) {
+        this.humanPoint = humanPoint;
+        logger.info("ClientService 设置Human连接点, id={}, humanId={}, humanPoint={}", getName(), humanId, humanPoint);
     }
 
     @Override
@@ -163,15 +172,20 @@ public class ClientService  extends GameServiceBase implements IClientService {
     private void onDispatchMessage(Message message) {
         switch (period) {
             case LOGIN:
-            case SELECT_HUMAN:
+            case SELECT_PLAYER:
                 ToPoint fromPoint = new ToPoint(GameProcess.getGameProcessName(), GameThread.getCurrentThreadName(), getName());
                 ILoginService loginService = ReferenceFactory.getProxy(ILoginService.class);
                 loginService.dispatch(message, fromPoint);
                 break;
             case PLAYING:
-                // 处理游戏请求
-                IHumanService humanService = ReferenceFactory.getProxy(IHumanService.class, humanToPoint);
-                humanService.dispatchProto(message);
+                // 处理游戏请求，协议ID大于50000，转发到场景服务
+                if (message.getProtoID() < 50000) {
+                    IPlayerService humanService = ReferenceFactory.getProxy(IPlayerService.class, playerPoint);
+                    humanService.dispatchProto(message);
+                } else {
+                    IHumanService humanService = ReferenceFactory.getProxy(IHumanService.class, humanPoint);
+                    humanService.dispatchProto(message);
+                }
                 break;
             case DISCONNECT:
                 // 处理断线请求

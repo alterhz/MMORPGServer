@@ -1,16 +1,16 @@
 package org.game.core.rpc;
 
-import org.game.human.HumanObject;
+import org.game.player.PlayerObject;
 
 public class HumanServiceBase {
 
-    protected final HumanObject humanObj;
+    protected final PlayerObject humanObj;
 
-    public HumanServiceBase(HumanObject humanObj) {
+    public HumanServiceBase(PlayerObject humanObj) {
         this.humanObj = humanObj;
     }
 
-    public HumanObject getHumanObj() {
+    public PlayerObject getHumanObj() {
         return humanObj;
     }
 }

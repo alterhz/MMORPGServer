@@ -4,9 +4,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.rpc.ReferenceFactory;
-import org.game.core.utils.SnowflakeIdGenerator;
 import org.game.global.rpc.IStageGlobalService;
-import org.game.stage.unit.StageHumanObject;
+import org.game.stage.human.HumanObject;
 import org.game.stage.unit.UnitObject;
 
 import java.util.HashMap;
@@ -24,7 +23,7 @@ public class StageObject {
 
     private final Map<Long, UnitObject> stageUnits = new HashMap<>();
 
-    private final Map<String, StageHumanObject> prepareEnterStageHumans = new HashMap<>();
+    private final Map<String, HumanObject> prepareEnterStageHumans = new HashMap<>();
 
     public StageObject(int stageSn, long stageId) {
         this.stageSn = stageSn;
@@ -39,7 +38,7 @@ public class StageObject {
         return stageId;
     }
 
-    public void humanEnter(StageHumanObject stageHumanObj) {
+    public void humanEnter(HumanObject stageHumanObj) {
         if (stageUnits.containsKey(stageHumanObj.getUnitId())) {
             logger.error("stageHumanObj already exist. stageHumanObj: {}", stageHumanObj);
             return;
@@ -51,7 +50,7 @@ public class StageObject {
         stageGlobalService.humanEnter(stageId);
     }
 
-    public void humanLeave(StageHumanObject stageHumanObj) {
+    public void humanLeave(HumanObject stageHumanObj) {
         if (!stageUnits.containsKey(stageHumanObj.getUnitId())) {
             logger.error("stageHumanObj not exist. stageHumanObj: {}", stageHumanObj);
             return;

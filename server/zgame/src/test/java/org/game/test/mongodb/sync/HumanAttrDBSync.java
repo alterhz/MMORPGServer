@@ -5,7 +5,7 @@ import org.game.BaseUtils;
 import org.game.LogCore;
 import org.game.config.MyConfig;
 import org.game.core.db.MongoDBSyncClient;
-import org.game.dao.HumanAttrDB;
+import org.game.dao.PlayerAttrDB;
 
 public class HumanAttrDBSync {
     public static void main(String[] args) {
@@ -16,17 +16,17 @@ public class HumanAttrDBSync {
         MongoDBSyncClient.init(MyConfig.getConfig().getMongodb().getUri(), MyConfig.getConfig().getMongodb().getDbName());
 
         try {
-            MongoCollection<HumanAttrDB> humanAttrs = MongoDBSyncClient.getOrCreateCollection("humanAttrs", HumanAttrDB.class);
+            MongoCollection<PlayerAttrDB> humanAttrs = MongoDBSyncClient.getOrCreateCollection("humanAttrs", PlayerAttrDB.class);
 
             humanAttrs.drop();
 
-            HumanAttrDB humanAttrDB = new HumanAttrDB();
-            humanAttrDB.setId(null);
-            humanAttrDB.setHumanId("admin");
-            humanAttrDB.setDescription("ok");
+            PlayerAttrDB playerAttrDB = new PlayerAttrDB();
+            playerAttrDB.setId(null);
+            playerAttrDB.setPlayerId("admin");
+            playerAttrDB.setDescription("ok");
 
 
-            humanAttrs.insertOne(humanAttrDB);
+            humanAttrs.insertOne(playerAttrDB);
 
             humanAttrs.find().forEach(human -> {
                 LogCore.logger.info("human={}", human);

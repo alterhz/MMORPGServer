@@ -6,10 +6,10 @@ import org.game.core.GameServiceBase;
 import org.game.core.GameThread;
 import org.game.core.Param;
 import org.game.core.utils.SnowflakeIdGenerator;
-import org.game.stage.StageHumanData;
+import org.game.stage.human.HumanObjectData;
 import org.game.stage.StageObject;
 import org.game.stage.rpc.IStageObjectService;
-import org.game.stage.unit.StageHumanObject;
+import org.game.stage.human.HumanObject;
 
 public class StageObjectService extends GameServiceBase implements IStageObjectService {
 
@@ -43,15 +43,16 @@ public class StageObjectService extends GameServiceBase implements IStageObjectS
     }
 
     @Override
-    public void registerStageHuman(StageHumanData stageHumanData) {
+    public void registerStageHuman(HumanObjectData humanObjectData) {
         GameThread currentGameThread = GameThread.getCurrentGameThread();
-        if (currentGameThread.getGameService(stageHumanData.getHumanId()) != null) {
-            logger.error("角色已经在当前线程: {}。humanId={}", currentGameThread.getName(), stageHumanData.getHumanId());
+        if (currentGameThread.getGameService(humanObjectData.getPlayerId()) != null) {
+            logger.error("角色已经在当前线程: {}。humanId={}", currentGameThread.getName(), humanObjectData.getPlayerId());
         }
 
         long id = SnowflakeIdGenerator.getInstance().nextId();
-        StageHumanObject stageHumanObject = new StageHumanObject(stageObj, id, stageHumanData.getHumanId());
-        StageHumanObjectService stageHumanObjectService = new StageHumanObjectService(stageHumanData.getHumanId(), stageHumanObject);
+        HumanObject stageHumanObj = new HumanObject(stageObj, id, humanObjectData.getPlayerId());
+        stageHumanObj.setClientPoint(humanObjectData.getClientPoint());
+        HumanService stageHumanObjectService = new HumanService(stageHumanObj);
 
         currentGameThread.addGameService(stageHumanObjectService);
         currentGameThread.runTask(() -> {

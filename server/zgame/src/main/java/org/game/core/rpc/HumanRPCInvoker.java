@@ -6,10 +6,10 @@ import org.apache.logging.log4j.Logger;
 import org.game.core.GameProcess;
 import org.game.core.GameThread;
 import org.game.core.ServiceRegistryManager;
-import org.game.core.human.HumanLookup;
-import org.game.core.human.HumanThread;
+import org.game.core.human.PlayerLookup;
+import org.game.core.human.PlayerThread;
 import org.game.core.utils.JsonUtils;
-import org.game.human.rpc.IHumanService;
+import org.game.player.rpc.IPlayerService;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -61,7 +61,7 @@ public class HumanRPCInvoker implements InvocationHandler {
         FromPoint fromPoint = new FromPoint(gameProcessName, currentThreadName); // 实际应用中需要获取当前进程和线程名
 
         // 如果ToPoint为空，则创建一个默认的ToPoint
-        ToPoint targetPoint = new ToPoint(gameProcessName, HumanThread.NAME, humanId);
+        ToPoint targetPoint = new ToPoint(gameProcessName, PlayerThread.NAME, humanId);
 
         // 构造参数类型列表
         Class<?>[] paramTypes = method.getParameterTypes();
@@ -89,7 +89,7 @@ public class HumanRPCInvoker implements InvocationHandler {
 
 
         // 构造RpcInvocation
-        RpcInvocation invocation = new RpcInvocation(fromPoint, targetPoint, IHumanService.DISPATCH_METHOD_NAME, dispatchMethodArgs, dispatchMethodArgsTypes);
+        RpcInvocation invocation = new RpcInvocation(fromPoint, targetPoint, IPlayerService.DISPATCH_METHOD_NAME, dispatchMethodArgs, dispatchMethodArgsTypes);
 
         // 生成唯一请求ID
         String requestId = UUID.randomUUID().toString();
@@ -153,9 +153,9 @@ public class HumanRPCInvoker implements InvocationHandler {
         if (StringUtils.isBlank(targetThreadName)) {
             String gameServiceName = request.getInvocation().getToPoint().getGameServiceName();
             targetThreadName = ServiceRegistryManager.getServiceGameThreadName(gameServiceName);
-        } else if (targetThreadName.equals(HumanThread.NAME)) {
+        } else if (targetThreadName.equals(PlayerThread.NAME)) {
             // 查找humanId所在的GameThread
-            String humanThreadName = HumanLookup.getHumanThreadName(request.getInvocation().getToPoint().getGameServiceName());
+            String humanThreadName = PlayerLookup.getHumanThreadName(request.getInvocation().getToPoint().getGameServiceName());
             targetThreadName = humanThreadName;
         }
 
