@@ -10,7 +10,7 @@ import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.core.stage.StageHumanModScanner;
 import org.game.global.rpc.IClientService;
-import org.game.proto.scene.SCEnterScene;
+import org.game.proto.scene.StageReadyNotify;
 import org.game.stage.StageObject;
 import org.game.stage.human.module.HumanModBase;
 import org.game.stage.unit.UnitObject;
@@ -29,8 +29,8 @@ public class HumanObject extends UnitObject {
 
     private final Map<Class<?>, HumanModBase> stageHumanModMap = new HashMap<>();
 
-    public HumanObject(StageObject stageObject, long unitId, String humanId) {
-        super(unitId, stageObject);
+    public HumanObject(StageObject stageObj, long unitId, String humanId) {
+        super(unitId, stageObj);
         this.humanId = humanId;
     }
 
@@ -54,8 +54,9 @@ public class HumanObject extends UnitObject {
         ToPoint stageHumanPoint = new ToPoint(GameProcess.getGameProcessName(), GameThread.getCurrentThreadName(), humanId);
         clientService.setStageHumanToPoint(stageHumanPoint);
 
-        SCEnterScene scEnterScene = new SCEnterScene();
-        sendMessage(scEnterScene);
+        StageReadyNotify stageReadyNotify = new StageReadyNotify();
+        stageReadyNotify.setStageSn(stageObj.getStageSn());
+        sendMessage(stageReadyNotify);
     }
 
     public <T> void sendMessage(T jsonObject) {

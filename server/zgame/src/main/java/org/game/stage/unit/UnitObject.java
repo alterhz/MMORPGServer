@@ -6,7 +6,7 @@ public abstract class UnitObject {
 
     private final long unitId;
 
-    private final StageObject stageObj;
+    protected final StageObject stageObj;
 
     public UnitObject(long unitId, StageObject stageObj) {
         this.unitId = unitId;

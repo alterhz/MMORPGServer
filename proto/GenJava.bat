@@ -37,6 +37,7 @@ for /D %%F in (%PROTO_DIR%\*) do (
 )
 
 echo All JSON files processed!
+pause
 
 cd ../server/dist
 call GenProtoIds.bat

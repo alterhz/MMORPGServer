@@ -6,8 +6,9 @@ import org.apache.logging.log4j.Logger;
 import org.game.core.message.ProtoListener;
 import org.game.core.net.Message;
 import org.game.proto.login.*;
-import org.game.proto.scene.CSEnterScene;
-import org.game.proto.scene.SCEnterScene;
+import org.game.proto.scene.EnterStageRequest;
+import org.game.proto.scene.EnterStageResponse;
+import org.game.proto.scene.StageReadyNotify;
 import org.game.test.net.ClientProtoDispatcher;
 
 public class LoginHandler extends ClientProtoDispatcher {
@@ -93,16 +94,23 @@ public class LoginHandler extends ClientProtoDispatcher {
         sendMessage(csTest);
     }
 
+    // StageReadyNotify
+    @ProtoListener(StageReadyNotify.class)
+    public void onStageReadyNotify(Message message) {
+        StageReadyNotify stageReadyNotify = message.getProto(StageReadyNotify.class);
+        logger.info("场景准备就绪:stageSn={}", stageReadyNotify.getStageSn());
+
+        EnterStageRequest enterStageRequest = new EnterStageRequest();
+        sendMessage(enterStageRequest);
+        logger.info("请求进入场景");
+    }
 
     // SCEnterScene
-    @ProtoListener(SCEnterScene.class)
-    public void onEnterScene(Message message) {
+    @ProtoListener(EnterStageResponse.class)
+    public void onEnterStage(Message message) {
         // 处理消息
-        SCEnterScene scEnterScene = message.getProto(SCEnterScene.class);
-        logger.info("进入场景成功:{}", scEnterScene);
-
-        CSEnterScene csEnterScene = new CSEnterScene();
-        sendMessage(csEnterScene);
+        EnterStageResponse enterStageResponse = message.getProto(EnterStageResponse.class);
+        logger.info("进入场景成功:{}", enterStageResponse);
     }
 
     // 测试

@@ -1,0 +1,26 @@
+{
+  "units": [
+    {
+      "unitId": 2000100000000001,
+      "name": "Warrior",
+      "position": {
+        "x": 10.5,
+        "y": 0.0,
+        "z": 25.3
+      },
+      "currentHealth": 85,
+      "maxHealth": 100
+    },
+    {
+      "unitId": 2000100000000002,
+      "name": "Mage",
+      "position": {
+        "x": 12.1,
+        "y": 1.0,
+        "z": 27.8
+      },
+      "currentHealth": 60,
+      "maxHealth": 80
+    }
+  ]
+}
