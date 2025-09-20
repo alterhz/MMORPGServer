@@ -4,6 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.GameProcess;
 import org.game.core.GameThread;
+import org.game.core.event.HumanEventDispatcher;
+import org.game.core.event.IEvent;
 import org.game.core.message.ProtoScanner;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
@@ -12,6 +14,7 @@ import org.game.core.stage.StageHumanModScanner;
 import org.game.global.rpc.IClientService;
 import org.game.proto.scene.StageReadyNotify;
 import org.game.stage.StageObject;
+import org.game.stage.human.event.OnStageReadyEvent;
 import org.game.stage.human.module.HumanModBase;
 import org.game.stage.unit.UnitObject;
 
@@ -57,12 +60,25 @@ public class HumanObject extends UnitObject {
         StageReadyNotify stageReadyNotify = new StageReadyNotify();
         stageReadyNotify.setStageSn(stageObj.getStageSn());
         sendMessage(stageReadyNotify);
+
+        fireEvent(new OnStageReadyEvent());
     }
 
     public <T> void sendMessage(T jsonObject) {
         int protoID = ProtoScanner.getProtoID(jsonObject.getClass());
         IClientService proxy = ReferenceFactory.getProxy(IClientService.class, clientPoint);
         proxy.sendMessage(Message.createMessage(protoID, jsonObject));
+    }
+
+    /**
+     * HumanObject事件
+     */
+    public void fireEvent(IEvent event) {
+        String eventKey = event.getClass().getSimpleName().toLowerCase();
+        HumanEventDispatcher.getInstance().dispatch(eventKey, method -> {
+            Class<?> modClass = method.getDeclaringClass();
+            return getModBase(modClass);
+        }, event);
     }
 
     private void InitMods() {

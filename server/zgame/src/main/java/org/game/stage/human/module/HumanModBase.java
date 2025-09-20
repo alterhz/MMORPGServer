@@ -1,5 +1,7 @@
 package org.game.stage.human.module;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.game.stage.human.HumanObject;
 
 /**
@@ -7,19 +9,21 @@ import org.game.stage.human.HumanObject;
  */
 public class HumanModBase {
 
-    private final HumanObject stageHumanObj;
+    public static final Logger logger = LogManager.getLogger(HumanModBase.class);
 
-    public HumanModBase(HumanObject stageHumanObj)
+    private final HumanObject humanObj;
+
+    public HumanModBase(HumanObject humanObj)
     {
-        this.stageHumanObj = stageHumanObj;
+        this.humanObj = humanObj;
     }
 
-    public HumanObject getStageHumanObj()
+    public HumanObject getHumanObj()
     {
-        return stageHumanObj;
+        return humanObj;
     }
 
     public <T extends HumanModBase> T getMod(Class<T> clazz) {
-        return stageHumanObj.getMod(clazz);
+        return humanObj.getMod(clazz);
     }
 }

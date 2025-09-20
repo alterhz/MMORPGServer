@@ -126,8 +126,8 @@ public class PlayerObject {
     public void fireEvent(IEvent event) {
         String eventKey = event.getClass().getSimpleName().toLowerCase();
         PlayerEventDispatcher.getInstance().dispatch(eventKey, method -> {
-            Class<?> hModClass = method.getDeclaringClass();
-            return getModBase(hModClass);
+            Class<?> modClass = method.getDeclaringClass();
+            return getModBase(modClass);
         }, event);
     }
 

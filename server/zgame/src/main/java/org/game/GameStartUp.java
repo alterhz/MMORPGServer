@@ -8,6 +8,7 @@ import org.game.core.db.DaoScanner;
 import org.game.core.db.HumanDBManager;
 import org.game.core.db.MongoDBAsyncClient;
 import org.game.core.db.MongoDBSyncClient;
+import org.game.core.event.HumanEventDispatcher;
 import org.game.core.event.PlayerEventDispatcher;
 import org.game.core.human.PlayerProtoDispatcher;
 import org.game.core.human.PlayerThread;
@@ -43,6 +44,7 @@ public class GameStartUp {
 
             // human初始化
             HumanProtoDispatcher.getInstance().init();
+            HumanEventDispatcher.getInstance().init();
 
             // DB实体扫描
             DaoScanner.init();
