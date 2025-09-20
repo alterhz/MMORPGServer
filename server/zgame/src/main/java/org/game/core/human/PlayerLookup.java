@@ -18,21 +18,21 @@ public class PlayerLookup {
 
     public static final Logger logger = LogManager.getLogger(PlayerLookup.class);
 
-    private static final Map<String, HumanLocation> humanIdMap = new ConcurrentHashMap<>();
-    private static final Map<String, HumanLocation> accountMap = new ConcurrentHashMap<>();
+    private static final Map<Long, PlayerLocation> playerIdMap = new ConcurrentHashMap<>();
+    private static final Map<String, PlayerLocation> accountMap = new ConcurrentHashMap<>();
 
-    public static void add(String humanId, String account, String threadName) {
+    public static void add(long humanId, String account, String threadName) {
         // 添加ID映射
-        humanIdMap.put(humanId, new HumanLocation(humanId, threadName, account));
+        playerIdMap.put(humanId, new PlayerLocation(humanId, threadName, account));
         // 添加账号映射
-        accountMap.put(account, new HumanLocation(humanId, threadName, account));
+        accountMap.put(account, new PlayerLocation(humanId, threadName, account));
     }
 
     public static void remove(String humanId) {
-        HumanLocation humanLocation = humanIdMap.get(humanId);
-        if (humanLocation != null) {
-            humanIdMap.remove(humanId);
-            accountMap.remove(humanLocation.getAccount());
+        PlayerLocation playerLocation = playerIdMap.get(humanId);
+        if (playerLocation != null) {
+            playerIdMap.remove(humanId);
+            accountMap.remove(playerLocation.getAccount());
         }
     }
 
@@ -40,51 +40,52 @@ public class PlayerLookup {
      * 获取玩家线程名称
      */
     public static String getHumanThreadName(String humanId) {
-        HumanLocation humanLocation = humanIdMap.get(humanId);
-        if (humanLocation != null) {
-            return humanLocation.getThreadName();
+        PlayerLocation playerLocation = playerIdMap.get(humanId);
+        if (playerLocation != null) {
+            return playerLocation.getThreadName();
         }
         return null;
     }
 
-    public static HumanLocation getByHumanIdSafely(String humanId) {
-        return humanIdMap.get(humanId);
+    public static PlayerLocation getByHumanIdSafely(String humanId) {
+        return playerIdMap.get(humanId);
     }
 
-    public static HumanLocation getByAccountSafely(String account) {
+    public static PlayerLocation getByAccountSafely(String account) {
         return accountMap.get(account);
     }
 
     public static void KickPlayerByAccount(String account) {
-        HumanLocation humanLocation = accountMap.get(account);
-        if (humanLocation != null) {
-            GameThread humanThread = GameProcess.getGameThread(humanLocation.threadName);
+        PlayerLocation playerLocation = accountMap.get(account);
+        if (playerLocation != null) {
+            GameThread humanThread = GameProcess.getGameThread(playerLocation.threadName);
             if (humanThread != null) {
                 humanThread.runTask(() -> {
-                    PlayerService humanService = (PlayerService)humanThread.getGameService(humanLocation.humanId);
+                    PlayerService humanService = (PlayerService)humanThread.getGameService(String.valueOf(playerLocation.playerId));
                     if (humanService != null) {
                         PlayerObject humanObj = humanService.getHumanObj();
                         humanObj.disconnect();
                         humanThread.removeGameService(humanService);
+                        logger.info("KickPlayerByAccount: {}", humanObj);
                     }
                 });
             }
         }
     }
 
-    public static class HumanLocation {
-        private final String humanId;
+    public static class PlayerLocation {
+        private final long playerId;
         private final String threadName;
         private final String account;
         
-        public HumanLocation(String humanId, String threadName, String account) {
-            this.humanId = humanId;
+        public PlayerLocation(long playerId, String threadName, String account) {
+            this.playerId = playerId;
             this.threadName = threadName;
             this.account = account;
         }
 
-        public String getHumanId() {
-            return humanId;
+        public long getPlayerId() {
+            return playerId;
         }
 
         public String getThreadName() {
@@ -98,7 +99,7 @@ public class PlayerLookup {
         @Override
         public String toString() {
             return new ToStringBuilder(this)
-                    .append("humanId", humanId)
+                    .append("humanId", playerId)
                     .append("threadName", threadName)
                     .append("account", account)
                     .toString();

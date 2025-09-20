@@ -7,7 +7,7 @@ import org.game.core.db.Entity;
 @Entity(collectionName = "PlayerInfos")
 public class PlayerInfoDB {
     private ObjectId id;
-    private String playerId;
+    private long playerId;
     private String info;
 
     public ObjectId getId() {
@@ -18,11 +18,11 @@ public class PlayerInfoDB {
         this.id = id;
     }
 
-    public String getPlayerId() {
+    public long getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(String playerId) {
+    public void setPlayerId(long playerId) {
         this.playerId = playerId;
     }
 

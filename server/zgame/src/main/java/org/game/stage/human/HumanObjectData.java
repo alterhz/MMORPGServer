@@ -5,18 +5,18 @@ import org.game.core.rpc.ToPoint;
 
 public class HumanObjectData {
 
-    private String playerId;
+    private long playerId;
 
     private ToPoint clientPoint;
 
     public HumanObjectData() {
     }
 
-    public String getPlayerId() {
+    public long getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(String playerId) {
+    public void setPlayerId(long playerId) {
         this.playerId = playerId;
     }
 

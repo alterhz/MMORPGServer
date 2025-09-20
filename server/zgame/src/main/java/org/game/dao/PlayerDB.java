@@ -1,5 +1,6 @@
 package org.game.dao;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bson.types.ObjectId;
 import org.game.core.db.Entity;
 
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 @Entity(collectionName = "Players")
 public class PlayerDB {
     private ObjectId id;
+    private long playerId;
     private String account;
     private String password;
     private String name;
@@ -37,6 +39,14 @@ public class PlayerDB {
 
     public void setId(ObjectId id) {
         this.id = id;
+    }
+
+    public long getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(long playerId) {
+        this.playerId = playerId;
     }
 
     public String getAccount() {
@@ -161,22 +171,23 @@ public class PlayerDB {
 
     @Override
     public String toString() {
-        return "HumanDB{" +
-                "id=" + id +
-                ", account='" + account + '\'' +
-                ", name='" + name + '\'' +
-                ", sex=" + (sex != null ? (sex ? "男" : "女") : "未知") +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", birthDate=" + birthDate +
-                ", age=" + getAge() +
-                ", address='" + address + '\'' +
-                ", idCardNumber='" + idCardNumber + '\'' +
-                ", registerTime=" + registerTime +
-                ", lastLoginTime=" + lastLoginTime +
-                ", isActive=" + isActive +
-                ", avatarUrl='" + avatarUrl + '\'' +
-                ", nickname='" + nickname + '\'' +
-                '}';
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("playerId", playerId)
+                .append("account", account)
+                .append("password", password)
+                .append("name", name)
+                .append("sex", sex)
+                .append("email", email)
+                .append("phoneNumber", phoneNumber)
+                .append("birthDate", birthDate)
+                .append("address", address)
+                .append("idCardNumber", idCardNumber)
+                .append("registerTime", registerTime)
+                .append("lastLoginTime", lastLoginTime)
+                .append("isActive", isActive)
+                .append("avatarUrl", avatarUrl)
+                .append("nickname", nickname)
+                .toString();
     }
 }

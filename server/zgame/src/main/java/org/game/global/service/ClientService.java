@@ -49,7 +49,7 @@ public class ClientService  extends GameServiceBase implements IClientService {
     // 添加消息队列，用于存储待处理的消息结构体
     private final BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
 
-    private String humanId;
+    private long playerId;
     // 玩家连接点
     private ToPoint playerPoint;
     // 场景连接点
@@ -112,17 +112,17 @@ public class ClientService  extends GameServiceBase implements IClientService {
     }
 
     @Override
-    public void setPlayerPoint(String humanId, ToPoint playerPoint) {
-        this.humanId = humanId;
+    public void setPlayerPoint(long playerId, ToPoint playerPoint) {
+        this.playerId = playerId;
         this.playerPoint = playerPoint;
         this.period = ClientPeriod.PLAYING;
-        logger.info("ClientService 设置Player连接点, id={}, humanId={}, playerPoint={}", getName(), humanId, playerPoint);
+        logger.info("ClientService 设置Player连接点, id={}, humanId={}, playerPoint={}", getName(), playerId, playerPoint);
     }
 
     @Override
     public void setStageHumanToPoint(ToPoint humanPoint) {
         this.humanPoint = humanPoint;
-        logger.info("ClientService 设置Human连接点, id={}, humanId={}, humanPoint={}", getName(), humanId, humanPoint);
+        logger.info("ClientService 设置Human连接点, id={}, humanId={}, humanPoint={}", getName(), playerId, humanPoint);
     }
 
     @Override

@@ -47,12 +47,11 @@ public class StageObjectService extends GameServiceBase implements IStageObjectS
     @Override
     public CompletableFuture<Boolean> registerStageHuman(HumanObjectData humanObjectData) {
         GameThread currentGameThread = GameThread.getCurrentGameThread();
-        if (currentGameThread.getGameService(humanObjectData.getPlayerId()) != null) {
+        if (currentGameThread.getGameService(String.valueOf(humanObjectData.getPlayerId())) != null) {
             logger.error("角色已经在当前线程: {}。humanId={}", currentGameThread.getName(), humanObjectData.getPlayerId());
         }
 
-        long id = SnowflakeIdGenerator.getInstance().nextId();
-        HumanObject stageHumanObj = new HumanObject(stageObj, id, humanObjectData.getPlayerId());
+        HumanObject stageHumanObj = new HumanObject(stageObj, humanObjectData.getPlayerId());
         stageHumanObj.setClientPoint(humanObjectData.getClientPoint());
         HumanService stageHumanObjectService = new HumanService(stageHumanObj);
 

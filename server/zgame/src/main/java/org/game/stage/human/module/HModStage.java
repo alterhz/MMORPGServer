@@ -28,7 +28,7 @@ public class HModStage extends HumanModBase {
     @EventListener
     public void onStageReady(OnStageReadyEvent event) {
         HumanObject humanObj = getHumanObj();
-        logger.info("HModStage.onStageReady: humanId={}", humanObj.getHumanId());
+        logger.info("HModStage.onStageReady: humanId={}", humanObj.getUnitId());
     }
 
 }

@@ -29,7 +29,7 @@ public class PlayerObject {
 
     public static final Logger logger = LogManager.getLogger(PlayerObject.class);
 
-    private final String id;
+    private final long id;
 
     private ToPoint clientPoint;
 
@@ -53,12 +53,12 @@ public class PlayerObject {
     private final TimerQueue timerQueue = new TimerQueue();
 
     public PlayerObject(PlayerDB playerDB, ToPoint playerPoint) {
-        this.id = playerDB.getId().toHexString();
+        this.id = playerDB.getPlayerId();
         this.playerDB = playerDB;
         this.playerPoint = playerPoint;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 

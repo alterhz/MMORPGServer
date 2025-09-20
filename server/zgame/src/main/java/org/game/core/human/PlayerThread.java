@@ -5,8 +5,11 @@ import org.game.core.GameThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.db.HumanDBManager;
+import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.dao.PlayerDB;
+import org.game.global.rpc.IServerService;
+import org.game.global.service.ServerService;
 import org.game.player.PlayerObject;
 import org.game.player.service.PlayerService;
 
@@ -62,7 +65,7 @@ public class PlayerThread extends GameThread {
     public static void loadPlayerObj(PlayerDB playerDB, ToPoint clientPoint) {
         logger.info("加载玩家对象: {}", playerDB);
 
-        String humanId = playerDB.getId().toHexString();
+        long playerId = playerDB.getPlayerId();
 
         // 随机分配一个线程
         long count = allocCount.getAndIncrement();
@@ -70,7 +73,11 @@ public class PlayerThread extends GameThread {
         PlayerThread playerThread = getHumanThread(threadIndex);
 
         // HumanObject连接点
-        ToPoint humanPoint = new ToPoint(GameProcess.getGameProcessName(), playerThread.getName(), humanId);
+        ToPoint humanPoint = new ToPoint(GameProcess.getGameProcessName(), playerThread.getName(), String.valueOf(playerId));
+
+        long allocHumanId = ServerService.idAllocator.allocateId();
+        IServerService serverService = ReferenceFactory.getProxy(IServerService.class);
+        serverService.updateId();
 
         PlayerObject humanObj = new PlayerObject(playerDB, humanPoint);
         humanObj.setClientPoint(clientPoint);

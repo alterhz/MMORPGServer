@@ -17,7 +17,7 @@ public class HumanService extends GameServiceBase implements IHumanService {
     private final HumanObject humanObj;
     
     public HumanService(HumanObject humanObj) {
-        super(humanObj.getHumanId());
+        super(String.valueOf(humanObj.getUnitId()));
         this.humanObj = humanObj;
     }
 

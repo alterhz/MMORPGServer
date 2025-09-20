@@ -12,7 +12,7 @@ public interface IClientService {
 
     void changePeriod(ClientPeriod period);
 
-    void setPlayerPoint(String humanId, ToPoint humanPoint);
+    void setPlayerPoint(long playerId, ToPoint humanPoint);
 
     void setStageHumanToPoint(ToPoint stageHumanPoint);
 

@@ -6,12 +6,15 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.InsertOneResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import java.util.List;
 
@@ -61,9 +64,11 @@ public class MongoDBSyncClient {
     /**
      * 使用默认数据库名获取集合
      */
-    public static <T> MongoCollection<T> getCollection(String collectionName, Class<T> clazz) {
+    public static <T> MongoCollection<T> getCollection(Class<T> clazz) {
+        String collectionName = DaoScanner.getCollectionName(clazz);
         return getDatabase().getCollection(collectionName, clazz);
     }
+
 
     /**
      * 获取默认数据库对象
@@ -97,11 +102,33 @@ public class MongoDBSyncClient {
             }
         }
 
-        return getCollection(collectionName, clazz);
+        return getDatabase().getCollection(collectionName, clazz);
+    }
+
+    public static <T> MongoCollection<T> getOrCreateCollection(Class<T> clazz) {
+        String collectionName = DaoScanner.getCollectionName(clazz);
+        return getDatabase().getCollection(collectionName, clazz);
     }
 
     public static MongoCollection<Document> getOrCreateCollection(String collectionName) {
         return getOrCreateCollection(collectionName, Document.class);
+    }
+
+    public static <T> boolean insertOne(T obj) {
+        try {
+            Entity annotation = obj.getClass().getAnnotation(Entity.class);
+            if (annotation == null) {
+                logger.error("Entity annotation not found on class: {}", obj.getClass().getName());
+                return false;
+            }
+            String collectionName = annotation.collectionName();
+            Class<T> clazz = (Class<T>) obj.getClass();
+            InsertOneResult insertOneResult = getCollection(clazz).insertOne(obj);
+            return insertOneResult.wasAcknowledged();
+        } catch (Exception e) {
+            logger.error("Failed to insert document into collection: {}", obj, e);
+            return false;
+        }
     }
 
     /**

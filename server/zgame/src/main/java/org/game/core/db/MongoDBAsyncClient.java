@@ -3,6 +3,7 @@ package org.game.core.db;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.result.InsertOneResult;
+import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoCollection;
@@ -107,5 +108,27 @@ public class MongoDBAsyncClient {
     // 应用关闭时调用
     public static void close() {
         client.close();
+    }
+
+    public static class UpdateSubscriber implements Subscriber<UpdateResult> {
+        @Override
+        public void onSubscribe(Subscription s) {
+            s.request(1);
+        }
+
+        @Override
+        public void onNext(UpdateResult updateResult) {
+            logger.debug("数据库更新成功，修改了 {} 条记录", updateResult.getModifiedCount());
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            logger.error("数据库更新失败", t);
+        }
+
+        @Override
+        public void onComplete() {
+            logger.debug("数据库更新完成");
+        }
     }
 }

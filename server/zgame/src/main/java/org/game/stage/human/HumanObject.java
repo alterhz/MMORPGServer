@@ -26,19 +26,15 @@ public class HumanObject extends UnitObject {
 
     private static final Logger logger = LogManager.getLogger(HumanObject.class);
 
-    private final String humanId;
-
     private ToPoint clientPoint;
 
     private final Map<Class<?>, HumanModBase> stageHumanModMap = new HashMap<>();
 
-    public HumanObject(StageObject stageObj, long unitId, String humanId) {
+    /**
+     * 角色对象使用playerId替换unitId
+     */
+    public HumanObject(StageObject stageObj, long unitId) {
         super(unitId, stageObj);
-        this.humanId = humanId;
-    }
-
-    public String getHumanId() {
-        return humanId;
     }
 
     public ToPoint getClientPoint() {
@@ -54,7 +50,7 @@ public class HumanObject extends UnitObject {
 
         // 更新ClientService的stageHumanPoint
         IClientService clientService = ReferenceFactory.getProxy(IClientService.class, clientPoint);
-        ToPoint stageHumanPoint = new ToPoint(GameProcess.getGameProcessName(), GameThread.getCurrentThreadName(), humanId);
+        ToPoint stageHumanPoint = new ToPoint(GameProcess.getGameProcessName(), GameThread.getCurrentThreadName(), String.valueOf(getUnitId()));
         clientService.setStageHumanToPoint(stageHumanPoint);
 
         StageReadyNotify stageReadyNotify = new StageReadyNotify();

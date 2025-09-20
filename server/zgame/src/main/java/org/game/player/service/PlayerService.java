@@ -26,7 +26,7 @@ public class PlayerService extends GameServiceBase implements IPlayerService {
     private final PlayerObject humanObj;
 
     public PlayerService(PlayerObject humanObj) {
-        super(humanObj.getId());
+        super(String.valueOf(humanObj.getId()));
         this.humanObj = humanObj;
     }
 

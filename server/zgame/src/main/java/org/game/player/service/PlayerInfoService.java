@@ -14,7 +14,7 @@ public class PlayerInfoService extends HumanServiceBase implements IPlayerInfoSe
 
     @Override
     public CompletableFuture<String> getInfo(int a, String b, MyStruct myStruct) {
-        String id = humanObj.getId();
-        return CompletableFuture.completedFuture("humanId=" + id);
+        long id = humanObj.getId();
+        return CompletableFuture.completedFuture("playerId=" + id);
     }
 }

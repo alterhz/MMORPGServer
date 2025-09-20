@@ -22,7 +22,7 @@ public class HumanAttrDBSync {
 
             PlayerAttrDB playerAttrDB = new PlayerAttrDB();
             playerAttrDB.setId(null);
-            playerAttrDB.setPlayerId("admin");
+            playerAttrDB.setPlayerId(20001000000080L);
             playerAttrDB.setDescription("ok");
 
 

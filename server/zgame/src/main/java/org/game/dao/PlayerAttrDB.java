@@ -9,7 +9,7 @@ import java.util.List;
 @Entity(collectionName = "HumanAttrs")
 public class PlayerAttrDB {
     private ObjectId id;
-    private String playerId;
+    private long playerId;
     private List<Attribute> attributes;
     private String description;
 
@@ -21,11 +21,11 @@ public class PlayerAttrDB {
         this.id = id;
     }
 
-    public String getPlayerId() {
+    public long getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(String playerId) {
+    public void setPlayerId(long playerId) {
         this.playerId = playerId;
     }
 
