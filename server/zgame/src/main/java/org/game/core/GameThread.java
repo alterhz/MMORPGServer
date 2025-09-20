@@ -301,8 +301,15 @@ public class GameThread extends Thread {
             if (result instanceof CompletableFuture) {
                 // 先获取结果，然后构造RPCResponse
                 CompletableFuture<?> future = (CompletableFuture<?>) result;
-                future.thenAccept(data -> {
-                    RPCResponse response = new RPCResponse(request.getRequestId(), request.getInvocation().getFromPoint(), data, null);
+                future.whenComplete((o, throwable) -> {
+                    RPCResponse response;
+                    if (throwable != null) {
+                        // 方法执行异常，构造错误响应
+                        response = new RPCResponse(request.getRequestId(), request.getInvocation().getFromPoint(), null, throwable.getMessage());
+                    } else {
+                        // 方法执行成功，构造成功响应
+                        response = new RPCResponse(request.getRequestId(), request.getInvocation().getFromPoint(), o, null);
+                    }
                     handleResponse(response);
                 });
             } else if (result == null) {

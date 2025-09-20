@@ -85,8 +85,12 @@ myStruct.setSex(true);
 myStruct.setDesc("测试");
 
 // 调用服务方法
-humanInfoService.getInfo(33, "dfsd", myStruct).thenAccept(humanInfo -> {
-    logger.info("获取角色信息成功: {}", humanInfo);
+humanInfoService.getInfo(33, "dfsd", myStruct).whenComplete((humanInfo, throwable) -> {
+    if (throwable != null) {
+        logger.error("获取角色信息失败: ", throwable);
+    } else {
+        logger.info("获取角色信息成功: {}", humanInfo);
+    }
 });
 ```
 

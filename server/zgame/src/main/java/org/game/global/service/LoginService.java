@@ -105,8 +105,12 @@ public class LoginService extends GameServiceBase implements ILoginService {
         myStruct.setName("张三");
         myStruct.setSex(true);
         myStruct.setDesc("测试");
-        PlayerInfoService.getInfo(33, "dfsd", myStruct).thenAccept(PlayerInfo -> {
-            logger.info("调用PlayerRPC，成功: {}", PlayerInfo);
+        PlayerInfoService.getInfo(33, "dfsd", myStruct).whenComplete((s, throwable) -> {
+            if (throwable != null) {
+                logger.error("CSTest，PlayerInfoService.getInfo: ", throwable);
+                return;
+            }
+            logger.info("CSTest，PlayerInfoService.getInfo: {}", s);
         });
         SCTest scTest = new SCTest();
         scTest.setMessage("登录成功测试");

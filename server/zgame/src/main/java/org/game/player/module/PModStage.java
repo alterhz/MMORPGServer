@@ -31,7 +31,12 @@ public class PModStage extends PlayerModBase {
 
         // 请求进入默认场景（示例中使用场景SN为1）
         CompletableFuture<Param> stageFuture = stageGlobalService.getStageInfo(101, 0);
-        stageFuture.thenAccept(param -> {
+        stageFuture.whenComplete((param, throwable) -> {
+            if (throwable != null) {
+                logger.error("获取场景信息失败. playerObj={}", playerObj, throwable);
+                return;
+            }
+
             if (param.containsKey("error")) {
                 logger.error("获取场景信息失败: {}", param);
                 return;
@@ -46,17 +51,19 @@ public class PModStage extends PlayerModBase {
             humanObjectData.setClientPoint(playerObj.getClientPoint());
 
             IStageObjectService stageObjectService = ReferenceFactory.getProxy(IStageObjectService.class, stageToPoint);
-            CompletableFuture<Boolean> future = stageObjectService.registerStageHuman(humanObjectData);
-            future.thenAccept(success -> {
+            stageObjectService.registerStageHuman(humanObjectData).whenComplete((success, registerThrowable) -> {
+                if (registerThrowable != null) {
+                    logger.error("玩家注册场景失败: stageId={}, stageSn={}, player={}", stageId, stageSn, playerObj, registerThrowable);
+                    return;
+                }
+
                 if (!success) {
                     logger.error("玩家注册场景失败: stageId={}, stageSn={}, player={}", stageId, stageSn, playerObj);
                     return;
                 }
+
                 logger.info("玩家注册场景成功: stageId={}, stageSn={}, playerObj={}", stageId, stageSn, playerObj);
             });
-        }).exceptionally(throwable -> {
-            logger.error("进入场景失败. playerObj={}", playerObj, throwable);
-            return null;
         });
     }
 }
