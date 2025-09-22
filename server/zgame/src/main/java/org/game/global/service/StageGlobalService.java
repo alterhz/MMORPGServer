@@ -155,7 +155,7 @@ public class StageGlobalService extends GameServiceBase implements IStageGlobalS
         StageInfo stageInfo = new StageInfo();
         stageInfo.stageSn = stageSn;
         stageInfo.stageId = stageId;
-        String gameProcessName = GameProcess.getGameProcessName();
+        String gameProcessName = GameProcess.getName();
         String stageThreadName = StageThread.getStageThreadName(threadIndex);
         stageInfo.toPoint = new ToPoint(gameProcessName, stageThreadName, String.valueOf(stageId));
 

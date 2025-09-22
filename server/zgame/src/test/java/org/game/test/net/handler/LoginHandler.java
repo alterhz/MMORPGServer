@@ -11,6 +11,8 @@ import org.game.proto.scene.EnterStageResponse;
 import org.game.proto.scene.StageReadyNotify;
 import org.game.test.net.ClientProtoDispatcher;
 
+import java.util.concurrent.TimeUnit;
+
 public class LoginHandler extends ClientProtoDispatcher {
     public static final Logger logger = LogManager.getLogger(LoginHandler.class);
 
@@ -21,9 +23,13 @@ public class LoginHandler extends ClientProtoDispatcher {
     @ProtoListener(SCLogin.class)
     public void onLogin(Message message) {
         logger.info("登录成功");
-        // 请求获取角色列表
-        CSQueryPlayer csQueryPlayers = new CSQueryPlayer();
-        sendMessage(csQueryPlayers);
+
+        channel.eventLoop().schedule(() -> {
+            // 请求获取角色列表
+            CSQueryPlayer csQueryPlayers = new CSQueryPlayer();
+            sendMessage(csQueryPlayers);
+            logger.info("延迟2秒，请求角色列表");
+        }, 2, TimeUnit.SECONDS);
     }
 
     @ProtoListener(SCQueryPlayer.class)

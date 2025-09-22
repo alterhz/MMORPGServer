@@ -4,14 +4,17 @@ import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.GameServiceBase;
+import org.game.core.GameThread;
 import org.game.core.Param;
 import org.game.core.event.IEvent;
+import org.game.core.human.PlayerLookup;
 import org.game.core.human.PlayerProtoDispatcher;
 import org.game.core.message.ProtoScanner;
 import org.game.core.net.Message;
-import org.game.core.rpc.HumanServiceBase;
+import org.game.core.rpc.PlayerServiceBase;
 import org.game.core.rpc.RpcInvocation;
 import org.game.player.PlayerObject;
+import org.game.player.PlayerStateEnum;
 import org.game.player.rpc.IPlayerService;
 
 import java.lang.reflect.InvocationTargetException;
@@ -23,22 +26,22 @@ public class PlayerService extends GameServiceBase implements IPlayerService {
 
     public static final Logger logger = LogManager.getLogger(PlayerService.class);
 
-    private final PlayerObject humanObj;
+    private final PlayerObject playerObj;
 
-    public PlayerService(PlayerObject humanObj) {
-        super(String.valueOf(humanObj.getId()));
-        this.humanObj = humanObj;
+    public PlayerService(PlayerObject playerObj) {
+        super(String.valueOf(playerObj.getPlayerId()));
+        this.playerObj = playerObj;
     }
 
-    public PlayerObject getHumanObj() {
-        return humanObj;
+    public PlayerObject getPlayerObj() {
+        return playerObj;
     }
 
     @Override
     public void init() {
         // 初始化角色服务
         logger.info("HumanObjectService 初始化");
-        humanObj.init();
+        playerObj.init();
     }
 
 
@@ -52,7 +55,16 @@ public class PlayerService extends GameServiceBase implements IPlayerService {
 
     @Override
     public void onPulse(long now) {
-        humanObj.pulse(now);
+        playerObj.pulse(now);
+
+        // 判断PlayerObject在销毁状态
+        if (playerObj.getState() == PlayerStateEnum.DESTROY) {
+            GameThread playerGameThread = getGameThread();
+            playerGameThread.runTask(() -> {
+                playerGameThread.removeGameService(this);
+                PlayerLookup.remove(playerObj.getPlayerId());
+            });
+        }
     }
 
 
@@ -60,6 +72,7 @@ public class PlayerService extends GameServiceBase implements IPlayerService {
     public void destroy() {
         // 销毁角色服务
         logger.info("HumanObjectService 销毁");
+        playerObj.Destroy();
     }
 
     @Override
@@ -72,7 +85,7 @@ public class PlayerService extends GameServiceBase implements IPlayerService {
         logger.info("HumanObjectService 调用: hModService={}, methodName={}, parameterTypes={}, parameters={}", hModService, methodName, parameterTypes, parameters);
 
         // 转发rpc调用
-        HumanServiceBase humanService = humanObj.getHumanService(hModService);
+        PlayerServiceBase humanService = playerObj.getHumanService(hModService);
         if (humanService == null) {
             logger.error("HumanObjectService 调用失败: hModService={}, methodName={}, parameterTypes={}, parameters={}", hModService, methodName, parameterTypes, parameters);
             return null;
@@ -110,20 +123,20 @@ public class PlayerService extends GameServiceBase implements IPlayerService {
         Class<?> protoClass = ProtoScanner.getProtoClass(protoID);
         Object protoObj = message.getProto(protoClass);
         if (protoObj == null) {
-            logger.error("HumanObject接收到协议，解析失败。protoID={}, humanObj={}", protoID, humanObj);
+            logger.error("HumanObject接收到协议，解析失败。protoID={}, humanObj={}", protoID, playerObj);
             return;
         }
 
         PlayerProtoDispatcher.getInstance().dispatch(String.valueOf(protoID), method ->  {
             Class<?> hModClass = method.getDeclaringClass();
-            return humanObj.getModBase(hModClass);
+            return playerObj.getModBase(hModClass);
         }, protoObj);
     }
 
 
     @Override
     public void fireEvent(IEvent event) {
-        humanObj.fireEvent(event);
+        playerObj.fireEvent(event);
     }
 
 

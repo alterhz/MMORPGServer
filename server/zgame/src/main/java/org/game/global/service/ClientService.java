@@ -173,7 +173,7 @@ public class ClientService  extends GameServiceBase implements IClientService {
         switch (period) {
             case LOGIN:
             case SELECT_PLAYER:
-                ToPoint fromPoint = new ToPoint(GameProcess.getGameProcessName(), GameThread.getCurrentThreadName(), getName());
+                ToPoint fromPoint = new ToPoint(GameProcess.getName(), GameThread.getCurrentThreadName(), getName());
                 ILoginService loginService = ReferenceFactory.getProxy(ILoginService.class);
                 loginService.dispatch(message, fromPoint);
                 break;

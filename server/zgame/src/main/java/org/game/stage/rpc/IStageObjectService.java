@@ -2,6 +2,7 @@ package org.game.stage.rpc;
 
 import org.game.core.Param;
 import org.game.core.rpc.RPCProxy;
+import org.game.core.rpc.ToPoint;
 import org.game.stage.human.HumanObjectData;
 
 import java.util.concurrent.CompletableFuture;
@@ -14,5 +15,5 @@ public interface IStageObjectService {
      */
     void hotfix(Param param);
 
-    CompletableFuture<Boolean> registerStageHuman(HumanObjectData humanObjectData);
+    CompletableFuture<ToPoint> registerStageHuman(HumanObjectData humanObjectData);
 }

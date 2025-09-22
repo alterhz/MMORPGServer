@@ -36,7 +36,7 @@ public class PModInfo extends PlayerModBase {
         if (playerInfoDBS.size() < 2) {
             PlayerInfoDB playerInfoDB = new PlayerInfoDB();
             playerInfoDB.setId(null);
-            playerInfoDB.setPlayerId(playerObj.getId());
+            playerInfoDB.setPlayerId(playerObj.getPlayerId());
             playerInfoDB.setInfo("这是测试数据");
 
             MongoDBAsyncClient.insertOne(playerInfoDB);

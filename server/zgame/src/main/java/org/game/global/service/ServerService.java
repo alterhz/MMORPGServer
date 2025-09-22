@@ -21,9 +21,6 @@ public class ServerService extends GameServiceBase implements IServerService {
 
     public static final Logger logger = LogManager.getLogger(ServerService.class);
 
-    // ID分配器
-    public static IdAllocator idAllocator;
-
     private ServerDB serverDB;
 
     public ServerService(String name) {
@@ -46,12 +43,6 @@ public class ServerService extends GameServiceBase implements IServerService {
             logger.info("表信息: {}", serverDB);
             this.serverDB = serverDB;
         }
-
-        // 初始化ID分配器，使用serverId=1，起始序号为0
-        int serverId = MyConfig.getConfig().getServer().getServerId();
-        // 在实际应用中，这些值应该从配置文件中读取
-        assert serverDB != null;
-        idAllocator = new IdAllocator(serverId, serverDB.getCurrentSequence());
     }
 
     @Override
@@ -66,12 +57,7 @@ public class ServerService extends GameServiceBase implements IServerService {
 
     @Override
     public void updateId() {
-        // 保存到数据库
-        MongoDBAsyncClient.getCollection(ServerDB.class).updateOne(
-                        Filters.eq("_id", serverDB.getId()),
-                        Updates.set("currentSequence", idAllocator.getCurrentSequence()))
-                .subscribe(new MongoDBAsyncClient.UpdateSubscriber());
-        logger.info("保存ID分配器信息: {}", idAllocator.getCurrentSequence());
+
     }
 
     @Override

@@ -2,12 +2,12 @@ package org.game.player.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.game.core.rpc.HumanServiceBase;
+import org.game.core.rpc.PlayerServiceBase;
 import org.game.player.PlayerObject;
 import org.game.player.module.MyStruct;
 import org.game.player.rpc.IPlayerAttrService;
 
-public class PlayerAttrService extends HumanServiceBase implements IPlayerAttrService {
+public class PlayerAttrService extends PlayerServiceBase implements IPlayerAttrService {
 
     public static final Logger logger = LogManager.getLogger(PlayerAttrService.class);
 
@@ -17,6 +17,6 @@ public class PlayerAttrService extends HumanServiceBase implements IPlayerAttrSe
 
     @Override
     public void test(String value, MyStruct myStruct) {
-        logger.info("test: {}, {}, humanObj: {}", value, myStruct, humanObj);
+        logger.info("test: {}, {}, humanObj: {}", value, myStruct, playerObj);
     }
 }

@@ -2,10 +2,11 @@ package org.game.stage.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.game.core.GameProcess;
 import org.game.core.GameServiceBase;
 import org.game.core.GameThread;
 import org.game.core.Param;
-import org.game.core.utils.SnowflakeIdGenerator;
+import org.game.core.rpc.ToPoint;
 import org.game.stage.human.HumanObjectData;
 import org.game.stage.StageObject;
 import org.game.stage.rpc.IStageObjectService;
@@ -45,15 +46,19 @@ public class StageObjectService extends GameServiceBase implements IStageObjectS
     }
 
     @Override
-    public CompletableFuture<Boolean> registerStageHuman(HumanObjectData humanObjectData) {
+    public CompletableFuture<ToPoint> registerStageHuman(HumanObjectData humanObjectData) {
         GameThread currentGameThread = GameThread.getCurrentGameThread();
         if (currentGameThread.getGameService(String.valueOf(humanObjectData.getPlayerId())) != null) {
             logger.error("角色已经在当前线程: {}。humanId={}", currentGameThread.getName(), humanObjectData.getPlayerId());
         }
 
-        HumanObject stageHumanObj = new HumanObject(stageObj, humanObjectData.getPlayerId());
-        stageHumanObj.setClientPoint(humanObjectData.getClientPoint());
-        HumanService stageHumanObjectService = new HumanService(stageHumanObj);
+        // HumanPoint
+        ToPoint humanPoint = new ToPoint(GameProcess.getName(), currentGameThread.getName(), String.valueOf(humanObjectData.getPlayerId()));
+
+        HumanObject humanObj = new HumanObject(stageObj, humanObjectData.getPlayerId());
+        humanObj.setClientPoint(humanObjectData.getClientPoint());
+        humanObj.setHumanPoint(humanPoint);
+        HumanService stageHumanObjectService = new HumanService(humanObj);
 
         currentGameThread.addGameService(stageHumanObjectService);
         currentGameThread.runTask(() -> {
@@ -61,6 +66,6 @@ public class StageObjectService extends GameServiceBase implements IStageObjectS
             stageHumanObjectService.startup();
         });
 
-        return CompletableFuture.completedFuture(true);
+        return CompletableFuture.completedFuture(humanPoint);
     }
 }

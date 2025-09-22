@@ -4,7 +4,7 @@ import org.game.stage.StageObject;
 
 public abstract class UnitObject {
 
-    private final long unitId;
+    protected final long unitId;
 
     protected final StageObject stageObj;
 

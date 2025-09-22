@@ -28,6 +28,8 @@ public class HumanObject extends UnitObject {
 
     private ToPoint clientPoint;
 
+    private ToPoint humanPoint;
+
     private final Map<Class<?>, HumanModBase> stageHumanModMap = new HashMap<>();
 
     /**
@@ -35,6 +37,10 @@ public class HumanObject extends UnitObject {
      */
     public HumanObject(StageObject stageObj, long unitId) {
         super(unitId, stageObj);
+    }
+
+    public long getPlayerId() {
+        return this.unitId;
     }
 
     public ToPoint getClientPoint() {
@@ -45,12 +51,20 @@ public class HumanObject extends UnitObject {
         this.clientPoint = clientPoint;
     }
 
+    public void setHumanPoint(ToPoint humanPoint) {
+        this.humanPoint = humanPoint;
+    }
+
+    public ToPoint getHumanPoint() {
+        return humanPoint;
+    }
+
     public void init() {
         InitMods();
 
         // 更新ClientService的stageHumanPoint
         IClientService clientService = ReferenceFactory.getProxy(IClientService.class, clientPoint);
-        ToPoint stageHumanPoint = new ToPoint(GameProcess.getGameProcessName(), GameThread.getCurrentThreadName(), String.valueOf(getUnitId()));
+        ToPoint stageHumanPoint = getHumanPoint();
         clientService.setStageHumanToPoint(stageHumanPoint);
 
         StageReadyNotify stageReadyNotify = new StageReadyNotify();

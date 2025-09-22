@@ -1,6 +1,8 @@
 package org.game.global.service;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import org.apache.commons.lang3.StringUtils;
@@ -9,10 +11,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.BsonValue;
 import org.bson.types.ObjectId;
+import org.game.config.MyConfig;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
 import org.game.core.db.MongoDBAsyncClient;
+import org.game.core.db.MongoDBSyncClient;
 import org.game.core.db.QuerySubscriber;
+import org.game.core.human.IdAllocator;
 import org.game.core.human.PlayerLookup;
 import org.game.core.human.PlayerThread;
 import org.game.core.message.ProtoListener;
@@ -21,7 +26,9 @@ import org.game.core.net.ClientPeriod;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
+import org.game.dao.IdAllocatorDB;
 import org.game.dao.PlayerDB;
+import org.game.dao.ServerDB;
 import org.game.player.module.MyStruct;
 import org.game.player.rpc.IPlayerInfoService;
 import org.game.proto.login.*;
@@ -29,6 +36,7 @@ import org.game.global.rpc.IClientService;
 import org.game.global.rpc.ILoginService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +59,11 @@ public class LoginService extends GameServiceBase implements ILoginService {
      */
     private final LoginDispatcher loginDispatcher = new LoginDispatcher();
 
+    // ID分配器
+    public static IdAllocator playerIdAllocator;
+
+    private IdAllocatorDB playerIdAllocatorDB;
+
     public LoginService(String name) {
         super(name);
     }
@@ -60,6 +73,24 @@ public class LoginService extends GameServiceBase implements ILoginService {
         // 初始化逻辑
         logger.info("LoginService 初始化");
         loginDispatcher.init();
+
+        MongoCollection<IdAllocatorDB> idAllocatorDBCollection = MongoDBSyncClient.getOrCreateCollection(IdAllocatorDB.class);
+        IdAllocatorDB loadIdAllocatorDB = idAllocatorDBCollection.find().first();
+        if (loadIdAllocatorDB == null) {
+            // 创建表
+            IdAllocatorDB newIdAllocatorDB = new IdAllocatorDB(1L);
+            ObjectId objectId = MongoDBSyncClient.insertOne(newIdAllocatorDB);
+            newIdAllocatorDB.setId(objectId);
+            this.playerIdAllocatorDB = newIdAllocatorDB;
+        } else {
+            // 获取表信息
+            logger.info("载入IdAllocatorDB信息: {}", loadIdAllocatorDB);
+            this.playerIdAllocatorDB = loadIdAllocatorDB;
+        }
+
+        // 初始化ID分配器，使用serverId=1，起始序号为0
+        int serverId = MyConfig.getConfig().getServer().getServerId();
+        playerIdAllocator = new IdAllocator(serverId, playerIdAllocatorDB.getCurrentSequence());
     }
 
     @Override
@@ -98,8 +129,8 @@ public class LoginService extends GameServiceBase implements ILoginService {
             logger.error("CSTest，loginInfo == null: clientID={}", clientID);
             return;
         }
-        String PlayerId = loginInfo.Players.get(0);
-        IPlayerInfoService PlayerInfoService = ReferenceFactory.getHumanProxy(IPlayerInfoService.class, PlayerId);
+        PlayerDB playerDB = loginInfo.players.values().iterator().next();
+        IPlayerInfoService PlayerInfoService = ReferenceFactory.getPlayerProxy(IPlayerInfoService.class, playerDB.getPlayerId());
         MyStruct myStruct = new MyStruct();
         myStruct.setId(1);
         myStruct.setName("张三");
@@ -134,11 +165,17 @@ public class LoginService extends GameServiceBase implements ILoginService {
 
         CSCreatePlayer csCreatePlayer = message.getProto(CSCreatePlayer.class);
 
+        long allocHumanId = playerIdAllocator.allocateId();
+        playerIdAllocatorDB.setCurrentSequence(allocHumanId);
+        savePlayerIdAllocatorDB(playerIdAllocatorDB);
+
         // TODO 创建角色
         PlayerDB playerDB = new PlayerDB();
         playerDB.setId(null);
+        playerDB.setPlayerId(allocHumanId);
         playerDB.setAccount(loginInfo.account);
         playerDB.setName(csCreatePlayer.getName());
+
 
         MongoDBAsyncClient.getCollection(PlayerDB.class)
                 .insertOne(playerDB)
@@ -146,10 +183,11 @@ public class LoginService extends GameServiceBase implements ILoginService {
                     @Override
                     protected void onLoadDB(List<InsertOneResult> dbCollections) {
                         BsonValue insertedId = dbCollections.get(0).getInsertedId();
+                        playerDB.setId(insertedId.asObjectId().getValue());
                         logger.info("创建角色成功: insertedId={}", insertedId);
                         SCCreatePlayer scCreatePlayer = new SCCreatePlayer();
                         scCreatePlayer.setCode(0);
-                        scCreatePlayer.setPlayerId(insertedId.asObjectId().getValue().toHexString());
+                        scCreatePlayer.setPlayerId(playerDB.getPlayerId());
                         scCreatePlayer.setSuccess(true);
                         sendProto(clientPoint, scCreatePlayer);
 
@@ -162,6 +200,15 @@ public class LoginService extends GameServiceBase implements ILoginService {
                     }
                 });
 
+    }
+
+    private void savePlayerIdAllocatorDB(IdAllocatorDB playerIdAllocatorDB) {
+        // 保存到数据库
+        MongoDBAsyncClient.getCollection(ServerDB.class).updateOne(
+                        Filters.eq("_id", playerIdAllocatorDB.getId()),
+                        Updates.set("currentSequence", playerIdAllocatorDB.getCurrentSequence()))
+                .subscribe(new MongoDBAsyncClient.UpdateSubscriber());
+        logger.info("保存ID分配器信息: {}", playerIdAllocator.getCurrentSequence());
     }
 
     /**
@@ -182,40 +229,40 @@ public class LoginService extends GameServiceBase implements ILoginService {
         }
 
         CSDeletePlayer csDeletePlayer = message.getProto(CSDeletePlayer.class);
-        String PlayerId = csDeletePlayer.getPlayerId();
+        long playerId = csDeletePlayer.getPlayerId();
 
         // 判断是否存在这个角色
-        if (!loginInfo.Players.contains(PlayerId)) {
-            logger.error("删除角色不存在: PlayerId={}", PlayerId);
+        if (!loginInfo.players.containsKey(playerId)) {
+            logger.error("删除角色不存在: playerId={}", playerId);
             SCDeletePlayer scDeletePlayerResp = new SCDeletePlayer();
             scDeletePlayerResp.setCode(1);
-            scDeletePlayerResp.setPlayerId(PlayerId);
+            scDeletePlayerResp.setPlayerId(playerId);
             scDeletePlayerResp.setMessage("删除角色不存在");
             sendProto(clientPoint, scDeletePlayerResp);
             return;
         }
 
-        loginInfo.Players.remove(PlayerId);
+        PlayerDB removePlayerDB = loginInfo.players.remove(playerId);
 
         // 根据角色ID删除角色
         MongoDBAsyncClient.getCollection(PlayerDB.class)
-                .deleteOne(Filters.eq("_id", new ObjectId(PlayerId)))
+                .deleteOne(Filters.eq("_id", removePlayerDB.getId()))
                 .subscribe(new QuerySubscriber<>(Long.MAX_VALUE) {
                     @Override
                     protected void onLoadDB(List<DeleteResult> dbCollections) {
                         if (dbCollections.isEmpty() || dbCollections.get(0).getDeletedCount() == 0) {
                             // 角色不存在
-                            logger.error("DB删除角色不存在: PlayerId={}", PlayerId);
+                            logger.error("DB删除角色不存在: playerId={}", playerId);
                             SCDeletePlayer scDeletePlayer = new SCDeletePlayer();
                             scDeletePlayer.setCode(1);
-                            scDeletePlayer.setPlayerId(PlayerId);
+                            scDeletePlayer.setPlayerId(playerId);
                             scDeletePlayer.setMessage("删除角色失败");
                             sendProto(clientPoint, scDeletePlayer);
                         } else {
                             // 角色删除成功
                             SCDeletePlayer scDeletePlayer = new SCDeletePlayer();
                             scDeletePlayer.setCode(0);
-                            scDeletePlayer.setPlayerId(PlayerId);
+                            scDeletePlayer.setPlayerId(playerId);
                             scDeletePlayer.setMessage("删除角色成功");
                             sendProto(clientPoint, scDeletePlayer);
                         }
@@ -225,7 +272,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                     protected void onError(String errMessage) {
                         SCDeletePlayer scDeletePlayer = new SCDeletePlayer();
                         scDeletePlayer.setCode(2);
-                        scDeletePlayer.setPlayerId(PlayerId);
+                        scDeletePlayer.setPlayerId(playerId);
                         scDeletePlayer.setMessage("删除角色异常: " + errMessage);
                         sendProto(clientPoint, scDeletePlayer);
                     }
@@ -249,11 +296,11 @@ public class LoginService extends GameServiceBase implements ILoginService {
         loginInfo.loginPeriod = LoginPeriod.SELECT_Player;
 
         CSSelectPlayer csSelectPlayer = message.getProto(CSSelectPlayer.class);
-        String PlayerId = csSelectPlayer.getPlayerId();
+        long playerId = csSelectPlayer.getPlayerId();
 
         // 是否存在PlayerId
-        if (!loginInfo.Players.contains(PlayerId)) {
-            logger.error("选择的角色不存在: PlayerId={}", PlayerId);
+        if (!loginInfo.players.containsKey(playerId)) {
+            logger.error("选择的角色不存在: playerId={}", playerId);
             SCSelectPlayer scSelectPlayer = new SCSelectPlayer();
             scSelectPlayer.setCode(1);
             scSelectPlayer.setMessage("选择失败");
@@ -261,8 +308,10 @@ public class LoginService extends GameServiceBase implements ILoginService {
             return;
         }
 
+        PlayerDB playerDB = loginInfo.players.get(playerId);
+
         MongoDBAsyncClient.getCollection(PlayerDB.class)
-                .find(Filters.eq("_id", new ObjectId(PlayerId)))
+                .find(Filters.eq("_id", playerDB.getId()))
                 .subscribe(new QuerySubscriber<>() {
                     @Override
                     protected void onLoadDB(List<PlayerDB> playerDBS) {
@@ -276,7 +325,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
                             scSelectPlayer.setMessage("选择角色成功");
                             sendProto(clientPoint, scSelectPlayer);
                         } else {
-                            logger.error("选择的角色不存在: PlayerId={}", PlayerId);
+                            logger.error("选择的角色不存在: playerId={}", playerId);
                             SCSelectPlayer scSelectPlayer = new SCSelectPlayer();
                             scSelectPlayer.setCode(1);
                             scSelectPlayer.setMessage("选择失败");
@@ -323,17 +372,17 @@ public class LoginService extends GameServiceBase implements ILoginService {
                         List<Player> PlayerList = new ArrayList<>();
                         for (PlayerDB playerDB : playerDBS) {
                             // 创建角色信息对象
-                            String hexPlayerId = playerDB.getId().toHexString();
+                            long playerId = playerDB.getPlayerId();
 
                             Player PlayerInfo = new Player();
-                            PlayerInfo.setid(hexPlayerId);
+                            PlayerInfo.setid(playerId);
                             PlayerInfo.setName(playerDB.getName());
                             // 这里暂时将职业字段设置为默认值，因为在PlayerDB中没有找到职业字段
                             PlayerInfo.setProfession("未知职业");
                             PlayerList.add(PlayerInfo);
 
                             // 记录角色列表ID
-                            loginInfo.Players.add(hexPlayerId);
+                            loginInfo.players.put(playerId, playerDB);
                         }
 
                         SCQueryPlayer scQueryPlayers = new SCQueryPlayer();
@@ -422,7 +471,7 @@ public class LoginService extends GameServiceBase implements ILoginService {
         ToPoint clientPoint;
         LoginPeriod loginPeriod = LoginPeriod.LOGIN;
         // 账号对应的PlayerDB列表
-        List<String> Players = new ArrayList<>();
+        Map<Long, PlayerDB> players = new HashMap<>();
 
         LoginInfo(String account, ToPoint clientPoint) {
             this.account = account;

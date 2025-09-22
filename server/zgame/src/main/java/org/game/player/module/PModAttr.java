@@ -29,7 +29,7 @@ public class PModAttr extends PlayerModBase {
         if (playerAttrDBS.size() < 2) {
             PlayerAttrDB playerAttrDB = new PlayerAttrDB();
             playerAttrDB.setId(null);
-            playerAttrDB.setPlayerId(playerObj.getId());
+            playerAttrDB.setPlayerId(playerObj.getPlayerId());
 
             ArrayList<PlayerAttrDB.Attribute> attributes = new ArrayList<>();
             PlayerAttrDB.Attribute attribute = new PlayerAttrDB.Attribute();

@@ -16,7 +16,7 @@ public class GameProcess {
         GameProcess.name = name;
     }
 
-    public static String getGameProcessName() {
+    public static String getName() {
         return name;
     }
 

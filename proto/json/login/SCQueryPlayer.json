@@ -3,17 +3,17 @@
   "message": "查询成功",
   "player": [
     {
-      "id": "5f8d0a2e7d4cb629b4d5e6f1",
+      "id": 200010000000001,
       "name": "勇者艾丹",
       "profession": "战士"
     },
     {
-      "id": "5f8d0a2e7d4cb629b4d5e6f2",
+      "id": 200010000000002,
       "name": "法师莉莉丝",
       "profession": "法师"
     },
     {
-      "id": "5f8d0a2e7d4cb629b4d5e6f3",
+      "id": 200010000000003,
       "name": "弓箭手罗宾",
       "profession": "弓箭手"
     }

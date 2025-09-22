@@ -1,6 +1,7 @@
 package org.game.core.rpc;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.GameProcess;
@@ -23,10 +24,10 @@ public class HumanRPCInvoker implements InvocationHandler {
 
     private static final Logger logger = LogManager.getLogger(HumanRPCInvoker.class);
 
-    private final String humanId;
+    private final long playerId;
 
-    HumanRPCInvoker(String humanId) {
-        this.humanId = humanId;
+    HumanRPCInvoker(long playerId) {
+        this.playerId = playerId;
     }
 
 
@@ -54,14 +55,14 @@ public class HumanRPCInvoker implements InvocationHandler {
         // 获取服务名称，接口名称（不包含包名）
         String serviceName = interfaceClass.getSimpleName().toLowerCase();
 
-        String gameProcessName = GameProcess.getGameProcessName();
+        String gameProcessName = GameProcess.getName();
         String currentThreadName = GameThread.getCurrentThreadName();
 
         // 构造FromPoint
         FromPoint fromPoint = new FromPoint(gameProcessName, currentThreadName); // 实际应用中需要获取当前进程和线程名
 
         // 如果ToPoint为空，则创建一个默认的ToPoint
-        ToPoint targetPoint = new ToPoint(gameProcessName, PlayerThread.NAME, humanId);
+        ToPoint targetPoint = new ToPoint(gameProcessName, PlayerThread.NAME, String.valueOf(playerId));
 
         // 构造参数类型列表
         Class<?>[] paramTypes = method.getParameterTypes();
@@ -155,8 +156,8 @@ public class HumanRPCInvoker implements InvocationHandler {
             targetThreadName = ServiceRegistryManager.getServiceGameThreadName(gameServiceName);
         } else if (targetThreadName.equals(PlayerThread.NAME)) {
             // 查找humanId所在的GameThread
-            String humanThreadName = PlayerLookup.getHumanThreadName(request.getInvocation().getToPoint().getGameServiceName());
-            targetThreadName = humanThreadName;
+            long playerId = NumberUtils.toLong(request.getInvocation().getToPoint().getGameServiceName());
+            targetThreadName = PlayerLookup.getPlayerThreadName(playerId);
         }
 
         // 通过GameProcess获取目标GameThread

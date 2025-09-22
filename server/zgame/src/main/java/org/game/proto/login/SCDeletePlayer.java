@@ -7,7 +7,7 @@ public class SCDeletePlayer {
 
     private long code;
 
-    private String playerId;
+    private long playerId;
 
     private String message;
 
@@ -19,11 +19,11 @@ public class SCDeletePlayer {
         this.code = value;
     }
 
-    public String getPlayerId() {
+    public long getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(String value) {
+    public void setPlayerId(long value) {
         this.playerId = value;
     }
 

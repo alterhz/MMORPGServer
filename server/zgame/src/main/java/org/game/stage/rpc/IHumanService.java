@@ -17,4 +17,6 @@ public interface IHumanService {
      * @param message 消息
      */
     void dispatchProto(Message message);
+
+    void humanLeaveStage();
 }

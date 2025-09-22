@@ -13,6 +13,7 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.types.ObjectId;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
@@ -114,20 +115,20 @@ public class MongoDBSyncClient {
         return getOrCreateCollection(collectionName, Document.class);
     }
 
-    public static <T> boolean insertOne(T obj) {
+    public static <T> ObjectId insertOne(T obj) {
         try {
             Entity annotation = obj.getClass().getAnnotation(Entity.class);
             if (annotation == null) {
                 logger.error("Entity annotation not found on class: {}", obj.getClass().getName());
-                return false;
+                return null;
             }
             String collectionName = annotation.collectionName();
             Class<T> clazz = (Class<T>) obj.getClass();
             InsertOneResult insertOneResult = getCollection(clazz).insertOne(obj);
-            return insertOneResult.wasAcknowledged();
+            return insertOneResult.getInsertedId().asObjectId().getValue();
         } catch (Exception e) {
             logger.error("Failed to insert document into collection: {}", obj, e);
-            return false;
+            return null;
         }
     }
 

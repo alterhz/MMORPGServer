@@ -4,9 +4,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.event.EventListener;
 import org.game.core.message.ProtoListener;
+import org.game.core.rpc.ReferenceFactory;
+import org.game.player.rpc.IPlayerInfoService;
 import org.game.proto.scene.EnterStageRequest;
 import org.game.stage.StageObject;
 import org.game.stage.human.HumanObject;
+import org.game.stage.human.Vector3;
 import org.game.stage.human.event.OnStageReadyEvent;
 
 public class HModStage extends HumanModBase {
@@ -29,6 +32,21 @@ public class HModStage extends HumanModBase {
     public void onStageReady(OnStageReadyEvent event) {
         HumanObject humanObj = getHumanObj();
         logger.info("HModStage.onStageReady: humanId={}", humanObj.getUnitId());
+    }
+
+    public void savePosition() {
+        HumanObject humanObj = getHumanObj();
+        StageObject stageObj = humanObj.getStageObj();
+        if (stageObj == null) {
+            logger.error("HModStage.savePosition: stageObj is null");
+            return;
+        }
+
+        Vector3 position = new Vector3(1, 2, 3);
+        IPlayerInfoService playerInfoService = ReferenceFactory.getPlayerProxy(IPlayerInfoService.class, humanObj.getPlayerId());
+        playerInfoService.savePosition(position);
+
+        // 移除服务
     }
 
 }

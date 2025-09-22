@@ -34,7 +34,7 @@ public class HumanDBManager {
             humanObj.addLoadingHModDB(humanLoaderMethodInfo.getCollectionName());
 
             MongoDBAsyncClient.getCollection(humanLoaderMethodInfo.getEntity())
-            .find(Filters.eq("humanId", humanObj.getId()))
+            .find(Filters.eq("playerId", humanObj.getPlayerId()))
                     .subscribe(new QuerySubscriber<Object>(Long.MAX_VALUE) {
                         @Override
                         protected void onLoadDB(List<Object> dbCollections) {

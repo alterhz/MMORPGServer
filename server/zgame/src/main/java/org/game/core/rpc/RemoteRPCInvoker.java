@@ -81,7 +81,7 @@ public class RemoteRPCInvoker implements InvocationHandler {
         // 获取服务名称，接口名称（不包含包名）
         String serviceName = interfaceClass.getSimpleName().toLowerCase();
 
-        String gameProcessName = GameProcess.getGameProcessName();
+        String gameProcessName = GameProcess.getName();
         String currentThreadName = GameThread.getCurrentThreadName();
 
         // 构造FromPoint

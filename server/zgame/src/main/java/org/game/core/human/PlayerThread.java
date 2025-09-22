@@ -9,7 +9,6 @@ import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.dao.PlayerDB;
 import org.game.global.rpc.IServerService;
-import org.game.global.service.ServerService;
 import org.game.player.PlayerObject;
 import org.game.player.service.PlayerService;
 
@@ -24,7 +23,7 @@ public class PlayerThread extends GameThread {
 
     private static final Logger logger = LogManager.getLogger(PlayerThread.class);
 
-    public static final String NAME = "HumanThread";
+    public static final String NAME = "PlayerThread";
 
     private static final Map<Integer, PlayerThread> humanThreads = new ConcurrentHashMap<>();
     /**
@@ -72,10 +71,9 @@ public class PlayerThread extends GameThread {
         int threadIndex = (int) (count % getHumanThreadCount());
         PlayerThread playerThread = getHumanThread(threadIndex);
 
-        // HumanObject连接点
-        ToPoint humanPoint = new ToPoint(GameProcess.getGameProcessName(), playerThread.getName(), String.valueOf(playerId));
+        // PlayerObject连接点
+        ToPoint humanPoint = new ToPoint(GameProcess.getName(), playerThread.getName(), String.valueOf(playerId));
 
-        long allocHumanId = ServerService.idAllocator.allocateId();
         IServerService serverService = ReferenceFactory.getProxy(IServerService.class);
         serverService.updateId();
 
@@ -90,7 +88,7 @@ public class PlayerThread extends GameThread {
             HumanDBManager.loadHumanModDB(humanObj);
         });
 
-        PlayerLookup.add(humanObj.getId(), humanObj.getAccount(), playerThread.getName());
+        PlayerLookup.add(humanObj.getPlayerId(), humanObj);
 
     }
 

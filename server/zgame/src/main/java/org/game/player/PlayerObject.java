@@ -16,6 +16,7 @@ import org.game.player.event.OnPlayerLoadComplete;
 import org.game.player.event.OnSendToClient;
 import org.game.proto.login.SCSendToClientBegin;
 import org.game.proto.login.SCSendToClientEnd;
+import org.game.stage.rpc.IHumanService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,41 +30,79 @@ public class PlayerObject {
 
     public static final Logger logger = LogManager.getLogger(PlayerObject.class);
 
-    private final long id;
+    private final long playerId;
 
-    private ToPoint clientPoint;
-
-    private final ToPoint playerPoint;
-
-    private final PlayerDB playerDB;
-
-    private final List<String> loadingHModDBs = new ArrayList<>();
+    private PlayerStateEnum state = PlayerStateEnum.LOADING;
 
     /**
-     * hModBase
+     * PlayerService连接点
      */
-    private final Map<Class<?>, PlayerModBase> hModBaseMap = new HashMap<>();
+    private final ToPoint playerPoint;
+
+    /**
+     * ClientService连接点
+     */
+    private ToPoint clientPoint;
+
+    /**
+     * 登录Token
+     */
+    private String token;
+
+    /**
+     * HumanService连接点
+     */
+    private ToPoint humanPoint;
+
+    /**
+     * Player基础数据
+     */
+    private final PlayerDB playerDB;
+
+    /**
+     * 正在加载的PlayerDB
+     */
+    private final List<String> loadingPlayerDBs = new ArrayList<>();
+
+    /**
+     * PlayerMod模块
+     */
+    private final Map<Class<?>, PlayerModBase> modBaseMap = new HashMap<>();
 
     /**
      * HumanServiceBase
      * key: classSimpleName, value: HumanServiceBase
      */
-    private final Map<String, HumanServiceBase> humanServiceBaseMap = new HashMap<>();
+    private final Map<String, PlayerServiceBase> humanServiceBaseMap = new HashMap<>();
 
     private final TimerQueue timerQueue = new TimerQueue();
 
     public PlayerObject(PlayerDB playerDB, ToPoint playerPoint) {
-        this.id = playerDB.getPlayerId();
+        this.playerId = playerDB.getPlayerId();
         this.playerDB = playerDB;
         this.playerPoint = playerPoint;
     }
 
-    public long getId() {
-        return id;
+    public long getPlayerId() {
+        return playerId;
     }
 
-    public PlayerDB getHumanDB() {
+    public PlayerStateEnum getState() {
+        return state;
+    }
+
+    public void setState(PlayerStateEnum state) {
+        this.state = state;
+    }
+
+    public PlayerDB getPlayerDB() {
         return playerDB;
+    }
+
+    // ToPoint连接点
+
+    public ToPoint getPlayerPoint() {
+        return playerPoint;
     }
 
     public void setClientPoint(ToPoint clientPoint) {
@@ -74,22 +113,26 @@ public class PlayerObject {
         return clientPoint;
     }
 
-    public ToPoint getPlayerPoint() {
-        return playerPoint;
+    public ToPoint getHumanPoint() {
+        return humanPoint;
+    }
+
+    public void setHumanPoint(ToPoint humanPoint) {
+        this.humanPoint = humanPoint;
     }
 
     public void addLoadingHModDB(String hModDB) {
-        loadingHModDBs.add(hModDB);
+        loadingPlayerDBs.add(hModDB);
         logger.debug("正在加载 {}", hModDB);
     }
 
     public void removeLoadingHModDB(String hModDB) {
-        loadingHModDBs.remove(hModDB);
+        loadingPlayerDBs.remove(hModDB);
         logger.debug("加载完成 {}", hModDB);
     }
 
     public void loadHModComplete() {
-        if (loadingHModDBs.isEmpty()) {
+        if (loadingPlayerDBs.isEmpty()) {
             onLoadingComplete();
         }
     }
@@ -102,7 +145,7 @@ public class PlayerObject {
 
         // 修改ClientService的HumanToPoint连接点，并切换阶段
         IClientService clientService = ReferenceFactory.getProxy(IClientService.class, clientPoint);
-        clientService.setPlayerPoint(id, playerPoint);
+        clientService.setPlayerPoint(playerId, playerPoint);
 
         // 发送协议
         SCSendToClientBegin scSendToClientBegin = new SCSendToClientBegin();
@@ -112,6 +155,15 @@ public class PlayerObject {
 
         SCSendToClientEnd scSendToClientEnd = new SCSendToClientEnd();
         sendMessage(scSendToClientEnd);
+
+        setState(PlayerStateEnum.READY);
+
+        // 随机token
+        token = String.valueOf(Math.random());
+    }
+
+    public String getToken() {
+        return token;
     }
 
     public <T> void sendMessage(T jsonObject) {
@@ -147,7 +199,7 @@ public class PlayerObject {
             try {
                 // 使用带参数的构造函数创建实例
                 PlayerModBase playerModBase = hModClass.getConstructor(PlayerObject.class).newInstance(this);
-                hModBaseMap.put(hModClass, playerModBase);
+                modBaseMap.put(hModClass, playerModBase);
             } catch (Exception e) {
                 logger.error("HModBase init error", e);
             }
@@ -156,16 +208,16 @@ public class PlayerObject {
     }
 
     private void initHModServices() {
-        List<Class<? extends HumanServiceBase>> humanService = HumanRPCScanner.getHumanService();
-        for (Class<? extends HumanServiceBase> humanServiceClass : humanService) {
+        List<Class<? extends PlayerServiceBase>> humanService = HumanRPCScanner.getHumanService();
+        for (Class<? extends PlayerServiceBase> humanServiceClass : humanService) {
             try {
-                HumanServiceBase humanServiceBase = humanServiceClass.getConstructor(PlayerObject.class).newInstance(this);
+                PlayerServiceBase playerServiceBase = humanServiceClass.getConstructor(PlayerObject.class).newInstance(this);
                 // 获取humanServiceClass实现的接口
                 Class<?>[] interfaces = humanServiceClass.getInterfaces();
                 for (Class<?> inter : interfaces) {
                     // 检查接口是否包含HumanRPCProxy注解
                     if (inter.isAnnotationPresent(HumanRPCProxy.class)) {
-                        humanServiceBaseMap.put(inter.getSimpleName().toLowerCase(), humanServiceBase);
+                        humanServiceBaseMap.put(inter.getSimpleName().toLowerCase(), playerServiceBase);
                         break;
                     }
                 }
@@ -175,42 +227,55 @@ public class PlayerObject {
         }
     }
 
-    public HumanServiceBase getHumanService(String classSimpleName) {
+    public PlayerServiceBase getHumanService(String classSimpleName) {
         return humanServiceBaseMap.get(classSimpleName);
     }
 
     public <T extends PlayerModBase> T getMod(Class<T> clazz) {
-        return (T) hModBaseMap.get(clazz);
+        return (T) modBaseMap.get(clazz);
     }
 
     public PlayerModBase getModBase(Class<?> clazz) {
-        return hModBaseMap.get(clazz);
+        return modBaseMap.get(clazz);
     }
 
     public void pulse(long now) {
         timerQueue.update(now);
 
-        hModBaseMap.forEach((aClass, hModBase) -> hModBase.onPulse(now));
+        modBaseMap.forEach((aClass, hModBase) -> hModBase.onPulse(now));
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("id", id)
+                .append("id", playerId)
                 .toString();
     }
 
     public void disconnect() {
         logger.info("断开连接");
 
-        saveHumanData();
-
         IClientService proxy = ReferenceFactory.getProxy(IClientService.class, clientPoint);
         proxy.Disconnect();
+
+        unload();
     }
 
-    private void saveHumanData() {
-        logger.info("保存数据");
-        // TODO 保存数据
+    public void unload() {
+        logger.info("unload");
+
+        humanLeaveStage();
+
+        // 改变状态: Unloading
+        setState(PlayerStateEnum.UNLOADING);
+    }
+
+    private void humanLeaveStage() {
+        IHumanService humanService = ReferenceFactory.getProxy(IHumanService.class, humanPoint);
+        humanService.humanLeaveStage();
+    }
+
+    public void Destroy() {
+        logger.info("Player {} Destroy", this);
     }
 }

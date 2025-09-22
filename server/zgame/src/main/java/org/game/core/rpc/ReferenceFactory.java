@@ -33,14 +33,14 @@ public class ReferenceFactory {
         );
     }
 
-    public static <T> T getHumanProxy(Class<T> clazz, String humanId) {
+    public static <T> T getPlayerProxy(Class<T> clazz, long playerId) {
         if (!clazz.isAnnotationPresent(HumanRPCProxy.class)) {
             throw new IllegalArgumentException("Interface must be annotated with @HumanRPCProxy");
         }
         return (T) Proxy.newProxyInstance(
                 clazz.getClassLoader(),
                 new Class[]{clazz},
-                new HumanRPCInvoker(humanId)
+                new HumanRPCInvoker(playerId)
         );
     }
 }

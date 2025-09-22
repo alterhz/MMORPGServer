@@ -5,13 +5,13 @@ import org.game.core.message.Proto;
 @Proto(value = 1005)
 public class CSSelectPlayer {
 
-    private String playerId;
+    private long playerId;
 
-    public String getPlayerId() {
+    public long getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(String value) {
+    public void setPlayerId(long value) {
         this.playerId = value;
     }
 }

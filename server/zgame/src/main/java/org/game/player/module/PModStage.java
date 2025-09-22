@@ -44,23 +44,25 @@ public class PModStage extends PlayerModBase {
 
             long stageId = param.getLong("stageId");
             int stageSn = param.getInt("stageSn");
-            ToPoint stageToPoint = param.get("toPoint");
+            ToPoint stagePoint = param.get("toPoint");
 
             HumanObjectData humanObjectData = new HumanObjectData();
-            humanObjectData.setPlayerId(playerObj.getId());
+            humanObjectData.setPlayerId(playerObj.getPlayerId());
             humanObjectData.setClientPoint(playerObj.getClientPoint());
 
-            IStageObjectService stageObjectService = ReferenceFactory.getProxy(IStageObjectService.class, stageToPoint);
-            stageObjectService.registerStageHuman(humanObjectData).whenComplete((success, registerThrowable) -> {
+            IStageObjectService stageObjectService = ReferenceFactory.getProxy(IStageObjectService.class, stagePoint);
+            stageObjectService.registerStageHuman(humanObjectData).whenComplete((humanPoint, registerThrowable) -> {
                 if (registerThrowable != null) {
                     logger.error("玩家注册场景失败: stageId={}, stageSn={}, player={}", stageId, stageSn, playerObj, registerThrowable);
                     return;
                 }
 
-                if (!success) {
+                if (humanPoint == null) {
                     logger.error("玩家注册场景失败: stageId={}, stageSn={}, player={}", stageId, stageSn, playerObj);
                     return;
                 }
+
+                playerObj.setHumanPoint(humanPoint);
 
                 logger.info("玩家注册场景成功: stageId={}, stageSn={}, playerObj={}", stageId, stageSn, playerObj);
             });

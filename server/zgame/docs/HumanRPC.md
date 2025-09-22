@@ -44,7 +44,7 @@ public interface IHumanInfoService {
 ```java
 package org.game.player.service;
 
-import org.game.core.rpc.HumanServiceBase;
+import org.game.core.rpc.PlayerServiceBase;
 import org.game.player.PlayerObject;
 import org.game.player.module.MyStruct;
 import org.game.player.rpc.IPlayerInfoService;
