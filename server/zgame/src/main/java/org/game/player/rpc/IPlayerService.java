@@ -4,6 +4,7 @@ import org.game.core.Param;
 import org.game.core.event.IEvent;
 import org.game.core.net.Message;
 import org.game.core.rpc.RPCProxy;
+import org.game.core.rpc.ToPoint;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -23,7 +24,7 @@ public interface IPlayerService {
     /**
      * 转发rpc调用
      */
-    public static final String DISPATCH_METHOD_NAME = "dispatchRPC";
+    String DISPATCH_METHOD_NAME = "dispatchRPC";
     /**
      * 转发rpc调用
      */
@@ -33,4 +34,13 @@ public interface IPlayerService {
      * 转发事件
      */
     void fireEvent(IEvent event);
+
+    /**
+     * 重连
+     *
+     * @return
+     */
+    CompletableFuture<Boolean> reconnect(String token, ToPoint clientPoint);
+
+
 }

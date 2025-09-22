@@ -31,6 +31,7 @@ import org.game.dao.PlayerDB;
 import org.game.dao.ServerDB;
 import org.game.player.module.MyStruct;
 import org.game.player.rpc.IPlayerInfoService;
+import org.game.player.rpc.IPlayerService;
 import org.game.proto.login.*;
 import org.game.global.rpc.IClientService;
 import org.game.global.rpc.ILoginService;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class LoginService extends GameServiceBase implements ILoginService {
 
@@ -146,6 +148,38 @@ public class LoginService extends GameServiceBase implements ILoginService {
         SCTest scTest = new SCTest();
         scTest.setMessage("登录成功测试");
         sendProto(clientPoint, scTest);
+    }
+
+    // 断线重连
+    @ProtoListener(CSReconnect.class)
+    private void CSReconnect(Message message, ToPoint clientPoint) {
+        logger.info("接收到消息CS_RECONNECT: {}", message);
+        CSReconnect csReconnect = message.getProto(CSReconnect.class);
+
+        IPlayerService playerService = ReferenceFactory.getPlayerProxy(IPlayerService.class, csReconnect.getPlayerId());
+        CompletableFuture<Boolean> future = playerService.reconnect(csReconnect.getToken(), clientPoint);
+        future.whenComplete((success, throwable) -> {
+            if (throwable != null) {
+                logger.error("CS_RECONNECT，playerService.reconnect: ", throwable);
+                SCReconnect scReconnect = new SCReconnect();
+                scReconnect.setResult(1);
+                scReconnect.setMessage("重连异常");
+                sendProto(clientPoint, scReconnect);
+                return;
+            }
+            if (!success) {
+                logger.error("CS_RECONNECT，playerService.reconnect: 失败");
+                SCReconnect scReconnect = new SCReconnect();
+                scReconnect.setResult(2);
+                scReconnect.setMessage("重连失败");
+                sendProto(clientPoint, scReconnect);
+                return;
+            }
+            SCReconnect scReconnect = new SCReconnect();
+            scReconnect.setResult(0);
+            scReconnect.setMessage("重连成功");
+            sendProto(clientPoint, scReconnect);
+        });
     }
 
     @ProtoListener(CSCreatePlayer.class)

@@ -62,6 +62,7 @@ import org.apache.logging.log4j.Logger;
 import org.game.core.GameServiceBase;
 import org.game.core.Param;
 import org.game.global.rpc.IHumanGlobalService;
+
 import java.util.concurrent.CompletableFuture;
 
 public class HumanGlobalService extends GameServiceBase implements IHumanGlobalService {

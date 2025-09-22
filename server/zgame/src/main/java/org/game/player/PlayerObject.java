@@ -143,10 +143,29 @@ public class PlayerObject {
     protected void onLoadingComplete() {
         fireEvent(new OnPlayerLoadComplete());
 
-        // 修改ClientService的HumanToPoint连接点，并切换阶段
-        IClientService clientService = ReferenceFactory.getProxy(IClientService.class, clientPoint);
-        clientService.setPlayerPoint(playerId, playerPoint);
+        setState(PlayerStateEnum.READY);
+        // 随机token
+        token = String.valueOf(Math.random());
 
+        syncPlayerPointToClientService();
+
+        // 发送协议
+        sendToClientEvent();
+    }
+
+    public void reconnect(ToPoint clientPoint) {
+        logger.debug("PlayerObject 重连: {}", clientPoint);
+        setClientPoint(clientPoint);
+
+        syncPlayerPointToClientService();
+
+        sendToClientEvent();
+
+        // TODO 进入场景
+
+    }
+
+    private void sendToClientEvent() {
         // 发送协议
         SCSendToClientBegin scSendToClientBegin = new SCSendToClientBegin();
         sendMessage(scSendToClientBegin);
@@ -154,12 +173,14 @@ public class PlayerObject {
         fireEvent(new OnSendToClient());
 
         SCSendToClientEnd scSendToClientEnd = new SCSendToClientEnd();
+        scSendToClientEnd.setToken(token);
         sendMessage(scSendToClientEnd);
+    }
 
-        setState(PlayerStateEnum.READY);
-
-        // 随机token
-        token = String.valueOf(Math.random());
+    private void syncPlayerPointToClientService() {
+        // 修改ClientService的HumanToPoint连接点，并切换阶段
+        IClientService clientService = ReferenceFactory.getProxy(IClientService.class, clientPoint);
+        clientService.setPlayerPoint(playerId, playerPoint);
     }
 
     public String getToken() {

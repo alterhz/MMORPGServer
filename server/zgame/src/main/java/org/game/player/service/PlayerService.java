@@ -12,7 +12,10 @@ import org.game.core.human.PlayerProtoDispatcher;
 import org.game.core.message.ProtoScanner;
 import org.game.core.net.Message;
 import org.game.core.rpc.PlayerServiceBase;
+import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.RpcInvocation;
+import org.game.core.rpc.ToPoint;
+import org.game.global.rpc.IClientService;
 import org.game.player.PlayerObject;
 import org.game.player.PlayerStateEnum;
 import org.game.player.rpc.IPlayerService;
@@ -137,6 +140,19 @@ public class PlayerService extends GameServiceBase implements IPlayerService {
     @Override
     public void fireEvent(IEvent event) {
         playerObj.fireEvent(event);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> reconnect(String token, ToPoint clientPoint) {
+        if (!playerObj.getToken().equalsIgnoreCase(token)) {
+            logger.error("HumanObjectService 重连失败: token={}, playerObj={}", token, playerObj);
+            return CompletableFuture.completedFuture(false);
+        }
+
+        logger.info("HumanObjectService 重连成功: token={}, playerObj={}", token, playerObj);
+        playerObj.reconnect(clientPoint);
+
+        return CompletableFuture.completedFuture(true);
     }
 
 

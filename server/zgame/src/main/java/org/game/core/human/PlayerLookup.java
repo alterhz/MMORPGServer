@@ -38,6 +38,19 @@ public class PlayerLookup {
     }
 
     /**
+     * 通过playerId获取PlayerPoint，验证token一致
+     */
+    public static ToPoint getPlayerPoint(long playerId, String token) {
+        PlayerObject playerObject = playerIdMap.get(playerId);
+        if (playerObject != null) {
+            if (playerObject.getToken().equals(token)) {
+                return playerObject.getPlayerPoint();
+            }
+        }
+        return null;
+    }
+
+    /**
      * 获取玩家线程名称
      */
     public static String getPlayerThreadName(long playerId) {
