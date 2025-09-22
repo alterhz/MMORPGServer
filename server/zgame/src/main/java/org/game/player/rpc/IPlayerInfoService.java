@@ -2,7 +2,7 @@ package org.game.player.rpc;
 
 import org.game.core.rpc.HumanRPCProxy;
 import org.game.player.module.MyStruct;
-import org.game.stage.human.Vector3;
+import org.game.core.utils.Vector3;
 
 import java.util.concurrent.CompletableFuture;
 

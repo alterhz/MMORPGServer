@@ -7,7 +7,7 @@ import org.game.player.PlayerObject;
 import org.game.player.PlayerStateEnum;
 import org.game.player.module.MyStruct;
 import org.game.player.rpc.IPlayerInfoService;
-import org.game.stage.human.Vector3;
+import org.game.core.utils.Vector3;
 
 import java.util.concurrent.CompletableFuture;
 

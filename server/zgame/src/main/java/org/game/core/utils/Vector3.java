@@ -1,4 +1,4 @@
-package org.game.stage.human;
+package org.game.core.utils;
 
 import java.util.Objects;
 
