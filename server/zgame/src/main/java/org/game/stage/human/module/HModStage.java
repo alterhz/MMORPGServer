@@ -8,6 +8,7 @@ import org.game.core.rpc.ReferenceFactory;
 import org.game.player.rpc.IPlayerInfoService;
 import org.game.proto.scene.EnterStageRequest;
 import org.game.stage.StageObject;
+import org.game.stage.human.HumanModBase;
 import org.game.stage.human.HumanObject;
 import org.game.stage.human.Vector3;
 import org.game.stage.human.event.OnStageReadyEvent;

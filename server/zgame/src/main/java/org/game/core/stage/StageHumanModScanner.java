@@ -3,7 +3,7 @@ package org.game.core.stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.utils.ScanClassUtils;
-import org.game.stage.human.module.HumanModBase;
+import org.game.stage.human.HumanModBase;
 
 import java.util.ArrayList;
 import java.util.List;

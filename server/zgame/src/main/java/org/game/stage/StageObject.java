@@ -8,7 +8,9 @@ import org.game.global.rpc.IStageGlobalService;
 import org.game.stage.human.HumanObject;
 import org.game.stage.unit.UnitObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +38,36 @@ public class StageObject {
 
     public long getStageId() {
         return stageId;
+    }
+
+    protected void onPulse(long now) {
+
+    }
+
+    protected void onPulseSec(long now) {
+
+    }
+
+    public void pulse(long now) {
+        // 复制stageUnits，然后心跳
+        List<UnitObject> stageUnits = new ArrayList<>(this.stageUnits.values());
+
+        for (UnitObject stageUnit : stageUnits) {
+            stageUnit.onPulse(now);
+        }
+
+        onPulse(now);
+    }
+
+    public void pulseSec(long now) {
+        // 复制stageUnits，然后心跳
+        List<UnitObject> stageUnits = new ArrayList<>(this.stageUnits.values());
+
+        for (UnitObject stageUnit : stageUnits) {
+            stageUnit.onPulseSec(now);
+        }
+
+        onPulseSec(now);
     }
 
     public void humanEnter(HumanObject stageHumanObj) {

@@ -3,7 +3,7 @@ package org.game.core.event;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.stage.StageHumanModScanner;
-import org.game.stage.human.module.HumanModBase;
+import org.game.stage.human.HumanModBase;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;

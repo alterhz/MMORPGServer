@@ -46,6 +46,20 @@ public class StageObjectService extends GameServiceBase implements IStageObjectS
     }
 
     @Override
+    protected void onPulseSec(long now) {
+        super.onPulseSec(now);
+
+        stageObj.pulseSec(now);
+    }
+
+    @Override
+    protected void onPulse(long now) {
+        super.onPulse(now);
+
+        stageObj.pulse(now);
+    }
+
+    @Override
     public CompletableFuture<ToPoint> registerStageHuman(HumanObjectData humanObjectData) {
         GameThread currentGameThread = GameThread.getCurrentGameThread();
         if (currentGameThread.getGameService(String.valueOf(humanObjectData.getPlayerId())) != null) {

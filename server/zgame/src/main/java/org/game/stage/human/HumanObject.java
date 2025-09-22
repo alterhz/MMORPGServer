@@ -13,7 +13,6 @@ import org.game.global.rpc.IClientService;
 import org.game.proto.scene.StageReadyNotify;
 import org.game.stage.StageObject;
 import org.game.stage.human.event.OnStageReadyEvent;
-import org.game.stage.human.module.HumanModBase;
 import org.game.stage.unit.UnitObject;
 
 import java.util.HashMap;
@@ -28,7 +27,7 @@ public class HumanObject extends UnitObject {
 
     private ToPoint humanPoint;
 
-    private final Map<Class<?>, HumanModBase> stageHumanModMap = new HashMap<>();
+    private final Map<Class<?>, HumanModBase> humanModBaseMap = new HashMap<>();
 
     /**
      * 角色对象使用playerId替换unitId
@@ -90,28 +89,39 @@ public class HumanObject extends UnitObject {
     }
 
     private void InitMods() {
-        List<Class<? extends HumanModBase>> stageHumanModClasses = StageHumanModScanner.getStageHumanModClasses();
-        for (Class<? extends HumanModBase> modClass : stageHumanModClasses) {
+        List<Class<? extends HumanModBase>> humanModClasses = StageHumanModScanner.getStageHumanModClasses();
+        for (Class<? extends HumanModBase> modClass : humanModClasses) {
             try {
                 // 使用带参数的构造函数创建实例
                 HumanModBase hModBase = modClass.getConstructor(HumanObject.class).newInstance(this);
-                stageHumanModMap.put(modClass, hModBase);
+                humanModBaseMap.put(modClass, hModBase);
             } catch (Exception e) {
                 logger.error("StageHumanModBase init error", e);
             }
         }
-        logger.info("{} 加载完成 {} 个StageHumanModBase", this, stageHumanModClasses.size());
+        logger.info("{} 加载完成 {} 个StageHumanModBase", this, humanModClasses.size());
     }
 
     public <T extends HumanModBase> T getMod(Class<T> clazz) {
-        return (T) stageHumanModMap.get(clazz);
+        return (T) humanModBaseMap.get(clazz);
     }
 
     public HumanModBase getModBase(Class<?> clazz) {
-        return stageHumanModMap.get(clazz);
+        return humanModBaseMap.get(clazz);
     }
 
-    // TODO 添加协议监听
 
-    // TODO 添加事件监听
+    @Override
+    public void onPulse(long now) {
+        super.onPulse(now);
+
+        humanModBaseMap.forEach((aClass, hModBase) -> hModBase.onPulse(now));
+    }
+
+    @Override
+    public void onPulseSec(long now) {
+        super.onPulseSec(now);
+
+        humanModBaseMap.forEach((aClass, hModBase) -> hModBase.onPulseSec(now));
+    }
 }

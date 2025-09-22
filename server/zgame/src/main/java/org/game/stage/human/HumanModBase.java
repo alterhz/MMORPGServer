@@ -1,8 +1,7 @@
-package org.game.stage.human.module;
+package org.game.stage.human;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.game.stage.human.HumanObject;
 
 /**
  * 场景角色模块基类
@@ -25,5 +24,13 @@ public class HumanModBase {
 
     public <T extends HumanModBase> T getMod(Class<T> clazz) {
         return humanObj.getMod(clazz);
+    }
+
+    protected void onPulse(long now) {
+
+    }
+
+    protected void onPulseSec(long now) {
+
     }
 }

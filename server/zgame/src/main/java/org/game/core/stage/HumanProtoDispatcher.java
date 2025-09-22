@@ -3,7 +3,7 @@ package org.game.core.stage;
 import org.game.core.event.EventDispatcher;
 import org.game.core.message.ProtoListener;
 import org.game.core.message.ProtoScanner;
-import org.game.stage.human.module.HumanModBase;
+import org.game.stage.human.HumanModBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

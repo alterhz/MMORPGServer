@@ -22,4 +22,11 @@ public abstract class UnitObject {
     }
 
 
+    public void onPulse(long now) {
+
+    }
+
+    public void onPulseSec(long now) {
+
+    }
 }
