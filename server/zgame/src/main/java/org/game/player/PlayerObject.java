@@ -248,7 +248,7 @@ public class PlayerObject {
         }
     }
 
-    public PlayerServiceBase getHumanService(String classSimpleName) {
+    public PlayerServiceBase getPlayerService(String classSimpleName) {
         return humanServiceBaseMap.get(classSimpleName);
     }
 

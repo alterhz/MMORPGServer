@@ -14,6 +14,7 @@ import org.game.core.net.RC4DecryptHandler;
 import org.game.core.net.RC4EncryptHandler;
 import org.game.core.message.ProtoScanner;
 import org.game.proto.login.CSLogin;
+import org.game.proto.login.CSReconnect;
 import org.game.test.net.handler.LoginHandler;
 
 import java.util.Scanner;
@@ -34,6 +35,8 @@ public class NettyClientAuto {
     private EventLoopGroup group;
     private Channel channel;
 
+    private ClientProtoDispatcher dispatcher;
+
     public NettyClientAuto(String host, int port, String rc4Key) {
         this.host = host;
         this.port = port;
@@ -46,40 +49,13 @@ public class NettyClientAuto {
      * @throws InterruptedException 如果连接过程中线程被中断
      */
     public void start(ClientProtoDispatcher dispatcher, String account) throws InterruptedException {
+        this.dispatcher = dispatcher;
         group = new NioEventLoopGroup();
         
         try {
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(group)
-                    .channel(NioSocketChannel.class)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ChannelPipeline pipeline = ch.pipeline();
-                            
-                            // 添加长度字段解码器处理粘包问题
-                            pipeline.addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 0, 4, 0, 4));
-                            
-                            // 添加RC4解密处理器
-                            pipeline.addLast(new RC4DecryptHandler(rc4Key));
-                            
-                            // 添加客户端业务处理器
-                            pipeline.addLast(new ClientHandler(dispatcher));
-                            
-                            // 添加长度字段编码器
-                            pipeline.addLast(new LengthFieldPrepender(4));
+            Channel connectChannel = connectToServer(dispatcher);
 
-                            // 添加RC4加密处理器（用于出站数据）
-                            pipeline.addLast(new RC4EncryptHandler(rc4Key));
-                        }
-                    });
-            
-            // 连接到服务器
-            ChannelFuture future = bootstrap.connect(host, port).sync();
-            channel = future.channel();
-            LogCore.logger.info("已连接到服务器 {}:{}", host, port);
-
-            login(account);
+            login(connectChannel, account);
 
             // 等待用户输入并发送消息
             handleUserInput();
@@ -91,11 +67,44 @@ public class NettyClientAuto {
         }
     }
 
-    private void login(String account) {
+    private Channel connectToServer(ClientProtoDispatcher dispatcher) throws InterruptedException {
+        Bootstrap bootstrap = new Bootstrap();
+        bootstrap.group(group)
+                .channel(NioSocketChannel.class)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ChannelPipeline pipeline = ch.pipeline();
+
+                        // 添加长度字段解码器处理粘包问题
+                        pipeline.addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 0, 4, 0, 4));
+
+                        // 添加RC4解密处理器
+                        pipeline.addLast(new RC4DecryptHandler(rc4Key));
+
+                        // 添加客户端业务处理器
+                        pipeline.addLast(new ClientHandler(dispatcher));
+
+                        // 添加长度字段编码器
+                        pipeline.addLast(new LengthFieldPrepender(4));
+
+                        // 添加RC4加密处理器（用于出站数据）
+                        pipeline.addLast(new RC4EncryptHandler(rc4Key));
+                    }
+                });
+
+        // 连接到服务器
+        ChannelFuture future = bootstrap.connect(host, port).sync();
+        channel = future.channel();
+        LogCore.logger.info("已连接到服务器 {}:{}", host, port);
+        return channel;
+    }
+
+    private void login(Channel channel, String account) {
         CSLogin csLogin = new CSLogin();
         csLogin.setAccount(account);
         csLogin.setPassword("password");
-        Integer protoID = ProtoScanner.getProtoID(CSLogin.class);
+        int protoID = ProtoScanner.getProtoID(CSLogin.class);
         Message message = Message.createMessage(protoID, csLogin);
 
         // 发送消息
@@ -105,6 +114,24 @@ public class NettyClientAuto {
             }
         });
     }
+
+    private void sendReconnect(Channel newChannel) {
+        CSReconnect csConnect = new CSReconnect();
+        csConnect.setPlayerId(TokenData.getPlayerId());
+        csConnect.setToken(TokenData.getToken());
+
+        LogCore.logger.info("重新连接：{}", csConnect);
+
+        int protoID = ProtoScanner.getProtoID(CSReconnect.class);
+        Message message = Message.createMessage(protoID, csConnect);
+        newChannel.writeAndFlush(message.toBytes()).addListener(future -> {
+            if (!future.isSuccess()) {
+                LogCore.logger.error("发送消息失败", future.cause());
+            }
+        });
+    }
+
+
 
     /**
      * 处理用户输入，发送消息到服务器
@@ -124,6 +151,12 @@ public class NettyClientAuto {
                     // 构造测试消息包：协议ID(4字节)+内容
                     byte[] content = input.getBytes();
 
+                    // 断线重连
+                    if (input.equals("reconnect")) {
+                        Channel newChannel = connectToServer(this.dispatcher);
+                        sendReconnect(newChannel);
+                    }
+
                     
                     // 等待一段时间避免过快输入
                     TimeUnit.MILLISECONDS.sleep(100);
@@ -135,7 +168,9 @@ public class NettyClientAuto {
             }
         }).start();
     }
-    
+
+
+
     /**
      * 关闭客户端资源
      */
@@ -160,8 +195,11 @@ public class NettyClientAuto {
 
         ProtoScanner.init();
 
+        LoginHandler loginHandler = new LoginHandler();
+        loginHandler.init();
+
         NettyClientAuto client = new NettyClientAuto("127.0.0.1", 1080, "your_rc4_key");
-        client.start(new LoginHandler(), "robot");
+        client.start(loginHandler, "robot");
     }
 
 }

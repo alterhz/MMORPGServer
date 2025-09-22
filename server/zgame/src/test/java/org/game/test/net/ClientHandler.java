@@ -22,7 +22,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         LogCore.logger.info("与服务器建立连接: {}", ctx.channel().remoteAddress());
-        clientProtoDispatcher.init();
         clientProtoDispatcher.setChannel(ctx.channel());
     }
 

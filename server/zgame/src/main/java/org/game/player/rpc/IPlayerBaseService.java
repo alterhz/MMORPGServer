@@ -1,0 +1,40 @@
+package org.game.player.rpc;
+
+import org.game.core.Param;
+import org.game.core.event.IEvent;
+import org.game.core.net.Message;
+import org.game.core.rpc.RPCProxy;
+import org.game.core.rpc.ToPoint;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+/**
+ * 玩家基础服务，主要处理转发，不能处理逻辑（<b>！！！注意！！！</b>）。
+ */
+@RPCProxy(startupType = RPCProxy.StartupType.MANUAL)
+public interface IPlayerBaseService {
+    /**
+     * 热更新
+     */
+    void hotfix(Param param);
+
+    /**
+     * 转发消息
+     */
+    void dispatchProto(Message message);
+
+    /**
+     * 转发rpc调用
+     */
+    String DISPATCH_METHOD_NAME = "dispatchRPC";
+    /**
+     * 转发rpc调用
+     */
+    CompletableFuture<Object> dispatchRPC(String hModService, String methodName, List<Object> parameters, List<String> parameterTypes);
+
+    /**
+     * 转发事件
+     */
+    void fireEvent(IEvent event);
+}

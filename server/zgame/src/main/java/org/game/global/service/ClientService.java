@@ -12,7 +12,7 @@ import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.global.rpc.IClientService;
 import org.game.global.rpc.ILoginService;
-import org.game.player.rpc.IPlayerService;
+import org.game.player.rpc.IPlayerBaseService;
 import org.game.stage.rpc.IHumanService;
 
 import java.util.concurrent.BlockingQueue;
@@ -120,7 +120,7 @@ public class ClientService  extends GameServiceBase implements IClientService {
     }
 
     @Override
-    public void setStageHumanToPoint(ToPoint humanPoint) {
+    public void setHumanPoint(ToPoint humanPoint) {
         this.humanPoint = humanPoint;
         logger.info("ClientService 设置Human连接点, id={}, humanId={}, humanPoint={}", getName(), playerId, humanPoint);
     }
@@ -180,7 +180,7 @@ public class ClientService  extends GameServiceBase implements IClientService {
             case PLAYING:
                 // 处理游戏请求，协议ID大于50000，转发到场景服务
                 if (message.getProtoID() < 50000) {
-                    IPlayerService humanService = ReferenceFactory.getProxy(IPlayerService.class, playerPoint);
+                    IPlayerBaseService humanService = ReferenceFactory.getProxy(IPlayerBaseService.class, playerPoint);
                     humanService.dispatchProto(message);
                 } else {
                     IHumanService humanService = ReferenceFactory.getProxy(IHumanService.class, humanPoint);

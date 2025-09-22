@@ -11,7 +11,10 @@ public class RobotLogin {
 
         ProtoScanner.init();
 
+        LoginHandler dispatcher = new LoginHandler();
+        dispatcher.init();
+
         NettyClientAuto client = new NettyClientAuto("127.0.0.1", 11001, "your_rc4_key");
-        client.start(new LoginHandler(), "robot05");
+        client.start(dispatcher, "robot05");
     }
 }

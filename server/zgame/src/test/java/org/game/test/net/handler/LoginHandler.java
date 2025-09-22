@@ -10,6 +10,7 @@ import org.game.proto.scene.EnterStageRequest;
 import org.game.proto.scene.EnterStageResponse;
 import org.game.proto.scene.StageReadyNotify;
 import org.game.test.net.ClientProtoDispatcher;
+import org.game.test.net.TokenData;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +19,13 @@ public class LoginHandler extends ClientProtoDispatcher {
 
     public LoginHandler()
     {
+    }
+
+    @ProtoListener(SCReconnect.class)
+    public void onReconnect(Message message) {
+        SCReconnect scReconnect = message.getProto(SCReconnect.class);
+        logger.debug("收到重连结果:{}", scReconnect);
+
     }
 
     @ProtoListener(SCLogin.class)
@@ -46,10 +54,13 @@ public class LoginHandler extends ClientProtoDispatcher {
                 csCreatePlayer.setProfession("magic");
                 sendMessage(csCreatePlayer);
             } else {
-                logger.info("选择角色");
                 CSSelectPlayer csSelectPlayer = new CSSelectPlayer();
-                csSelectPlayer.setPlayerId(scQueryPlayers.getPlayer().get(0).getid());
+                long playerId = scQueryPlayers.getPlayer().get(0).getid();
+                csSelectPlayer.setPlayerId(playerId);
                 sendMessage(csSelectPlayer);
+
+                TokenData.setPlayerId(playerId);
+                logger.info("选择角色：{}", playerId);
             }
         }
     }
@@ -93,6 +104,7 @@ public class LoginHandler extends ClientProtoDispatcher {
     public void onSendToClientEnd(Message message) {
         // 处理消息
         SCSendToClientEnd scSendToClientEnd = message.getProto(SCSendToClientEnd.class);
+        TokenData.setToken(scSendToClientEnd.getToken());
         logger.info("结束发送数据:{}", scSendToClientEnd);
 
         // 测试

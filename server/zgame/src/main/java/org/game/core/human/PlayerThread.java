@@ -10,7 +10,7 @@ import org.game.core.rpc.ToPoint;
 import org.game.dao.PlayerDB;
 import org.game.global.rpc.IServerService;
 import org.game.player.PlayerObject;
-import org.game.player.service.PlayerService;
+import org.game.player.service.PlayerBaseService;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,7 +79,7 @@ public class PlayerThread extends GameThread {
 
         PlayerObject humanObj = new PlayerObject(playerDB, humanPoint);
         humanObj.setClientPoint(clientPoint);
-        PlayerService humanService = new PlayerService(humanObj);
+        PlayerBaseService humanService = new PlayerBaseService(humanObj);
         playerThread.addGameService(humanService);
         playerThread.runTask(() -> {
             humanService.init();

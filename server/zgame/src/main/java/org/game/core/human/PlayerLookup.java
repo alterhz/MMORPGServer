@@ -1,13 +1,12 @@
 package org.game.core.human;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.core.GameProcess;
 import org.game.core.GameThread;
 import org.game.core.rpc.ToPoint;
 import org.game.player.PlayerObject;
-import org.game.player.service.PlayerService;
+import org.game.player.service.PlayerBaseService;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,7 +67,7 @@ public class PlayerLookup {
             GameThread humanThread = GameProcess.getGameThread(playerThreadName);
             if (humanThread != null) {
                 humanThread.runTask(() -> {
-                    PlayerService humanService = (PlayerService)humanThread.getGameService(String.valueOf(playerObject.getPlayerId()));
+                    PlayerBaseService humanService = (PlayerBaseService)humanThread.getGameService(String.valueOf(playerObject.getPlayerId()));
                     if (humanService != null) {
                         PlayerObject humanObj = humanService.getPlayerObj();
                         humanObj.disconnect();

@@ -7,6 +7,7 @@ import org.game.core.Param;
 import org.game.core.message.ProtoScanner;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
+import org.game.core.rpc.ToPoint;
 import org.game.core.stage.HumanProtoDispatcher;
 import org.game.player.rpc.IPlayerInfoService;
 import org.game.stage.human.module.HModStage;
@@ -74,6 +75,12 @@ public class HumanService extends GameServiceBase implements IHumanService {
         getGameThread().runTask(() -> {
             getGameThread().removeGameService(HumanService.this);
         });
+    }
+
+    @Override
+    public void reconnect(ToPoint clientPoint) {
+        humanObj.setClientPoint(clientPoint);
+        logger.info("HumanService 重连: {}", clientPoint);
     }
 
 }

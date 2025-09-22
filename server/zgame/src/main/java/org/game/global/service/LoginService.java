@@ -29,12 +29,12 @@ import org.game.core.rpc.ToPoint;
 import org.game.dao.IdAllocatorDB;
 import org.game.dao.PlayerDB;
 import org.game.dao.ServerDB;
+import org.game.global.rpc.IClientService;
+import org.game.global.rpc.ILoginService;
 import org.game.player.module.MyStruct;
 import org.game.player.rpc.IPlayerInfoService;
 import org.game.player.rpc.IPlayerService;
 import org.game.proto.login.*;
-import org.game.global.rpc.IClientService;
-import org.game.global.rpc.ILoginService;
 
 import java.util.ArrayList;
 import java.util.HashMap;

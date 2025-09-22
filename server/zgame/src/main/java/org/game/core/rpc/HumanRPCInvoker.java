@@ -10,7 +10,7 @@ import org.game.core.ServiceRegistryManager;
 import org.game.core.human.PlayerLookup;
 import org.game.core.human.PlayerThread;
 import org.game.core.utils.JsonUtils;
-import org.game.player.rpc.IPlayerService;
+import org.game.player.rpc.IPlayerBaseService;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -90,7 +90,7 @@ public class HumanRPCInvoker implements InvocationHandler {
 
 
         // 构造RpcInvocation
-        RpcInvocation invocation = new RpcInvocation(fromPoint, targetPoint, IPlayerService.DISPATCH_METHOD_NAME, dispatchMethodArgs, dispatchMethodArgsTypes);
+        RpcInvocation invocation = new RpcInvocation(fromPoint, targetPoint, IPlayerBaseService.DISPATCH_METHOD_NAME, dispatchMethodArgs, dispatchMethodArgsTypes);
 
         // 生成唯一请求ID
         String requestId = UUID.randomUUID().toString();

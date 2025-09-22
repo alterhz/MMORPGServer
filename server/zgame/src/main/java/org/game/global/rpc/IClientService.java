@@ -14,7 +14,7 @@ public interface IClientService {
 
     void setPlayerPoint(long playerId, ToPoint humanPoint);
 
-    void setStageHumanToPoint(ToPoint stageHumanPoint);
+    void setHumanPoint(ToPoint stageHumanPoint);
 
     void sendMessage(Message message);
 

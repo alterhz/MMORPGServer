@@ -2,8 +2,6 @@ package org.game.stage.human;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.game.core.GameProcess;
-import org.game.core.GameThread;
 import org.game.core.event.HumanEventDispatcher;
 import org.game.core.event.IEvent;
 import org.game.core.message.ProtoScanner;
@@ -65,7 +63,7 @@ public class HumanObject extends UnitObject {
         // 更新ClientService的stageHumanPoint
         IClientService clientService = ReferenceFactory.getProxy(IClientService.class, clientPoint);
         ToPoint stageHumanPoint = getHumanPoint();
-        clientService.setStageHumanToPoint(stageHumanPoint);
+        clientService.setHumanPoint(stageHumanPoint);
 
         StageReadyNotify stageReadyNotify = new StageReadyNotify();
         stageReadyNotify.setStageSn(stageObj.getStageSn());
