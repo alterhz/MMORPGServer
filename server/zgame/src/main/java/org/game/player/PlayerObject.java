@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.game.core.TimerQueue;
 import org.game.core.event.PlayerEventDispatcher;
 import org.game.core.event.IEvent;
-import org.game.core.human.PlayerModScanner;
+import org.game.core.player.PlayerModScanner;
 import org.game.core.net.Message;
 import org.game.core.rpc.*;
 import org.game.dao.PlayerDB;

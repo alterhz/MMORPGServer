@@ -26,7 +26,19 @@ public class HModStage extends HumanModBase {
     public void onEnterStage(EnterStageRequest enterStageRequest) {
         HumanObject humanObj = getHumanObj();
         StageObject stageObj = humanObj.getStageObj();
-        stageObj.humanEnter(humanObj);
+        stageObj.enterStage(humanObj);
+    }
+
+    // TODO 测试用
+    public void leaveStage() {
+        HumanObject humanObj = getHumanObj();
+        StageObject stageObj = humanObj.getStageObj();
+        if (stageObj == null) {
+            logger.error("HModStage.leaveStage: stageObj is null");
+            return;
+        }
+
+        stageObj.leaveStage(humanObj);
     }
 
     @EventListener

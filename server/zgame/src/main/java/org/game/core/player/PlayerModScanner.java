@@ -1,4 +1,4 @@
-package org.game.core.human;
+package org.game.core.player;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

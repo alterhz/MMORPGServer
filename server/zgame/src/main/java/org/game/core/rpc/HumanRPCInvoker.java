@@ -7,8 +7,8 @@ import org.apache.logging.log4j.Logger;
 import org.game.core.GameProcess;
 import org.game.core.GameThread;
 import org.game.core.ServiceRegistryManager;
-import org.game.core.human.PlayerLookup;
-import org.game.core.human.PlayerThread;
+import org.game.core.player.PlayerLookup;
+import org.game.core.player.PlayerThread;
 import org.game.core.utils.JsonUtils;
 import org.game.player.rpc.IPlayerBaseService;
 

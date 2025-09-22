@@ -21,6 +21,13 @@ public abstract class UnitObject {
         return stageObj;
     }
 
+    public void onEnterStage(StageObject stageObj) {
+
+    }
+
+    public void onLeaveStage(StageObject stageObj) {
+
+    }
 
     public void onPulse(long now) {
 

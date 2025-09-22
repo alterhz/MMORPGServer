@@ -2,7 +2,7 @@ package org.game.core.event;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.game.core.human.PlayerModScanner;
+import org.game.core.player.PlayerModScanner;
 import org.game.player.PlayerModBase;
 
 import java.lang.reflect.Method;

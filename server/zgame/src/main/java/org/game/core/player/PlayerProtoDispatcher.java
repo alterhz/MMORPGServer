@@ -1,4 +1,4 @@
-package org.game.core.human;
+package org.game.core.player;
 
 import org.game.core.event.EventDispatcher;
 import org.game.core.message.ProtoListener;

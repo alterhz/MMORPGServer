@@ -3,7 +3,7 @@ package org.game.core.db;
 import com.mongodb.client.model.Filters;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.game.core.human.PlayerModScanner;
+import org.game.core.player.PlayerModScanner;
 import org.game.player.PlayerModBase;
 import org.game.player.PlayerObject;
 

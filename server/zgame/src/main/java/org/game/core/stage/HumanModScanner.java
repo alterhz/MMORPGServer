@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class StageHumanModScanner {
+public class HumanModScanner {
 
-    public static final Logger logger = LogManager.getLogger(StageHumanModScanner.class);
+    public static final Logger logger = LogManager.getLogger(HumanModScanner.class);
 
     private static final List<Class<? extends HumanModBase>> stageHumanModClasses = new ArrayList<>();
 

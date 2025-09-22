@@ -28,16 +28,19 @@ public class StageObjectService extends GameServiceBase implements IStageObjectS
     @Override
     public void init() {
         logger.info("StageObjectService 初始化. {}", stageObj);
+        stageObj.init();
     }
 
     @Override
     public void startup() {
         logger.info("StageObjectService 启动");
+        stageObj.startup();
     }
 
     @Override
     public void destroy() {
         logger.info("StageObjectService 销毁");
+        stageObj.destroy();
     }
 
     @Override

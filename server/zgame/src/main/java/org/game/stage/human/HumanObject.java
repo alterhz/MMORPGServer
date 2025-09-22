@@ -8,8 +8,9 @@ import org.game.core.message.ProtoScanner;
 import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
-import org.game.core.stage.StageHumanModScanner;
+import org.game.core.stage.HumanModScanner;
 import org.game.global.rpc.IClientService;
+import org.game.global.rpc.IStageGlobalService;
 import org.game.proto.scene.StageReadyNotify;
 import org.game.stage.StageObject;
 import org.game.stage.human.event.OnStageReadyEvent;
@@ -89,7 +90,7 @@ public class HumanObject extends UnitObject {
     }
 
     private void InitMods() {
-        List<Class<? extends HumanModBase>> humanModClasses = StageHumanModScanner.getStageHumanModClasses();
+        List<Class<? extends HumanModBase>> humanModClasses = HumanModScanner.getStageHumanModClasses();
         for (Class<? extends HumanModBase> modClass : humanModClasses) {
             try {
                 // 使用带参数的构造函数创建实例
@@ -110,6 +111,21 @@ public class HumanObject extends UnitObject {
         return humanModBaseMap.get(clazz);
     }
 
+    @Override
+    public void onEnterStage(StageObject stageObj) {
+        super.onEnterStage(stageObj);
+
+        IStageGlobalService stageGlobalService = ReferenceFactory.getProxy(IStageGlobalService.class);
+        stageGlobalService.humanEnter(stageObj.getStageId());
+    }
+
+    @Override
+    public void onLeaveStage(StageObject stageObj) {
+        super.onLeaveStage(stageObj);
+
+        IStageGlobalService stageGlobalService = ReferenceFactory.getProxy(IStageGlobalService.class);
+        stageGlobalService.humanLeave(stageObj.getStageId());
+    }
 
     @Override
     public void onPulse(long now) {

@@ -22,7 +22,7 @@ public class HumanProtoDispatcher extends EventDispatcher {
     @Override
     public void init() {
         // 扫描所有的HMod，获取包含@ProtoListener注解的方法，注册到HumanProtoDispatcher
-        List<Class<? extends HumanModBase>> stageHumanModClasses = StageHumanModScanner.getStageHumanModClasses();
+        List<Class<? extends HumanModBase>> stageHumanModClasses = HumanModScanner.getStageHumanModClasses();
         for (Class<? extends HumanModBase> stageHumanModClass : stageHumanModClasses) {
             Method[] methods = stageHumanModClass.getDeclaredMethods();
             for (Method method : methods) {

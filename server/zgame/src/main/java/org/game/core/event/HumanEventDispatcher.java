@@ -2,7 +2,7 @@ package org.game.core.event;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.game.core.stage.StageHumanModScanner;
+import org.game.core.stage.HumanModScanner;
 import org.game.stage.human.HumanModBase;
 
 import java.lang.reflect.Method;
@@ -21,7 +21,7 @@ public class HumanEventDispatcher extends EventDispatcher {
     @Override
     public void init() {
         // 扫描所有的HMod，获取包含@EventListener注解的方法，注册到HumanEventDispatcher
-        List<Class<? extends HumanModBase>> hModClasses = StageHumanModScanner.getStageHumanModClasses();
+        List<Class<? extends HumanModBase>> hModClasses = HumanModScanner.getStageHumanModClasses();
         for (Class<? extends HumanModBase> hModClass : hModClasses) {
             Method[] methods = hModClass.getDeclaredMethods();
             for (Method method : methods) {

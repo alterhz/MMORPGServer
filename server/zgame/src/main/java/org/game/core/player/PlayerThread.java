@@ -1,4 +1,4 @@
-package org.game.core.human;
+package org.game.core.player;
 
 import org.game.core.GameProcess;
 import org.game.core.GameThread;
