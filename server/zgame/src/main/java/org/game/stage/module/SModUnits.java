@@ -1,9 +1,11 @@
 package org.game.stage.module;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.game.core.event.EventListener;
 import org.game.stage.StageObject;
+import org.game.stage.event.EnterStageEvent;
+import org.game.stage.event.LeaveStageEvent;
 import org.game.stage.human.HumanObject;
+import org.game.stage.unit.Entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,12 +20,20 @@ public class SModUnits extends StageModBase {
         super(stageObj);
     }
 
-    public void onUnitEnter(HumanObject humanObject) {
-        humanMap.put(humanObject.getUnitId(), humanObject);
+    @EventListener
+    public void onUnitEnter(EnterStageEvent enterStageEvent) {
+        Entity entity = enterStageEvent.getUnitObject();
+        if (entity instanceof HumanObject) {
+            humanMap.put(entity.getEntityId(), (HumanObject) entity);
+        }
     }
 
-    public void onUnitLeave(HumanObject humanObject) {
-        humanMap.remove(humanObject.getUnitId());
+    @EventListener
+    public void onUnitLeave(LeaveStageEvent leaveStageEvent) {
+        Entity entity = leaveStageEvent.getUnitObject();
+        if (entity instanceof HumanObject) {
+            humanMap.remove(entity.getEntityId());
+        }
     }
 
     // 获取角色列表

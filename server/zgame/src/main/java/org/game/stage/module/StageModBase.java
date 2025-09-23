@@ -3,8 +3,7 @@ package org.game.stage.module;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.stage.StageObject;
-import org.game.stage.human.HumanObject;
-import org.game.stage.unit.UnitObject;
+import org.game.stage.unit.Entity;
 
 public class StageModBase {
 
@@ -22,14 +21,6 @@ public class StageModBase {
 
     public <T extends StageModBase> T getMod(Class<T> clazz) {
         return stageObj.getMod(clazz);
-    }
-
-    public void onUnitEnter(UnitObject unitObj) {
-
-    }
-
-    public void onUnitLeave(UnitObject unitObj) {
-
     }
 
     public void onPulse(long now) {

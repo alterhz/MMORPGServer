@@ -6,10 +6,8 @@ import org.game.core.GameServiceBase;
 import org.game.core.Param;
 import org.game.core.message.ProtoScanner;
 import org.game.core.net.Message;
-import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.core.stage.HumanProtoDispatcher;
-import org.game.player.rpc.IPlayerInfoService;
 import org.game.stage.human.module.HModStage;
 import org.game.stage.rpc.IHumanService;
 import org.game.stage.human.HumanObject;
@@ -21,7 +19,7 @@ public class HumanService extends GameServiceBase implements IHumanService {
     private final HumanObject humanObj;
     
     public HumanService(HumanObject humanObj) {
-        super(String.valueOf(humanObj.getUnitId()));
+        super(String.valueOf(humanObj.getEntityId()));
         this.humanObj = humanObj;
     }
 

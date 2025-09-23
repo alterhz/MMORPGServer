@@ -2,19 +2,19 @@ package org.game.stage.unit;
 
 import org.game.stage.StageObject;
 
-public abstract class UnitObject {
+public abstract class Entity {
 
-    protected final long unitId;
+    protected final long entityId;
 
     protected final StageObject stageObj;
 
-    public UnitObject(long unitId, StageObject stageObj) {
-        this.unitId = unitId;
+    public Entity(long entityId, StageObject stageObj) {
+        this.entityId = entityId;
         this.stageObj = stageObj;
     }
 
-    public long getUnitId() {
-        return unitId;
+    public long getEntityId() {
+        return entityId;
     }
 
     public StageObject getStageObj() {

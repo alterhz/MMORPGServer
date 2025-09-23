@@ -14,13 +14,13 @@ import org.game.global.rpc.IStageGlobalService;
 import org.game.proto.scene.StageReadyNotify;
 import org.game.stage.StageObject;
 import org.game.stage.human.event.OnStageReadyEvent;
-import org.game.stage.unit.UnitObject;
+import org.game.stage.unit.Entity;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HumanObject extends UnitObject {
+public class HumanObject extends Entity {
 
     private static final Logger logger = LogManager.getLogger(HumanObject.class);
 
@@ -38,7 +38,7 @@ public class HumanObject extends UnitObject {
     }
 
     public long getPlayerId() {
-        return this.unitId;
+        return this.entityId;
     }
 
     public ToPoint getClientPoint() {

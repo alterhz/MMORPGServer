@@ -3,15 +3,20 @@ package org.game.stage;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.game.core.event.IEvent;
+import org.game.core.event.StageEventDispatcher;
 import org.game.core.stage.StageModScanner;
+import org.game.stage.event.EnterStageEvent;
+import org.game.stage.event.LeaveStageEvent;
+import org.game.stage.event.PulseEvent;
+import org.game.stage.event.PulseSecEvent;
 import org.game.stage.module.StageModBase;
-import org.game.stage.unit.UnitObject;
+import org.game.stage.unit.Entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 场景对象
@@ -23,12 +28,12 @@ public class StageObject {
     private final int stageSn;
     private final long stageId;
 
-    private final Map<Long, UnitObject> stageUnits = new HashMap<>();
+    private final Map<Long, Entity> stageUnits = new HashMap<>();
 
     /**
      * 存储模块实例的映射
      */
-    private final Map<Class<? extends StageModBase>, StageModBase> modules = new ConcurrentHashMap<>();
+    private final Map<Class<? extends StageModBase>, StageModBase> modules = new HashMap<>();
 
     public StageObject(int stageSn, long stageId) {
         this.stageSn = stageSn;
@@ -66,56 +71,30 @@ public class StageObject {
 
     }
 
-    public void pulse(long now) {
-        // 复制stageUnits，然后心跳
-        List<UnitObject> stageUnits = new ArrayList<>(this.stageUnits.values());
-
-        for (UnitObject stageUnit : stageUnits) {
-            stageUnit.onPulse(now);
-        }
-
-        modules.forEach((clazz, modBase) -> modBase.onPulse(now));
-        onPulse(now);
-    }
-
-    public void pulseSec(long now) {
-        // 复制stageUnits，然后心跳
-        List<UnitObject> stageUnits = new ArrayList<>(this.stageUnits.values());
-
-        for (UnitObject stageUnit : stageUnits) {
-            stageUnit.onPulseSec(now);
-        }
-
-        modules.forEach((clazz, modBase) -> modBase.onPulseSec(now));
-        onPulseSec(now);
-    }
-
-
-
-    public void enterStage(UnitObject unitObject) {
-        if (stageUnits.containsKey(unitObject.getUnitId())) {
-            logger.error("unitObject already exist. unitObject: {}", unitObject);
+    public void enterStage(Entity Entity) {
+        if (stageUnits.containsKey(Entity.getEntityId())) {
+            logger.error("unitObject already exist. unitObject: {}", Entity);
             return;
         }
 
-        stageUnits.put(unitObject.getUnitId(), unitObject);
+        stageUnits.put(Entity.getEntityId(), Entity);
 
-        modules.forEach((clazz, modBase) -> modBase.onUnitEnter(unitObject));
+        fireEvent(new EnterStageEvent(Entity));
 
-        unitObject.onEnterStage(this);
+        Entity.onEnterStage(this);
     }
 
-    public void leaveStage(UnitObject unitObject) {
-        if (!stageUnits.containsKey(unitObject.getUnitId())) {
-            logger.error("unitObject not exist. unitObject: {}", unitObject);
+    public void leaveStage(Entity Entity) {
+        if (!stageUnits.containsKey(Entity.getEntityId())) {
+            logger.error("unitObject not exist. unitObject: {}", Entity);
             return;
         }
 
-        stageUnits.remove(unitObject.getUnitId());
+        stageUnits.remove(Entity.getEntityId());
 
-        modules.forEach((clazz, modBase) -> modBase.onUnitLeave(unitObject));
+        fireEvent(new LeaveStageEvent(Entity));
 
-        unitObject.onLeaveStage(this);
+        Entity.onLeaveStage(this);
     }
 
     /**
@@ -135,6 +114,41 @@ public class StageObject {
         logger.info("{} 加载完成 {} 个StageModBase", this, stageModClasses.size());
     }
 
+    public void pulse(long now) {
+        // 复制stageUnits，然后心跳
+        List<Entity> stageUnits = new ArrayList<>(this.stageUnits.values());
+
+        for (Entity stageUnit : stageUnits) {
+            stageUnit.onPulse(now);
+        }
+
+        fireEvent(new PulseEvent());
+        onPulse(now);
+    }
+
+    public void pulseSec(long now) {
+        // 复制stageUnits，然后心跳
+        List<Entity> stageUnits = new ArrayList<>(this.stageUnits.values());
+
+        for (Entity stageUnit : stageUnits) {
+            stageUnit.onPulseSec(now);
+        }
+
+        fireEvent(new PulseSecEvent());
+        onPulseSec(now);
+    }
+
+    /**
+     * 触发事件
+     */
+    public void fireEvent(IEvent event) {
+        String eventKey = event.getClass().getSimpleName().toLowerCase();
+        StageEventDispatcher.getInstance().dispatch(eventKey, method -> {
+            Class<?> modClass = method.getDeclaringClass();
+            return getModBase(modClass);
+        }, event);
+    }
+
     /**
      * 获取模块实例
      *
@@ -144,6 +158,10 @@ public class StageObject {
      */
     public <T extends StageModBase> T getMod(Class<T> clazz) {
         return (T) modules.get(clazz);
+    }
+
+    public StageModBase getModBase(Class<?> clazz) {
+        return modules.get(clazz);
     }
 
     @Override
