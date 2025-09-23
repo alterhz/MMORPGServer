@@ -11,16 +11,18 @@ import org.game.core.rpc.ToPoint;
 import org.game.core.stage.HumanModScanner;
 import org.game.global.rpc.IClientService;
 import org.game.global.rpc.IStageGlobalService;
-import org.game.proto.scene.StageReadyNotify;
+import org.game.proto.scene.*;
 import org.game.stage.StageObject;
 import org.game.stage.human.event.OnStageReadyEvent;
 import org.game.stage.unit.Entity;
+import org.game.stage.unit.UnitObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HumanObject extends Entity {
+public class HumanObject extends UnitObject {
 
     private static final Logger logger = LogManager.getLogger(HumanObject.class);
 
@@ -113,7 +115,7 @@ public class HumanObject extends Entity {
 
     @Override
     public void onEnterStage(StageObject stageObj) {
-        super.onEnterStage(stageObj);
+        // super.onEnterStage(stageObj); // Entity中的方法是抽象的，不能调用
 
         IStageGlobalService stageGlobalService = ReferenceFactory.getProxy(IStageGlobalService.class);
         stageGlobalService.humanEnter(stageObj.getStageId());
@@ -121,7 +123,7 @@ public class HumanObject extends Entity {
 
     @Override
     public void onLeaveStage(StageObject stageObj) {
-        super.onLeaveStage(stageObj);
+        // super.onLeaveStage(stageObj); // Entity中的方法是抽象的，不能调用
 
         IStageGlobalService stageGlobalService = ReferenceFactory.getProxy(IStageGlobalService.class);
         stageGlobalService.humanLeave(stageObj.getStageId());
@@ -139,5 +141,49 @@ public class HumanObject extends Entity {
         super.onPulseSec(now);
 
         humanModBaseMap.forEach((aClass, hModBase) -> hModBase.onPulseSec(now));
+    }
+
+    /**
+     * 发送单位出现广播
+     * @param unit 出现的单位
+     */
+    public void sendUnitAppear(Entity unit) {
+        UnitAppearBroadcast broadcast = new UnitAppearBroadcast();
+        List<Unit> units = new ArrayList<>();
+        Unit u = new Unit();
+        u.setUnitId(unit.getEntityId());
+        u.setName(unit.getClass().getSimpleName() + "_" + unit.getEntityId());
+
+        if (unit.getPosition() != null) {
+            Position pos = new Position();
+            pos.setX(unit.getPosition().getX());
+            pos.setY(unit.getPosition().getY());
+            pos.setZ(unit.getPosition().getZ());
+            u.setPosition(pos);
+        }
+
+        // 设置生命值信息（示例值）
+        u.setCurrentHealth(1000);
+        u.setMaxHealth(1000);
+
+        units.add(u);
+        broadcast.setUnits(units);
+
+        // 发送广播到客户端
+        sendMessage(broadcast);
+    }
+
+    /**
+     * 发送单位消失广播
+     * @param unit 消失的单位
+     */
+    public void sendUnitDisappear(Entity unit) {
+        UnitDisappearBroadcast broadcast = new UnitDisappearBroadcast();
+        List<Long> unitIds = new ArrayList<>();
+        unitIds.add(unit.getEntityId());
+        broadcast.setUnitIds(unitIds);
+
+        // 发送广播到客户端
+        sendMessage(broadcast);
     }
 }

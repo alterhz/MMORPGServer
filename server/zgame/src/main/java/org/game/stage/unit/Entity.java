@@ -1,5 +1,6 @@
 package org.game.stage.unit;
 
+import org.game.core.utils.Vector3;
 import org.game.stage.StageObject;
 
 public abstract class Entity {
@@ -7,6 +8,8 @@ public abstract class Entity {
     protected final long entityId;
 
     protected final StageObject stageObj;
+
+    protected Vector3 position;
 
     public Entity(long entityId, StageObject stageObj) {
         this.entityId = entityId;
@@ -21,13 +24,17 @@ public abstract class Entity {
         return stageObj;
     }
 
-    public void onEnterStage(StageObject stageObj) {
-
+    public Vector3 getPosition() {
+        return position;
     }
 
-    public void onLeaveStage(StageObject stageObj) {
-
+    public void setPosition(Vector3 position) {
+        this.position = position;
     }
+
+    public abstract void onEnterStage(StageObject stageObj);
+
+    public abstract void onLeaveStage(StageObject stageObj);
 
     public void onPulse(long now) {
 
