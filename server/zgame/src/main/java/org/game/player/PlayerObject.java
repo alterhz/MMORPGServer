@@ -29,6 +29,10 @@ import java.util.Map;
 public class PlayerObject {
 
     public static final Logger logger = LogManager.getLogger(PlayerObject.class);
+    /**
+     * 玩家最大掉线可以返回时间：5分钟
+     */
+    public static final int MAX_DROP_TIME = 5 * 60 * 1000;
 
     private final long playerId;
 
@@ -43,6 +47,11 @@ public class PlayerObject {
      * ClientService连接点
      */
     private ToPoint clientPoint;
+
+    /**
+     * 断线时间
+     */
+    private long disconnectTime;
 
     /**
      * 登录Token
@@ -161,8 +170,8 @@ public class PlayerObject {
 
         sendToClientEvent();
 
-        // TODO 进入场景
-
+        // 断线重连
+        disconnectTime = 0L;
     }
 
     private void sendToClientEvent() {
@@ -178,6 +187,10 @@ public class PlayerObject {
     }
 
     private void syncPlayerPointToClientService() {
+        if (clientPoint == null) {
+            logger.error("PlayerObject {}: syncPlayerPointToClientService: clientPoint == null.", this);
+            return;
+        }
         // 修改ClientService的HumanToPoint连接点，并切换阶段
         IClientService clientService = ReferenceFactory.getProxy(IClientService.class, clientPoint);
         clientService.setPlayerPoint(playerId, playerPoint);
@@ -188,6 +201,11 @@ public class PlayerObject {
     }
 
     public <T> void sendMessage(T jsonObject) {
+        if (clientPoint == null) {
+            logger.warn("PlayerObject {}: sendMessage: clientPoint == null.", this);
+            return;
+        }
+
         int protoID = ProtoScanner.getProtoID(jsonObject.getClass());
         IClientService proxy = ReferenceFactory.getProxy(IClientService.class, clientPoint);
         proxy.sendMessage(Message.createMessage(protoID, jsonObject));
@@ -266,6 +284,18 @@ public class PlayerObject {
         modBaseMap.forEach((aClass, hModBase) -> hModBase.onPulse(now));
     }
 
+    public void onPulseSec(long now) {
+        if (state == PlayerStateEnum.READY) {
+            if (disconnectTime != 0L) {
+                // 5分钟自动下线
+                if (now - disconnectTime > MAX_DROP_TIME) {
+                    unload();
+                }
+            }
+        }
+
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -276,10 +306,13 @@ public class PlayerObject {
     public void disconnect() {
         logger.info("断开连接");
 
-        IClientService proxy = ReferenceFactory.getProxy(IClientService.class, clientPoint);
-        proxy.Disconnect();
+        if (clientPoint != null) {
+            IClientService proxy = ReferenceFactory.getProxy(IClientService.class, clientPoint);
+            proxy.Disconnect();
+            clientPoint = null;
+        }
 
-        unload();
+        disconnectTime = System.currentTimeMillis();
     }
 
     public void unload() {
@@ -299,4 +332,7 @@ public class PlayerObject {
     public void Destroy() {
         logger.info("Player {} Destroy", this);
     }
+
+
+
 }

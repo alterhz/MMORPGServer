@@ -83,6 +83,12 @@ public class ClientService  extends GameServiceBase implements IClientService {
             return;
         }
         delayCloseTimer = new TickTimer(2000);
+
+        if (playerPoint != null) {
+            IPlayerBaseService humanService = ReferenceFactory.getProxy(IPlayerBaseService.class, playerPoint);
+            humanService.disconnect();
+            playerPoint = null;
+        }
     }
 
     @Override

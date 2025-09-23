@@ -12,6 +12,9 @@ import org.game.stage.human.HumanModBase;
 import org.game.stage.human.HumanObject;
 import org.game.core.utils.Vector3;
 import org.game.stage.human.event.OnStageReadyEvent;
+import org.game.stage.module.SModUnits;
+
+import java.util.List;
 
 public class HModStage extends HumanModBase {
 
@@ -29,7 +32,14 @@ public class HModStage extends HumanModBase {
         stageObj.enterStage(humanObj);
     }
 
-    // TODO 测试用
+
+
+    @EventListener
+    public void onStageReady(OnStageReadyEvent event) {
+        HumanObject humanObj = getHumanObj();
+        logger.info("HModStage.onStageReady: humanId={}", humanObj.getUnitId());
+    }
+
     public void leaveStage() {
         HumanObject humanObj = getHumanObj();
         StageObject stageObj = humanObj.getStageObj();
@@ -38,16 +48,16 @@ public class HModStage extends HumanModBase {
             return;
         }
 
+        // TODO test
+        List<HumanObject> humanObjects = stageObj.getMod(SModUnits.class).getHumanObjects();
+        logger.info("human count： {}", humanObjects.size());
+
+        savePosition();
+
         stageObj.leaveStage(humanObj);
     }
 
-    @EventListener
-    public void onStageReady(OnStageReadyEvent event) {
-        HumanObject humanObj = getHumanObj();
-        logger.info("HModStage.onStageReady: humanId={}", humanObj.getUnitId());
-    }
-
-    public void savePosition() {
+    private void savePosition() {
         HumanObject humanObj = getHumanObj();
         StageObject stageObj = humanObj.getStageObj();
         if (stageObj == null) {
@@ -58,8 +68,6 @@ public class HModStage extends HumanModBase {
         Vector3 position = new Vector3(1, 2, 3);
         IPlayerInfoService playerInfoService = ReferenceFactory.getPlayerProxy(IPlayerInfoService.class, humanObj.getPlayerId());
         playerInfoService.savePosition(position);
-
-        // 移除服务
     }
 
 }

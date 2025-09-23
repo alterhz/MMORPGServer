@@ -69,8 +69,8 @@ public class HumanService extends GameServiceBase implements IHumanService {
 
     @Override
     public void humanLeaveStage() {
-        logger.info("HumanLeaveStage，保存坐标信息");
-        humanObj.getMod(HModStage.class).savePosition();
+        logger.info("HumanLeaveStage，保存坐标信息等");
+        humanObj.getMod(HModStage.class).leaveStage();
 
         getGameThread().runTask(() -> {
             getGameThread().removeGameService(HumanService.this);

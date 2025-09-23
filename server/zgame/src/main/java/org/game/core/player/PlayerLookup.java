@@ -70,7 +70,7 @@ public class PlayerLookup {
                     PlayerBaseService humanService = (PlayerBaseService)humanThread.getGameService(String.valueOf(playerObject.getPlayerId()));
                     if (humanService != null) {
                         PlayerObject humanObj = humanService.getPlayerObj();
-                        humanObj.disconnect();
+                        humanObj.unload();
                         logger.info("KickPlayerByAccount: {}", humanObj);
                     }
                 });

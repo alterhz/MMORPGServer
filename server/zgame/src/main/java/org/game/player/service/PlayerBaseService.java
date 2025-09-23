@@ -67,6 +67,12 @@ public class PlayerBaseService extends GameServiceBase implements IPlayerBaseSer
         }
     }
 
+    @Override
+    protected void onPulseSec(long now) {
+        super.onPulseSec(now);
+
+        playerObj.onPulseSec(now);
+    }
 
     @Override
     public void destroy() {
@@ -137,6 +143,11 @@ public class PlayerBaseService extends GameServiceBase implements IPlayerBaseSer
     @Override
     public void fireEvent(IEvent event) {
         playerObj.fireEvent(event);
+    }
+
+    @Override
+    public void disconnect() {
+        playerObj.disconnect();
     }
 
 }

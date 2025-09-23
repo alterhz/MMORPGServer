@@ -4,7 +4,6 @@ import org.game.core.Param;
 import org.game.core.event.IEvent;
 import org.game.core.net.Message;
 import org.game.core.rpc.RPCProxy;
-import org.game.core.rpc.ToPoint;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -37,4 +36,6 @@ public interface IPlayerBaseService {
      * 转发事件
      */
     void fireEvent(IEvent event);
+
+    void disconnect();
 }
