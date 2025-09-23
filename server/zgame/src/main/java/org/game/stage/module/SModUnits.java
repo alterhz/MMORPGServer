@@ -5,7 +5,7 @@ import org.game.stage.StageObject;
 import org.game.stage.event.EnterStageEvent;
 import org.game.stage.event.LeaveStageEvent;
 import org.game.stage.human.HumanObject;
-import org.game.stage.unit.Entity;
+import org.game.stage.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;

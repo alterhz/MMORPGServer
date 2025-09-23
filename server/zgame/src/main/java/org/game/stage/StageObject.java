@@ -11,7 +11,7 @@ import org.game.stage.event.LeaveStageEvent;
 import org.game.stage.event.PulseEvent;
 import org.game.stage.event.PulseSecEvent;
 import org.game.stage.module.StageModBase;
-import org.game.stage.unit.Entity;
+import org.game.stage.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;

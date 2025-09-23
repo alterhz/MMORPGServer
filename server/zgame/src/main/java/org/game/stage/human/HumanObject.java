@@ -14,8 +14,8 @@ import org.game.global.rpc.IStageGlobalService;
 import org.game.proto.scene.*;
 import org.game.stage.StageObject;
 import org.game.stage.human.event.OnStageReadyEvent;
-import org.game.stage.unit.Entity;
-import org.game.stage.unit.UnitObject;
+import org.game.stage.entity.Entity;
+import org.game.stage.entity.UnitObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;

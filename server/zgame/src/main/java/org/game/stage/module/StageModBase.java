@@ -3,7 +3,6 @@ package org.game.stage.module;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.game.stage.StageObject;
-import org.game.stage.unit.Entity;
 
 public class StageModBase {
 

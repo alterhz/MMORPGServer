@@ -1,9 +1,5 @@
-package org.game.stage.unit;
+package org.game.stage.entity;
 
-import org.game.proto.scene.Position;
-import org.game.proto.scene.Unit;
-import org.game.proto.scene.UnitAppearBroadcast;
-import org.game.proto.scene.UnitDisappearBroadcast;
 import org.game.stage.StageObject;
 import org.game.stage.human.HumanObject;
 import org.game.stage.module.Grid;

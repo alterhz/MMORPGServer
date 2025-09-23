@@ -1,7 +1,7 @@
 package org.game.stage.event;
 
 import org.game.core.event.IEvent;
-import org.game.stage.unit.Entity;
+import org.game.stage.entity.Entity;
 
 public class LeaveStageEvent implements IEvent {
 

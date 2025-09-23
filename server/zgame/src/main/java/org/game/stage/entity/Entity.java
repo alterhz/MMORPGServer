@@ -1,4 +1,4 @@
-package org.game.stage.unit;
+package org.game.stage.entity;
 
 import org.game.core.utils.Vector3;
 import org.game.stage.StageObject;

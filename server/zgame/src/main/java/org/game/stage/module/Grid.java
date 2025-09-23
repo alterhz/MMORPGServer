@@ -1,6 +1,6 @@
 package org.game.stage.module;
 
-import org.game.stage.unit.Entity;
+import org.game.stage.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
