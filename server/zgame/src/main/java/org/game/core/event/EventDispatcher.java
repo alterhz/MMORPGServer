@@ -68,8 +68,6 @@ public abstract class EventDispatcher {
                     logger.error("事件触发时，Method调用异常, eventName={}, method={}", eventName, method, e);
                 }
             }
-        } else {
-            logger.error("事件触发时，Event未注册2. eventName={}", eventName);
         }
     }
 }
