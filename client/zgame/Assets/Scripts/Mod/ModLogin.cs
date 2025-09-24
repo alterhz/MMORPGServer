@@ -57,7 +57,7 @@ public class ModLogin : ModBase
         {
             LogUtils.Log("登录成功，用户ID: " + scLogin.message);
 
-            GetMod<ModSelectPlayer>().QueryHumans();
+            GetMod<ModSelectPlayer>().QueryPlayer();
         }
         else
         {

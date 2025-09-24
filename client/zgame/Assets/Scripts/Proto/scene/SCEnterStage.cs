@@ -1,7 +1,7 @@
 namespace ZGame
 {
-    [Proto(2002)]
-    public partial class ScEnterScene
+    [Proto(50002)]
+    public partial class ScEnterStage
     {
         public long stageSn { get; set; }
         public long x { get; set; }

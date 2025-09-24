@@ -8,17 +8,17 @@ using ZGame;
 public class PlayerListEvent : EventArgs
 {
     public bool IsSuccess { get; }
-    public List<Human> PlayerList { get; }
+    public List<Player> PlayerList { get; }
     public string Message { get; }
 
-    public PlayerListEvent(bool isSuccess, List<Human> playerList, string message)
+    public PlayerListEvent(bool isSuccess, List<Player> playerList, string message)
     {
         IsSuccess = isSuccess;
-        PlayerList = playerList ?? new List<Human>();
+        PlayerList = playerList ?? new List<Player>();
         Message = message;
     }
 
-    public static PlayerListEvent Success(List<Human> playerList, string message = "获取角色列表成功")
+    public static PlayerListEvent Success(List<Player> playerList, string message = "获取角色列表成功")
     {
         return new PlayerListEvent(true, playerList, message);
     }

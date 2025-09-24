@@ -71,7 +71,7 @@ public class SelectPlayerView : ViewBase
         }
 
         // 发送创建角色请求
-        GetMod<ModSelectPlayer>().CreateHuman(name, profession);
+        GetMod<ModSelectPlayer>().CreatePlayer(name, profession);
     }
 
     // 角色按钮点击事件处理函数
@@ -84,10 +84,10 @@ public class SelectPlayerView : ViewBase
         if (index >= 0 && index < playerList.Count)
         {
             // 获取选中的角色ID
-            string humanId = playerList[index].id;
+            long playerId = playerList[index].id;
 
             // 请求选择角色
-            GetMod<ModSelectPlayer>().SelectHuman(humanId);
+            GetMod<ModSelectPlayer>().SelectPlayer(playerId);
         }
         else
         {
@@ -126,8 +126,8 @@ public class SelectPlayerView : ViewBase
         // 遍历角色列表，将角色信息显示在按钮上
         for (int i = 0; i < playerList.Count; i++)
         {
-            Human humanInfo = playerList[i];
-            SetButtonText($"Player{i + 1}", $"{humanInfo.name}");
+            Player player = playerList[i];
+            SetButtonText($"Player{i + 1}", $"{player.name}");
             // 显示删除按钮
             ShowComponent($"Player{i + 1}/Delete");
         }
@@ -137,11 +137,11 @@ public class SelectPlayerView : ViewBase
 
     // 选择角色事件处理函数
     [EventListener]
-    private void OnSelectHumanEvent(SelectHumanEvent selectHumanEvent)
+    private void OnSelectPlayerEvent(SelectPlayerEvent selectHumanEvent)
     {
         if (selectHumanEvent.IsSuccess)
         {
-            LogUtils.Log($"选择角色成功: {selectHumanEvent.HumanId}");
+            LogUtils.Log($"选择角色成功: {selectHumanEvent.PlayerId}");
             // 可以在这里添加进入游戏场景的逻辑
             // 关闭选择角色界面，打开游戏主界面
             ShowCanvas(ViewNames.MAIN);
@@ -157,7 +157,7 @@ public class SelectPlayerView : ViewBase
 
     // 创建角色事件处理函数
     [EventListener]
-    private void OnCreateHumanEvent(CreateHumanEvent createHumanEvent)
+    private void OnCreatePlayerEvent(CreatePlayerEvent createHumanEvent)
     {
         // 隐藏创建角色面板
         HideComponent("CreateRole");
@@ -188,15 +188,15 @@ public class SelectPlayerView : ViewBase
         if (index >= 0 && index < playerList.Count)
         {
             // 获取选中的角色ID
-            string humanId = playerList[index].id;
+            long playerId = playerList[index].id;
             // 角色名
             string humanName = playerList[index].name;
 
             ConfirmPanel.Create($"确定要删除该角色（{humanName}）吗？", () =>
             {
-                LogUtils.Log($"确认删除角色: {humanName} (ID: {humanId})");
+                LogUtils.Log($"确认删除角色: {humanName} (ID: {playerId})");
                 // 请求删除角色
-                GetMod<ModSelectPlayer>().DeleteHuman(humanId);
+                GetMod<ModSelectPlayer>().DeletePlayer(playerId);
             }, null).Show();
 
             
@@ -209,18 +209,18 @@ public class SelectPlayerView : ViewBase
 
     // 删除角色事件处理函数
     [EventListener]
-    private void OnDeleteHumanEvent(DeleteHumanEvent deleteHumanEvent)
+    private void OnDeletePlayerEvent(DeletePlayerEvent deletePlayerEvent)
     {
-        if (deleteHumanEvent.IsSuccess)
+        if (deletePlayerEvent.IsSuccess)
         {
-            LogUtils.Log($"删除角色成功: {deleteHumanEvent.HumanId}");
+            LogUtils.Log($"删除角色成功: {deletePlayerEvent.PlayerId}");
             SetText("Tips", "删除成功");
             DisplayPlayerList();
         }
         else
         {
-            LogUtils.LogWarning($"删除角色失败: {deleteHumanEvent.Message}");
-            SetText("Tips", deleteHumanEvent.Message);
+            LogUtils.LogWarning($"删除角色失败: {deletePlayerEvent.Message}");
+            SetText("Tips", deletePlayerEvent.Message);
         }
     }
 }

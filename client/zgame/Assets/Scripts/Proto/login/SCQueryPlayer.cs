@@ -3,16 +3,16 @@ namespace ZGame
     using System.Collections.Generic;
 
     [Proto(1004)]
-    public partial class ScQueryHuman
+    public partial class ScQueryPlayer
     {
         public long code { get; set; }
         public string message { get; set; }
-        public List<Human> human { get; set; }
+        public List<Player> player { get; set; }
     }
 
-    public partial class Human
+    public partial class Player
     {
-        public string id { get; set; }
+        public long id { get; set; }
         public string name { get; set; }
         public string profession { get; set; }
     }

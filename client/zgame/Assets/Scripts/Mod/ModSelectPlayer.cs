@@ -4,9 +4,9 @@ using ZGame;
 
 public class ModSelectPlayer : ModBase
 {
-    private readonly List<Human> _playerList = new();
+    private readonly List<Player> _playerList = new();
 
-    private string selectedHumanId;
+    private long selectedHumanId;
 
     public override void Initialize()
     {
@@ -30,9 +30,9 @@ public class ModSelectPlayer : ModBase
     /// <summary>
     /// 请求角色列表
     /// </summary>
-    public void QueryHumans()
+    public void QueryPlayer()
     {
-        CsQueryHuman request = new();
+        CsQueryPlayer request = new();
         Send(request);
     }
 
@@ -40,16 +40,16 @@ public class ModSelectPlayer : ModBase
     /// 角色列表响应处理
     /// </summary>
     [ProtoListener]
-    private void OnQueryHumans(ScQueryHuman scQueryHuman)
+    private void OnQueryPlayer(ScQueryPlayer scQueryHuman)
     {
         if (scQueryHuman.code == 0)
         {
             _playerList.Clear();
-            _playerList.AddRange(scQueryHuman.human);
+            _playerList.AddRange(scQueryHuman.player);
 
-            LogUtils.Log("获取角色列表成功，角色数量: " + scQueryHuman.human.Count);
+            LogUtils.Log("获取角色列表成功，角色数量: " + scQueryHuman.player.Count);
             // 触发角色列表事件
-            EventManager.Instance.Trigger(PlayerListEvent.Success(scQueryHuman.human, scQueryHuman.message));
+            EventManager.Instance.Trigger(PlayerListEvent.Success(scQueryHuman.player, scQueryHuman.message));
         }
         else
         {
@@ -62,42 +62,42 @@ public class ModSelectPlayer : ModBase
     /// <summary>
     /// 选择角色进入游戏
     /// </summary>
-    /// <param name="humanId">角色ID</param>
-    public void SelectHuman(string humanId)
+    /// <param name="playerId">角色ID</param>
+    public void SelectPlayer(long playerId)
     {
-        CsSelectHuman request = new()
+        CsSelectPlayer request = new()
         {
-            humanId = humanId
+            playerId = playerId
         };
         Send(request);
-        selectedHumanId = humanId;
-        LogUtils.Log("请求选择角色: " + humanId);
+        selectedHumanId = playerId;
+        LogUtils.Log("请求选择角色: " + playerId);
     }
 
     /// <summary>
     /// 选择角色响应处理
     /// </summary>
     [ProtoListener]
-    private void OnSelectHuman(ScSelectHuman scSelectHuman)
+    private void OnSelectPlayer(ScSelectPlayer scSelectPlayer)
     {
-        if (scSelectHuman.code == 0)
+        if (scSelectPlayer.code == 0)
         {
             LogUtils.Log("选择角色成功");
             // 触发选择角色事件（成功）
-            EventManager.Instance.Trigger(SelectHumanEvent.Success(selectedHumanId, scSelectHuman.message));
+            EventManager.Instance.Trigger(SelectPlayerEvent.Success(selectedHumanId, scSelectPlayer.message));
         }
         else
         {
-            LogUtils.LogWarning("选择角色失败: " + scSelectHuman.message);
+            LogUtils.LogWarning("选择角色失败: " + scSelectPlayer.message);
             // 触发选择角色事件（失败）
-            EventManager.Instance.Trigger(SelectHumanEvent.Failure(selectedHumanId, scSelectHuman.message));
+            EventManager.Instance.Trigger(SelectPlayerEvent.Failure(selectedHumanId, scSelectPlayer.message));
         }
     }
 
 
-    public List<Human> GetPlayerList()
+    public List<Player> GetPlayerList()
     {
-        return new List<Human>(_playerList);
+        return new List<Player>(_playerList);
     }
 
     /// <summary>
@@ -105,9 +105,9 @@ public class ModSelectPlayer : ModBase
     /// </summary>
     /// <param name="name">角色名</param>
     /// <param name="profession">职业</param>
-    public void CreateHuman(string name, string profession)
+    public void CreatePlayer(string name, string profession)
     {
-        CsCreateHuman request = new()
+        CsCreatePlayer request = new()
         {
             name = name,
             profession = profession
@@ -120,55 +120,55 @@ public class ModSelectPlayer : ModBase
     /// 创建角色响应处理
     /// </summary>
     [ProtoListener]
-    private void OnCreateHuman(ScCreateHuman scCreateHuman)
+    private void OnCreatePlayer(ScCreatePlayer scCreateHuman)
     {
         if (scCreateHuman.code == 0)
         {
             LogUtils.Log("创建角色成功");
             // 触发创建角色成功事件
-            EventManager.Instance.Trigger(CreateHumanEvent.Success(scCreateHuman.message));
+            EventManager.Instance.Trigger(CreatePlayerEvent.Success(scCreateHuman.message));
         }
         else
         {
             LogUtils.LogWarning("创建角色失败: " + scCreateHuman.message);
             // 触发创建角色失败事件
-            EventManager.Instance.Trigger(CreateHumanEvent.Failure(scCreateHuman.message));
+            EventManager.Instance.Trigger(CreatePlayerEvent.Failure(scCreateHuman.message));
         }
     }
     
     /// <summary>
     /// 删除角色
     /// </summary>
-    /// <param name="humanId">角色ID</param>
-    public void DeleteHuman(string humanId)
+    /// <param name="playerId">角色ID</param>
+    public void DeletePlayer(long playerId)
     {
-        CsDeleteHuman request = new()
+        CsDeletePlayer request = new()
         {
-            humanId = humanId
+            playerId = playerId
         };
         Send(request);
-        LogUtils.Log($"请求删除角色: {humanId}");
+        LogUtils.Log($"请求删除角色: {playerId}");
     }
 
     /// <summary>
     /// 删除角色响应处理
     /// </summary>
     [ProtoListener]
-    private void OnDeleteHuman(ScDeleteHuman scDeleteHuman)
+    private void OnDeletePlayer(ScDeletePlayer scDeletePlayer)
     {
-        if (scDeleteHuman.code == 0)
+        if (scDeletePlayer.code == 0)
         {
-            LogUtils.Log($"删除角色成功{scDeleteHuman.humanId}");
-            _playerList.RemoveAll(h => h.id == scDeleteHuman.humanId);
+            LogUtils.Log($"删除角色成功{scDeletePlayer.playerId}");
+            _playerList.RemoveAll(h => h.id == scDeletePlayer.playerId);
 
             // 触发删除角色成功事件
-            EventManager.Instance.Trigger(DeleteHumanEvent.Success(scDeleteHuman.humanId, scDeleteHuman.message));
+            EventManager.Instance.Trigger(DeletePlayerEvent.Success(scDeletePlayer.playerId, scDeletePlayer.message));
         }
         else
         {
-            LogUtils.LogWarning("删除角色失败: " + scDeleteHuman.message);
+            LogUtils.LogWarning("删除角色失败: " + scDeletePlayer.message);
             // 触发删除角色失败事件
-            EventManager.Instance.Trigger(DeleteHumanEvent.Failure(scDeleteHuman.humanId, scDeleteHuman.message));
+            EventManager.Instance.Trigger(DeletePlayerEvent.Failure(scDeletePlayer.playerId, scDeletePlayer.message));
         }
     }
 
