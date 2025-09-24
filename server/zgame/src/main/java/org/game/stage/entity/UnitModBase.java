@@ -7,16 +7,12 @@ public class UnitModBase {
     
     public static final Logger logger = LogManager.getLogger(UnitModBase.class);
     
-    private final UnitObject unitObj;
+    protected final UnitObject unitObj;
     
     public UnitModBase(UnitObject unitObj) {
         this.unitObj = unitObj;
     }
-    
-    public UnitObject getUnitObj() {
-        return unitObj;
-    }
-    
+
     public <T extends UnitModBase> T getMod(Class<T> clazz) {
         return unitObj.getUMod(clazz);
     }

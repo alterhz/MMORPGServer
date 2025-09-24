@@ -2,17 +2,15 @@ package org.game.stage.entity;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.game.core.event.EventListener;
 import org.game.core.event.IEvent;
 import org.game.core.event.UnitEventDispatcher;
 import org.game.core.stage.UModScanner;
+import org.game.core.utils.Vector3;
 import org.game.stage.StageObject;
 import org.game.stage.human.HumanObject;
 import org.game.stage.module.Grid;
 import org.game.stage.module.SModAOI;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,7 +116,7 @@ public abstract class UnitObject extends Entity {
      * @param oldGrid 旧格子
      * @param newGrid 新格子
      */
-    protected void changeGrid(Grid oldGrid, Grid newGrid) {
+    public void changeGrid(Grid oldGrid, Grid newGrid) {
         if (oldGrid != null) {
             oldGrid.removeEntity(this);
         }
@@ -222,6 +220,47 @@ public abstract class UnitObject extends Entity {
      */
     public Grid getCurrentGrid() {
         return currentGrid;
+    }
+
+    /**
+     * 设置位置并检查九宫格切换
+     * @param position 新位置
+     */
+    @Override
+    public void setPosition(Vector3 position) {
+        Vector3 oldPosition = this.position;
+        this.position = position;
+        
+        // 如果旧位置不为空，则检查是否需要切换格子
+        if (oldPosition != null) {
+            checkGridChange(oldPosition, position);
+        }
+    }
+
+    /**
+     * 检查并处理格子切换
+     * @param oldPosition 旧位置
+     * @param newPosition 新位置
+     */
+    private void checkGridChange(Vector3 oldPosition, Vector3 newPosition) {
+        Grid currentGrid = getCurrentGrid();
+        if (currentGrid == null) {
+            return;
+        }
+
+        // 获取场景AOI模块
+        var aoiMod = getStageObj().getMod(org.game.stage.module.SModAOI.class);
+        if (aoiMod == null) {
+            return;
+        }
+
+        // 计算新位置所在的格子
+        Grid newGrid = aoiMod.getGrid((int)newPosition.getX(), (int)newPosition.getY());
+
+        // 如果格子发生变化，调用changeGrid方法
+        if (newGrid != currentGrid) {
+            changeGrid(currentGrid, newGrid);
+        }
     }
 
     @Override
