@@ -6,8 +6,9 @@ import org.game.core.event.EventListener;
 import org.game.core.message.ProtoListener;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.player.rpc.IPlayerInfoService;
-import org.game.proto.scene.EnterStageRequest;
+import org.game.proto.scene.*;
 import org.game.stage.StageObject;
+import org.game.stage.entity.module.UModMove;
 import org.game.stage.human.HumanModBase;
 import org.game.stage.human.HumanObject;
 import org.game.core.utils.Vector3;
@@ -32,7 +33,36 @@ public class HModStage extends HumanModBase {
         stageObj.enterStage(humanObj);
     }
 
+    @ProtoListener(UnitMoveRequest.class)
+    public void onUnitMove(UnitMoveRequest moveRequest) {
+        HumanObject humanObj = getHumanObj();
 
+        // 创建目标位置
+        Vector3 targetPosition = new Vector3(
+                (float) moveRequest.getX(),
+                (float) moveRequest.getY(),
+                (float) moveRequest.getZ()
+        );
+
+        // 获取移动模块
+        UModMove moveMod = humanObj.getUMod(UModMove.class);
+        if (moveMod != null) {
+            // 设置移动到目标点
+            moveMod.moveTo(targetPosition);
+
+            // 发送移动响应
+            UnitMoveResponse response = new UnitMoveResponse();
+            response.setFix(false); // 不需要修正位置
+
+            Position pos = new Position();
+            pos.setX(moveRequest.getX());
+            pos.setY(moveRequest.getY());
+            pos.setZ(moveRequest.getZ());
+            response.setPosition(pos);
+
+            humanObj.sendMessage(response);
+        }
+    }
 
     @EventListener
     public void onStageReady(OnStageReadyEvent event) {

@@ -9,6 +9,7 @@ import org.game.core.net.Message;
 import org.game.core.rpc.ReferenceFactory;
 import org.game.core.rpc.ToPoint;
 import org.game.core.stage.HumanModScanner;
+import org.game.core.utils.Vector3;
 import org.game.global.rpc.IClientService;
 import org.game.global.rpc.IStageGlobalService;
 import org.game.proto.scene.*;
@@ -16,6 +17,7 @@ import org.game.stage.StageObject;
 import org.game.stage.human.event.OnStageReadyEvent;
 import org.game.stage.entity.Entity;
 import org.game.stage.entity.UnitObject;
+import org.game.stage.entity.module.UModMove;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -117,7 +119,7 @@ public class HumanObject extends UnitObject {
 
     @Override
     public void onEnterStage(StageObject stageObj) {
-        // super.onEnterStage(stageObj); // Entity中的方法是抽象的，不能调用
+        super.onEnterStage(stageObj); // Entity中的方法是抽象的，不能调用
 
         IStageGlobalService stageGlobalService = ReferenceFactory.getProxy(IStageGlobalService.class);
         stageGlobalService.humanEnter(stageObj.getStageId());
@@ -125,7 +127,7 @@ public class HumanObject extends UnitObject {
 
     @Override
     public void onLeaveStage(StageObject stageObj) {
-        // super.onLeaveStage(stageObj); // Entity中的方法是抽象的，不能调用
+        super.onLeaveStage(stageObj); // Entity中的方法是抽象的，不能调用
 
         IStageGlobalService stageGlobalService = ReferenceFactory.getProxy(IStageGlobalService.class);
         stageGlobalService.humanLeave(stageObj.getStageId());
@@ -188,4 +190,27 @@ public class HumanObject extends UnitObject {
         // 发送广播到客户端
         sendMessage(broadcast);
     }
+
+    /**
+     * 发送单位移动广播
+     * @param unitId 单位ID
+     * @param position 移动位置
+     */
+    public void sendUnitMove(long unitId, Vector3 position) {
+        UnitMoveBroadcast broadcast = new UnitMoveBroadcast();
+        broadcast.setUnitId(unitId);
+        
+        List<Position> positions = new ArrayList<>();
+        Position pos = new Position();
+        pos.setX(position.getX());
+        pos.setY(position.getY());
+        pos.setZ(position.getZ());
+        positions.add(pos);
+        
+        broadcast.setPosition(positions);
+
+        // 发送广播到客户端
+        sendMessage(broadcast);
+    }
+
 }

@@ -9,7 +9,7 @@ public abstract class Entity {
 
     protected final StageObject stageObj;
 
-    protected Vector3 position;
+    protected Vector3 position = new Vector3();
 
     public Entity(long entityId, StageObject stageObj) {
         this.entityId = entityId;

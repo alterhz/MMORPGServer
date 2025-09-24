@@ -6,10 +6,12 @@ import org.apache.logging.log4j.Logger;
 import org.game.core.event.IEvent;
 import org.game.core.event.StageEventDispatcher;
 import org.game.core.stage.StageModScanner;
+import org.game.proto.scene.EnterStageResponse;
 import org.game.stage.event.EnterStageEvent;
 import org.game.stage.event.LeaveStageEvent;
 import org.game.stage.event.PulseEvent;
 import org.game.stage.event.PulseSecEvent;
+import org.game.stage.human.HumanObject;
 import org.game.stage.module.StageModBase;
 import org.game.stage.entity.Entity;
 
@@ -71,17 +73,25 @@ public class StageObject {
 
     }
 
-    public void enterStage(Entity Entity) {
-        if (stageUnits.containsKey(Entity.getEntityId())) {
-            logger.error("unitObject already exist. unitObject: {}", Entity);
+    public void enterStage(Entity entity) {
+        if (stageUnits.containsKey(entity.getEntityId())) {
+            logger.error("unitObject already exist. unitObject: {}", entity);
             return;
         }
 
-        stageUnits.put(Entity.getEntityId(), Entity);
+        stageUnits.put(entity.getEntityId(), entity);
 
-        fireEvent(new EnterStageEvent(Entity));
+        fireEvent(new EnterStageEvent(entity));
 
-        Entity.onEnterStage(this);
+        entity.onEnterStage(this);
+
+        if (entity instanceof HumanObject) {
+            HumanObject humanObject = (HumanObject) entity;
+
+            EnterStageResponse enterStageResponse = new EnterStageResponse();
+            enterStageResponse.setStageSn(getStageSn());
+            humanObject.sendMessage(enterStageResponse);
+        }
     }
 
     public void leaveStage(Entity Entity) {

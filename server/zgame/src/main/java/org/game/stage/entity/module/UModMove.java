@@ -2,9 +2,15 @@ package org.game.stage.entity.module;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.game.core.event.EventListener;
 import org.game.core.utils.Vector3;
-import org.game.stage.entity.UnitModBase;
 import org.game.stage.entity.UnitObject;
+import org.game.stage.entity.UnitModBase;
+import org.game.stage.module.Grid;
+import org.game.stage.human.HumanObject;
+import org.game.stage.entity.Entity;
+
+import java.util.List;
 
 /**
  * UnitObject的移动模块
@@ -134,6 +140,29 @@ public class UModMove extends UnitModBase {
         
         // 更新位置
         unitObj.setPosition(newPosition);
+        
+        // 如果是玩家对象，广播移动消息
+        if (unitObj instanceof HumanObject) {
+            HumanObject humanObj = (HumanObject) unitObj;
+            // 获取场景中的AOI模块
+            var aoiMod = unitObj.getStageObj().getMod(org.game.stage.module.SModAOI.class);
+            if (aoiMod != null) {
+                // 获取周围的格子
+                List<Grid> neighbors = aoiMod.getNeighbors(
+                    (int) newPosition.getX(), 
+                    (int) newPosition.getY()
+                );
+                
+                // 向周围的所有玩家广播移动消息
+                for (Grid grid : neighbors) {
+                    for (Entity entity : grid.getEntities()) {
+                        if (entity instanceof HumanObject) {
+                            HumanObject nearbyHuman = (HumanObject) entity;
+                            nearbyHuman.sendUnitMove(unitObj.getEntityId(), newPosition);
+                        }
+                    }
+                }
+            }
+        }
     }
-
 }

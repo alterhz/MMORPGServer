@@ -211,7 +211,6 @@ public class StageGlobalService extends GameServiceBase implements IStageGlobalS
     
     @Override
     public void recycleTest() {
-        logger.info("开始检查可回收场景");
         long now = System.currentTimeMillis();
         
         for (Map.Entry<Long, StageInfo> entry : stageInfos.entrySet()) {

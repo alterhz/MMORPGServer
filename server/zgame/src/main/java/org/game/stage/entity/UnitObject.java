@@ -230,7 +230,7 @@ public abstract class UnitObject extends Entity {
     public void setPosition(Vector3 position) {
         Vector3 oldPosition = this.position;
         this.position = position;
-        
+
         // 如果旧位置不为空，则检查是否需要切换格子
         if (oldPosition != null) {
             checkGridChange(oldPosition, position);

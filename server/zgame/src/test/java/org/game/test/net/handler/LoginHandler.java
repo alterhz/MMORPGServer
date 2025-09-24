@@ -6,9 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.game.core.message.ProtoListener;
 import org.game.core.net.Message;
 import org.game.proto.login.*;
-import org.game.proto.scene.EnterStageRequest;
-import org.game.proto.scene.EnterStageResponse;
-import org.game.proto.scene.StageReadyNotify;
+import org.game.proto.scene.*;
 import org.game.test.net.ClientProtoDispatcher;
 import org.game.test.net.TokenData;
 
@@ -112,6 +110,8 @@ public class LoginHandler extends ClientProtoDispatcher {
         sendMessage(csTest);
     }
 
+    
+
     // StageReadyNotify
     @ProtoListener(StageReadyNotify.class)
     public void onStageReadyNotify(Message message) {
@@ -129,6 +129,13 @@ public class LoginHandler extends ClientProtoDispatcher {
         // 处理消息
         EnterStageResponse enterStageResponse = message.getProto(EnterStageResponse.class);
         logger.info("进入场景成功:{}", enterStageResponse);
+
+        // 移动到100,100
+        UnitMoveRequest unitMoveRequest = new UnitMoveRequest();
+        unitMoveRequest.setX(100);
+        unitMoveRequest.setY(100);
+        unitMoveRequest.setZ(0);
+        sendMessage(unitMoveRequest);
     }
 
     // 测试
@@ -137,6 +144,37 @@ public class LoginHandler extends ClientProtoDispatcher {
         // 处理消息
         SCTest scTest = message.getProto(SCTest.class);
         logger.info("测试结果：{}", scTest.getMessage());
+    }
+
+    // UnitAppearBroadcast
+    @ProtoListener(UnitAppearBroadcast.class)
+    public void onUnitAppear(Message message) {
+        UnitAppearBroadcast unitAppear = message.getProto(UnitAppearBroadcast.class);
+        logger.info("单位出现:{}", unitAppear.getUnits());
+    }
+
+    // UnitDisappearBroadcast
+    @ProtoListener(UnitDisappearBroadcast.class)
+    public void onUnitDisappear(Message message) {
+        UnitDisappearBroadcast unitDisappear = message.getProto(UnitDisappearBroadcast.class);
+        logger.info("单位消失:{}", unitDisappear.getUnitIds());
+    }
+
+    // UnitMoveBroadcast
+    @ProtoListener(UnitMoveBroadcast.class)
+    public void onUnitMoveBroadcast(Message message) {
+        UnitMoveBroadcast unitMove = message.getProto(UnitMoveBroadcast.class);
+        logger.info("单位移动广播: unitId={}, x={}, y={}, z={}", unitMove.getUnitId(),
+                unitMove.getPosition().get(0).getX(),
+                unitMove.getPosition().get(0).getY(),
+                unitMove.getPosition().get(0).getZ());
+    }
+
+    // UnitMoveResponse
+    @ProtoListener(UnitMoveResponse.class)
+    public void onUnitMoveResponse(Message message) {
+        UnitMoveResponse unitMoveResponse = message.getProto(UnitMoveResponse.class);
+        logger.info("单位移动响应: fix={}, position={}", unitMoveResponse.getFix(), unitMoveResponse.getPosition());
     }
 
 }
