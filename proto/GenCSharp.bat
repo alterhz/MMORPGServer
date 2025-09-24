@@ -4,6 +4,11 @@ setlocal enabledelayedexpansion
 set PROTO_DIR=json
 set JAVA_OUT_DIR=..\client\zgame\Assets\Scripts\Proto
 
+:: 删除文件夹
+if exist %JAVA_OUT_DIR% (
+    rmdir /s /q %JAVA_OUT_DIR%
+)
+
 :: 遍历 PROTO_DIR 下的每个子文件夹
 for /D %%F in (%PROTO_DIR%\*) do (
     set "FOLDER=%%~nxF"

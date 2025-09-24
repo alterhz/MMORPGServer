@@ -4,28 +4,31 @@ setlocal enabledelayedexpansion
 set PROTO_DIR=json
 set JAVA_OUT_DIR=..\server\zgame\src\main\java\org\game\proto
 
-:: ±éÀú PROTO_DIR ÏÂµÄÃ¿¸ö×ÓÎÄ¼þ¼Ð
+:: åˆ é™¤æ–‡ä»¶å¤¹
+rmdir /s /q %JAVA_OUT_DIR%
+
+:: ï¿½ï¿½ï¿½ï¿½ PROTO_DIR ï¿½Âµï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½
 for /D %%F in (%PROTO_DIR%\*) do (
     set "FOLDER=%%~nxF"
-    set "PACKAGE=!FOLDER: =_!"  # Ìæ»»¿Õ¸ñÎªÏÂ»®Ïß
+    set "PACKAGE=!FOLDER: =_!"  # ï¿½æ»»ï¿½Õ¸ï¿½Îªï¿½Â»ï¿½ï¿½ï¿½
 
     echo Processing folder: !FOLDER!
 
-    :: ±éÀú×ÓÎÄ¼þ¼ÐÖÐµÄÃ¿¸ö .json ÎÄ¼þ
+    :: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ðµï¿½Ã¿ï¿½ï¿½ .json ï¿½Ä¼ï¿½
     for %%J in ("%%F\*.json") do (
-        set "JSON_FILE=%%~nJ"          # »ñÈ¡ÎÄ¼þÃû£¨ÎÞÀ©Õ¹Ãû£©
+        set "JSON_FILE=%%~nJ"          # ï¿½ï¿½È¡ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½
         set "OUTPUT_DIR=!JAVA_OUT_DIR!\!FOLDER!"
         set "OUTPUT_FILE=!OUTPUT_DIR!\!JSON_FILE!.java"
         set "FULL_JSON_PATH=%%J"
 
         echo Generating !JSON_FILE!.java from %%J ...
 
-        :: ´´½¨Êä³öÄ¿Â¼£¨Èç¹û²»´æÔÚ£©
+        :: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½
         if not exist "!OUTPUT_DIR!" (
             mkdir "!OUTPUT_DIR!"
         )
 
-        :: µ÷ÓÃ quicktype Îªµ¥¸ö JSON ÎÄ¼þÉú³É Java Àà
+        :: ï¿½ï¿½ï¿½ï¿½ quicktype Îªï¿½ï¿½ï¿½ï¿½ JSON ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ Java ï¿½ï¿½
         call quicktype -l java --array-type list --just-types --acronym-style original --package "org.game.proto.!PACKAGE!" --src "!FULL_JSON_PATH!" --out "!OUTPUT_FILE!"
 
         if !errorlevel! equ 0 (
@@ -42,7 +45,7 @@ pause
 cd ../server/dist
 call GenProtoIds.bat
 
-echo ×¢½âÌí¼ÓÍê±Ï
+echo ×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 pause
 
