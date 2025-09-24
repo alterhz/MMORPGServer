@@ -301,8 +301,8 @@ public abstract class UnitObject extends Entity {
      * @param position 移动位置
      */
     public void sendUnitMove(long unitId, Vector3 position) {
-        SCMoveStart broadcast = new SCMoveStart();
-        broadcast.setUnitId(unitId);
+        SCMoveStart scMoveStart = new SCMoveStart();
+        scMoveStart.setUnitId(unitId);
 
         List<Position> positions = new ArrayList<>();
         Position pos = new Position();
@@ -311,11 +311,11 @@ public abstract class UnitObject extends Entity {
         pos.setZ(position.getZ());
         positions.add(pos);
 
-        broadcast.setPosition(positions);
+        scMoveStart.setPosition(positions);
 
         // 发送广播到客户端
         if (this instanceof HumanObject) {
-            ((HumanObject) this).sendMessage(broadcast);
+            ((HumanObject) this).sendMessage(scMoveStart);
         }
     }
 }

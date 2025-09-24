@@ -88,21 +88,19 @@ public class UModMove extends UnitModBase {
         moveStop.setPosition(pos);
         
         // 获取场景中的AOI模块
-        var aoiMod = unitObj.getStageObj().getMod(org.game.stage.module.SModAOI.class);
+        var aoiMod = unitObj.getStageObj().getMod(SModAOI.class);
         if (aoiMod != null && position != null) {
             // 获取周围的格子
-            List<Grid> neighbors = aoiMod.getNeighbors(
+            List<Entity> entities = aoiMod.getAoiManager().getEntitiesInNeighbors(
                 (int) position.getX(), 
                 (int) position.getY()
             );
             
             // 向周围的所有玩家广播停止移动消息
-            for (Grid grid : neighbors) {
-                for (Entity entity : grid.getEntities()) {
-                    if (entity instanceof HumanObject) {
-                        HumanObject nearbyHuman = (HumanObject) entity;
-                        nearbyHuman.sendMessage(moveStop);
-                    }
+            for (Entity entity : entities) {
+                if (entity instanceof HumanObject) {
+                    HumanObject nearbyHuman = (HumanObject) entity;
+                    nearbyHuman.sendMessage(moveStop);
                 }
             }
         }
@@ -185,7 +183,7 @@ public class UModMove extends UnitModBase {
             if (aoiMod != null) {
                 List<Entity> entities = aoiMod.getAoiManager().getEntitiesInNeighbors((int)newPosition.getX(), (int)newPosition.getY());
                 for (Entity entity : entities) {
-                    if (entity instanceof HumanObject) {
+                    if (entity instanceof HumanObject && entity != humanObj) {
                         HumanObject nearbyHuman = (HumanObject) entity;
                         nearbyHuman.sendUnitMove(unitObj.getEntityId(), newPosition);
                     }
