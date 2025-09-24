@@ -143,6 +143,17 @@ public class AOIManager {
         return entities;
     }
     
+    /**
+     * 获取指定坐标周围九宫格内的所有实体
+     * @param centerX 中心X坐标
+     * @param centerY 中心Y坐标
+     * @return 九宫格内所有实体列表
+     */
+    public List<Entity> getEntitiesInNeighbors(int centerX, int centerY) {
+        List<Grid> neighbors = getNeighbors(centerX, centerY);
+        return getEntitiesInGrids(neighbors);
+    }
+    
     public int getGridWidth() {
         return gridWidth;
     }

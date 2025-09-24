@@ -113,29 +113,29 @@ public class LoginHandler extends ClientProtoDispatcher {
     
 
     // StageReadyNotify
-    @ProtoListener(StageReadyNotify.class)
+    @ProtoListener(SCStageReady.class)
     public void onStageReadyNotify(Message message) {
-        StageReadyNotify stageReadyNotify = message.getProto(StageReadyNotify.class);
+        SCStageReady stageReadyNotify = message.getProto(SCStageReady.class);
         logger.info("场景准备就绪:stageSn={}", stageReadyNotify.getStageSn());
 
-        EnterStageRequest enterStageRequest = new EnterStageRequest();
+        CSEnterStage enterStageRequest = new CSEnterStage();
         sendMessage(enterStageRequest);
         logger.info("请求进入场景");
     }
 
     // SCEnterScene
-    @ProtoListener(EnterStageResponse.class)
+    @ProtoListener(SCEnterStage.class)
     public void onEnterStage(Message message) {
         // 处理消息
-        EnterStageResponse enterStageResponse = message.getProto(EnterStageResponse.class);
-        logger.info("进入场景成功:{}", enterStageResponse);
+        SCEnterStage csEnterStage = message.getProto(SCEnterStage.class);
+        logger.info("进入场景成功:{}", csEnterStage);
 
         // 移动到100,100
-        UnitMoveRequest unitMoveRequest = new UnitMoveRequest();
-        unitMoveRequest.setX(100);
-        unitMoveRequest.setY(100);
-        unitMoveRequest.setZ(0);
-        sendMessage(unitMoveRequest);
+        CSMoveStart csMoveStart = new CSMoveStart();
+        csMoveStart.setX(100);
+        csMoveStart.setY(100);
+        csMoveStart.setZ(0);
+        sendMessage(csMoveStart);
     }
 
     // 测试
@@ -147,23 +147,23 @@ public class LoginHandler extends ClientProtoDispatcher {
     }
 
     // UnitAppearBroadcast
-    @ProtoListener(UnitAppearBroadcast.class)
+    @ProtoListener(SCUnitAppear.class)
     public void onUnitAppear(Message message) {
-        UnitAppearBroadcast unitAppear = message.getProto(UnitAppearBroadcast.class);
+        SCUnitAppear unitAppear = message.getProto(SCUnitAppear.class);
         logger.info("单位出现:{}", unitAppear.getUnits());
     }
 
     // UnitDisappearBroadcast
-    @ProtoListener(UnitDisappearBroadcast.class)
+    @ProtoListener(SCUnitDisappear.class)
     public void onUnitDisappear(Message message) {
-        UnitDisappearBroadcast unitDisappear = message.getProto(UnitDisappearBroadcast.class);
+        SCUnitDisappear unitDisappear = message.getProto(SCUnitDisappear.class);
         logger.info("单位消失:{}", unitDisappear.getUnitIds());
     }
 
     // UnitMoveBroadcast
-    @ProtoListener(UnitMoveBroadcast.class)
+    @ProtoListener(SCMoveStart.class)
     public void onUnitMoveBroadcast(Message message) {
-        UnitMoveBroadcast unitMove = message.getProto(UnitMoveBroadcast.class);
+        SCMoveStart unitMove = message.getProto(SCMoveStart.class);
         logger.info("单位移动广播: unitId={}, x={}, y={}, z={}", unitMove.getUnitId(),
                 unitMove.getPosition().get(0).getX(),
                 unitMove.getPosition().get(0).getY(),
@@ -171,10 +171,14 @@ public class LoginHandler extends ClientProtoDispatcher {
     }
 
     // UnitMoveResponse
-    @ProtoListener(UnitMoveResponse.class)
+    @ProtoListener(SCMoveStop.class)
     public void onUnitMoveResponse(Message message) {
-        UnitMoveResponse unitMoveResponse = message.getProto(UnitMoveResponse.class);
-        logger.info("单位移动响应: fix={}, position={}", unitMoveResponse.getFix(), unitMoveResponse.getPosition());
+        SCMoveStop unitMoveResponse = message.getProto(SCMoveStop.class);
+        logger.info("单位移动响应: unitId={}, x={}, y={}, z={}",
+                unitMoveResponse.getUnitId(),
+                unitMoveResponse.getPosition().getX(),
+                unitMoveResponse.getPosition().getY(),
+                unitMoveResponse.getPosition().getZ());
     }
 
 }

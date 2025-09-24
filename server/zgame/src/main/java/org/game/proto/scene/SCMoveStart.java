@@ -3,8 +3,8 @@ package org.game.proto.scene;
 import java.util.List;
 import org.game.core.message.Proto;
 
-@Proto(value = 50007)
-public class UnitMoveBroadcast {
+@Proto(value = 50006)
+public class SCMoveStart {
 
     private long unitId;
 

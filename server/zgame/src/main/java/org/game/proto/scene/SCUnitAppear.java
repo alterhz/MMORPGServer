@@ -4,7 +4,7 @@ import java.util.List;
 import org.game.core.message.Proto;
 
 @Proto(value = 50003)
-public class UnitAppearBroadcast {
+public class SCUnitAppear {
 
     private List<Unit> units;
 

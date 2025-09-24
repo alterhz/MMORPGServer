@@ -2,19 +2,19 @@ package org.game.proto.scene;
 
 import org.game.core.message.Proto;
 
-@Proto(value = 50006)
-public class UnitMoveResponse {
+@Proto(value = 50008)
+public class SCMoveStop {
 
-    private boolean fix;
+    private long unitId;
 
     private Position position;
 
-    public boolean getFix() {
-        return fix;
+    public long getUnitId() {
+        return unitId;
     }
 
-    public void setFix(boolean value) {
-        this.fix = value;
+    public void setUnitId(long value) {
+        this.unitId = value;
     }
 
     public Position getPosition() {

@@ -3,7 +3,7 @@ package org.game.proto.scene;
 import org.game.core.message.Proto;
 
 @Proto(value = 50005)
-public class UnitMoveRequest {
+public class CSMoveStart {
 
     private double x;
 

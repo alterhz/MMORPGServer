@@ -10,6 +10,8 @@ import org.game.stage.StageObject;
 import org.game.stage.human.HumanObject;
 import org.game.stage.module.Grid;
 import org.game.stage.module.SModAOI;
+import org.game.proto.scene.Position;
+import org.game.proto.scene.SCMoveStart;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -180,9 +182,8 @@ public abstract class UnitObject extends Entity {
         
         SModAOI aoiMod = stageObj.getMod(SModAOI.class);
         if (aoiMod == null) return;
-        
-        List<Grid> neighbors = aoiMod.getNeighbors(currentGrid.getX(), currentGrid.getY());
-        List<Entity> entities = aoiMod.getAoiManager().getEntitiesInGrids(neighbors);
+
+        List<Entity> entities = aoiMod.getAoiManager().getEntitiesInNeighbors(currentGrid.getX(), currentGrid.getY());
         
         for (Entity entity : entities) {
             if (entity instanceof HumanObject && entity != this) {
@@ -202,8 +203,7 @@ public abstract class UnitObject extends Entity {
         SModAOI aoiMod = stageObj.getMod(SModAOI.class);
         if (aoiMod == null) return;
         
-        List<Grid> neighbors = aoiMod.getNeighbors(currentGrid.getX(), currentGrid.getY());
-        List<Entity> entities = aoiMod.getAoiManager().getEntitiesInGrids(neighbors);
+        List<Entity> entities = aoiMod.getAoiManager().getEntitiesInNeighbors(currentGrid.getX(), currentGrid.getY());
         
         for (Entity entity : entities) {
             if (entity instanceof HumanObject && entity != this) {
@@ -293,5 +293,29 @@ public abstract class UnitObject extends Entity {
         super.onPulseSec(now);
         
         unitModBaseMap.forEach((aClass, uModBase) -> uModBase.onPulseSec(now));
+    }
+
+    /**
+     * 发送单位移动广播
+     * @param unitId 单位ID
+     * @param position 移动位置
+     */
+    public void sendUnitMove(long unitId, Vector3 position) {
+        SCMoveStart broadcast = new SCMoveStart();
+        broadcast.setUnitId(unitId);
+
+        List<Position> positions = new ArrayList<>();
+        Position pos = new Position();
+        pos.setX(position.getX());
+        pos.setY(position.getY());
+        pos.setZ(position.getZ());
+        positions.add(pos);
+
+        broadcast.setPosition(positions);
+
+        // 发送广播到客户端
+        if (this instanceof HumanObject) {
+            ((HumanObject) this).sendMessage(broadcast);
+        }
     }
 }

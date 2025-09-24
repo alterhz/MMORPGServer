@@ -4,7 +4,7 @@ import java.util.List;
 import org.game.core.message.Proto;
 
 @Proto(value = 50004)
-public class UnitDisappearBroadcast {
+public class SCUnitDisappear {
 
     private List<Long> unitIds;
 

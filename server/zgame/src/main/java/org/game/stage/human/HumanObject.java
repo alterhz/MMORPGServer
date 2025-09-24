@@ -69,7 +69,7 @@ public class HumanObject extends UnitObject {
         ToPoint stageHumanPoint = getHumanPoint();
         clientService.setHumanPoint(stageHumanPoint);
 
-        StageReadyNotify stageReadyNotify = new StageReadyNotify();
+        SCStageReady stageReadyNotify = new SCStageReady();
         stageReadyNotify.setStageSn(stageObj.getStageSn());
         sendMessage(stageReadyNotify);
 
@@ -152,7 +152,7 @@ public class HumanObject extends UnitObject {
      * @param unit 出现的单位
      */
     public void sendUnitAppear(Entity unit) {
-        UnitAppearBroadcast broadcast = new UnitAppearBroadcast();
+        SCUnitAppear broadcast = new SCUnitAppear();
         List<Unit> units = new ArrayList<>();
         Unit u = new Unit();
         u.setUnitId(unit.getEntityId());
@@ -182,32 +182,10 @@ public class HumanObject extends UnitObject {
      * @param unit 消失的单位
      */
     public void sendUnitDisappear(Entity unit) {
-        UnitDisappearBroadcast broadcast = new UnitDisappearBroadcast();
+        SCUnitDisappear broadcast = new SCUnitDisappear();
         List<Long> unitIds = new ArrayList<>();
         unitIds.add(unit.getEntityId());
         broadcast.setUnitIds(unitIds);
-
-        // 发送广播到客户端
-        sendMessage(broadcast);
-    }
-
-    /**
-     * 发送单位移动广播
-     * @param unitId 单位ID
-     * @param position 移动位置
-     */
-    public void sendUnitMove(long unitId, Vector3 position) {
-        UnitMoveBroadcast broadcast = new UnitMoveBroadcast();
-        broadcast.setUnitId(unitId);
-        
-        List<Position> positions = new ArrayList<>();
-        Position pos = new Position();
-        pos.setX(position.getX());
-        pos.setY(position.getY());
-        pos.setZ(position.getZ());
-        positions.add(pos);
-        
-        broadcast.setPosition(positions);
 
         // 发送广播到客户端
         sendMessage(broadcast);

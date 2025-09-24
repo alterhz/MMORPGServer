@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.game.core.event.IEvent;
 import org.game.core.event.StageEventDispatcher;
 import org.game.core.stage.StageModScanner;
-import org.game.proto.scene.EnterStageResponse;
+import org.game.proto.scene.SCEnterStage;
 import org.game.stage.event.EnterStageEvent;
 import org.game.stage.event.LeaveStageEvent;
 import org.game.stage.event.PulseEvent;
@@ -88,7 +88,7 @@ public class StageObject {
         if (entity instanceof HumanObject) {
             HumanObject humanObject = (HumanObject) entity;
 
-            EnterStageResponse enterStageResponse = new EnterStageResponse();
+            SCEnterStage enterStageResponse = new SCEnterStage();
             enterStageResponse.setStageSn(getStageSn());
             humanObject.sendMessage(enterStageResponse);
         }

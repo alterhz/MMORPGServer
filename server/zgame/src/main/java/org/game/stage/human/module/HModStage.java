@@ -26,22 +26,22 @@ public class HModStage extends HumanModBase {
         super(stageHumanObj);
     }
 
-    @ProtoListener(EnterStageRequest.class)
-    public void onEnterStage(EnterStageRequest enterStageRequest) {
+    @ProtoListener(CSEnterStage.class)
+    public void onEnterStage(CSEnterStage csEnterStage) {
         HumanObject humanObj = getHumanObj();
         StageObject stageObj = humanObj.getStageObj();
         stageObj.enterStage(humanObj);
     }
 
-    @ProtoListener(UnitMoveRequest.class)
-    public void onUnitMove(UnitMoveRequest moveRequest) {
+    @ProtoListener(CSMoveStart.class)
+    public void onUnitMove(CSMoveStart csMoveStart) {
         HumanObject humanObj = getHumanObj();
 
         // 创建目标位置
         Vector3 targetPosition = new Vector3(
-                (float) moveRequest.getX(),
-                (float) moveRequest.getY(),
-                (float) moveRequest.getZ()
+                (float) csMoveStart.getX(),
+                (float) csMoveStart.getY(),
+                (float) csMoveStart.getZ()
         );
 
         // 获取移动模块
@@ -49,18 +49,6 @@ public class HModStage extends HumanModBase {
         if (moveMod != null) {
             // 设置移动到目标点
             moveMod.moveTo(targetPosition);
-
-            // 发送移动响应
-            UnitMoveResponse response = new UnitMoveResponse();
-            response.setFix(false); // 不需要修正位置
-
-            Position pos = new Position();
-            pos.setX(moveRequest.getX());
-            pos.setY(moveRequest.getY());
-            pos.setZ(moveRequest.getZ());
-            response.setPosition(pos);
-
-            humanObj.sendMessage(response);
         }
     }
 
