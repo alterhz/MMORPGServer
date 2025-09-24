@@ -11,6 +11,8 @@ import org.game.core.db.MongoDBSyncClient;
 import org.game.core.event.HumanEventDispatcher;
 import org.game.core.event.PlayerEventDispatcher;
 import org.game.core.event.StageEventDispatcher;
+import org.game.core.event.UnitEventDispatcher;
+import org.game.core.event.UnitEventDispatcher;
 import org.game.core.player.PlayerProtoDispatcher;
 import org.game.core.player.PlayerThread;
 import org.game.core.message.ProtoScanner;
@@ -49,6 +51,7 @@ public class GameStartUp {
 
             // 初始化事件监听器
             StageEventDispatcher.getInstance().init();
+            UnitEventDispatcher.getInstance().init();
 
             // DB实体扫描
             DaoScanner.init();

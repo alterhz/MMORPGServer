@@ -1,19 +1,83 @@
 package org.game.stage.entity;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.game.core.event.EventListener;
+import org.game.core.event.IEvent;
+import org.game.core.event.UnitEventDispatcher;
+import org.game.core.stage.UModScanner;
 import org.game.stage.StageObject;
 import org.game.stage.human.HumanObject;
 import org.game.stage.module.Grid;
 import org.game.stage.module.SModAOI;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class UnitObject extends Entity {
+    private static final Logger logger = LogManager.getLogger(UnitObject.class);
+    
     // 当前所在的格子
     private Grid currentGrid;
+    
+    private final Map<Class<?>, UnitModBase> unitModBaseMap = new HashMap<>();
 
     public UnitObject(long entityId, StageObject stageObj) {
         super(entityId, stageObj);
+        initMods();
+    }
+
+    /**
+     * 初始化模块
+     */
+    private void initMods() {
+        List<Class<? extends UnitModBase>> unitModClasses = UModScanner.getStageUnitModClasses();
+        for (Class<? extends UnitModBase> modClass : unitModClasses) {
+            try {
+                // 使用带参数的构造函数创建实例
+                UnitModBase uModBase = modClass.getConstructor(UnitObject.class).newInstance(this);
+                unitModBaseMap.put(modClass, uModBase);
+            } catch (Exception e) {
+                logger.error("StageUnitModBase init error", e);
+            }
+        }
+        logger.info("{} 加载完成 {} 个StageUnitModBase", this, unitModClasses.size());
+    }
+
+    /**
+     * 获取模块
+     * @param clazz 模块类
+     * @param <T> 模块类型
+     * @return 模块实例
+     */
+    public <T extends UnitModBase> T getUMod(Class<T> clazz) {
+        return (T) unitModBaseMap.get(clazz);
+    }
+
+    /**
+     * 获取模块基础类
+     * @param clazz 模块类
+     * @return 模块基础实例
+     */
+    public UnitModBase getUModBase(Class<?> clazz) {
+        return unitModBaseMap.get(clazz);
+    }
+
+    /**
+     * 触发事件
+     * @param event 事件对象
+     */
+    public void fireEvent(IEvent event) {
+        String eventKey = event.getClass().getSimpleName().toLowerCase();
+        UnitEventDispatcher.getInstance().dispatch(eventKey, (method) -> {
+            // 根据method找到对应的mod实例
+            Class<?> modClass = method.getDeclaringClass();
+            return unitModBaseMap.get(modClass);
+        }, event);
     }
 
     /**
@@ -176,5 +240,19 @@ public abstract class UnitObject extends Entity {
     public void onLeaveStage(StageObject stageObj) {
         // 当单位离开场景时，离开当前格子
         leaveGrid(currentGrid);
+    }
+    
+    @Override
+    public void onPulse(long now) {
+        super.onPulse(now);
+        
+        unitModBaseMap.forEach((aClass, uModBase) -> uModBase.onPulse(now));
+    }
+    
+    @Override
+    public void onPulseSec(long now) {
+        super.onPulseSec(now);
+        
+        unitModBaseMap.forEach((aClass, uModBase) -> uModBase.onPulseSec(now));
     }
 }

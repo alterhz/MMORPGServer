@@ -83,7 +83,9 @@ public class HumanObject extends UnitObject {
     /**
      * HumanObject事件
      */
+    @Override
     public void fireEvent(IEvent event) {
+        super.fireEvent(event);
         String eventKey = event.getClass().getSimpleName().toLowerCase();
         HumanEventDispatcher.getInstance().dispatch(eventKey, method -> {
             Class<?> modClass = method.getDeclaringClass();
