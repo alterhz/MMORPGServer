@@ -93,6 +93,7 @@
     <Compile Include="Assets\Scripts\ZGame\UI\UIManager.cs" />
     <Compile Include="Assets\Scripts\GameInitializer.cs" />
     <Compile Include="Assets\Scripts\Proto\login\SCSelectPlayer.cs" />
+    <Compile Include="Assets\Scripts\Mod\ModStage.cs" />
     <Compile Include="Assets\Scripts\ZGame\Mod\ModScanner.cs" />
     <Compile Include="Assets\Scripts\Event\CreatePlayerEvent.cs" />
     <Compile Include="Assets\Scripts\Event\BalanceQueryResultEvent.cs" />
