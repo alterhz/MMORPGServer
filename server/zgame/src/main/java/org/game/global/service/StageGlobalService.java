@@ -13,7 +13,9 @@ import org.game.global.rpc.IStageGlobalService;
 import org.game.stage.rpc.IStageService;
 import org.game.stage.service.StageService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -212,7 +214,9 @@ public class StageGlobalService extends GameServiceBase implements IStageGlobalS
     @Override
     public void recycleTest() {
         long now = System.currentTimeMillis();
-        
+
+        List<Long> removeStageIds = new ArrayList<>();
+
         for (Map.Entry<Long, StageInfo> entry : stageInfos.entrySet()) {
             Long stageId = entry.getKey();
             StageInfo stageInfo = entry.getValue();
@@ -222,8 +226,16 @@ public class StageGlobalService extends GameServiceBase implements IStageGlobalS
                 now - stageInfo.lastActiveTime > STAGE_RECYCLE_TIME_THRESHOLD) {
                 
                 // 可以回收场景
-                stageInfos.remove(stageId);
+                removeStageIds.add(stageId);
                 logger.info("回收空闲场景: stageId={}", stageId);
+            }
+        }
+
+        for (Long stageId : removeStageIds) {
+            StageInfo stageInfo = stageInfos.remove(stageId);
+            if (stageInfo != null) {
+                // 删除场景信息
+                logger.info("删除场景信息: stageId={}", stageId);
             }
         }
     }
